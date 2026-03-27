@@ -12,6 +12,9 @@ export interface LocalGameState {
   tornadoActive: boolean;
   tornadoSeed: number | null;
   status: "playing" | "finished";
+  p1Attempts: number;
+  p1Streak: number;
+  p1MaxStreak: number;
 }
 
 // 8 animal emojis for pairs
@@ -59,6 +62,9 @@ export function initGame(): LocalGameState {
     tornadoActive: false,
     tornadoSeed: null,
     status: "playing",
+    p1Attempts: 0,
+    p1Streak: 0,
+    p1MaxStreak: 0,
   };
 }
 

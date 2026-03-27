@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "Memory Race",
-    "slug": "memory-race",
-    "version": "1.0.0",
+    "name": "Flipia",
+    "slug": "flipia",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "memory-race",
+    "scheme": "flipia",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.rdh36.memoryrace"
+      "bundleIdentifier": "com.rdh36.flipia"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,13 +23,11 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.rdh36.memoryrace"
+      "package": "com.rdh36.flipia"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-router"
-    ]
+    "plugins": ["expo-router"]
   }
 }

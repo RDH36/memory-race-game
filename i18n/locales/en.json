@@ -1,0 +1,164 @@
+{
+  "tabs": {
+    "home": "Play",
+    "leaderboard": "Leaderboard",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "home": {
+    "welcome": "Welcome",
+    "remaining": "+{{count}} remaining",
+    "chooseMode": "Choose a mode",
+    "myStats": "My stats",
+    "chooseDifficulty": "Choose difficulty",
+    "modes": {
+      "ranked": "Ranked Game",
+      "rankedDesc": "Face a real player online. Win or lose ELO.",
+      "rankedBadge": "±ELO · RANKED",
+      "solo": "vs AI",
+      "soloDesc": "Train against an AI. Choose the difficulty.",
+      "soloBadge": "NO ELO · SOLO",
+      "casual": "Casual",
+      "casualDesc": "Play without pressure, no ELO. Against a friend or random.",
+      "casualBadge": "NO ELO · FREE"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "easyDesc": "Distracted CPU",
+      "medium": "Normal",
+      "mediumDesc": "Smart CPU",
+      "hard": "Hard",
+      "hardDesc": "Unbeatable CPU"
+    }
+  },
+  "game": {
+    "menu": "Menu",
+    "ia": "AI",
+    "pairs": "PAIRS",
+    "you": "You",
+    "player": "Player"
+  },
+  "tornado": {
+    "used": "Tornado already used",
+    "available": "Tornado available",
+    "default": "Tornado",
+    "usedSub": "You can only use it once per game",
+    "availableSub": "Shuffle cards · End your turn",
+    "waitSub": "Wait for your turn to launch",
+    "launch": "Launch"
+  },
+  "feedback": {
+    "playerMatch": "Nice one!",
+    "cpuMatch": "CPU +1",
+    "playerMiss": "Missed!",
+    "cpuMiss": "Missed!"
+  },
+  "result": {
+    "header": "GAME OVER · VS AI",
+    "youWonTitle": "You",
+    "youWonHighlight": "won.",
+    "youLostTitle": "You",
+    "youLostHighlight": "lost.",
+    "drawTitle": "It's a",
+    "drawHighlight": "draw.",
+    "timePerPair": "Time / pair",
+    "precision": "Accuracy",
+    "tornadoUsed": "Tornado used",
+    "streak": "Streak",
+    "xpGained": "XP EARNED",
+    "rankUp": "Rank up!",
+    "rematch": "Rematch",
+    "newGame": "New",
+    "goHome": "Home"
+  },
+  "stats": {
+    "winRate": "Win rate",
+    "streak": "Streak",
+    "games": "Games"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "global": "Global",
+    "you": "You",
+    "xp": "XP",
+    "level": "Lv.",
+    "wins": "W",
+    "empty": "No players yet"
+  },
+  "profile": {
+    "title": "Profile",
+    "guest": "Guest",
+    "guestDesc": "Data stored locally",
+    "editNickname": "Edit nickname",
+    "nicknamePlaceholder": "Your nickname",
+    "linkEmail": "Link email",
+    "tapToChange": "Tap to change",
+    "level": "Level {{level}}",
+    "totalXp": "Total XP",
+    "gamesPlayed": "Games played",
+    "gamesWon": "Wins",
+    "bestStreak": "Best streak",
+    "currentStreak": "Current streak",
+    "winRate": "Win rate",
+    "rankProgress": "Rank progress",
+    "nextRank": "Next: {{rank}}",
+    "maxRank": "Max rank reached!",
+    "statsTitle": "Statistics",
+    "rankTitle": "Rank"
+  },
+  "ranks": {
+    "BRONZE": "Bronze",
+    "SILVER": "Silver",
+    "GOLD": "Gold",
+    "PLATINUM": "Platinum",
+    "DIAMOND": "Diamond",
+    "MASTER": "Master"
+  },
+  "auth": {
+    "protectTitle": "Protect my account",
+    "protectSubtitle": "Link your email to recover your data on another device.",
+    "emailPlaceholder": "your@email.com",
+    "sendCode": "Sign in",
+    "sendError": "Failed to send code",
+    "codeSent": "Code sent to {{email}}",
+    "codePlaceholder": "000000",
+    "verify": "Verify",
+    "invalidCode": "Invalid code",
+    "changeEmail": "Change email",
+    "successTitle": "Account protected!",
+    "successMessage": "Your data is linked to {{email}}. You can recover it on another device.",
+    "close": "Close",
+    "linked": "Account linked to",
+    "tagline": "Memorize.\nCompete.\nDominate!",
+    "loginWithEmail": "Continue with an email address",
+    "subtitle": "Enter your email to receive a 6-digit login code.",
+    "emailLabel": "EMAIL ADDRESS",
+    "continueGuest": "Continue as guest",
+    "guestWarning": "As a guest, <u>your ELO won't be saved</u>. You can create an account later.",
+    "legal": "By continuing, you accept our <conditions>Terms</conditions> and <privacy>Privacy Policy</privacy>.",
+    "or": "or",
+    "back": "Back"
+  },
+  "setup": {
+    "title": "Avatar",
+    "subtitle": "Choose your avatar and nickname",
+    "nicknameLabel": "Nickname",
+    "continue": "Let's go!",
+    "nicknameTaken": "This nickname is already taken",
+    "saveError": "Failed to save"
+  },
+  "avatarPicker": {
+    "title": "Choose your avatar"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Appearance",
+    "themeDesc": "Choose the app theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "language": "Language",
+    "languageDesc": "Choose the app language",
+    "comingSoon": "Coming soon"
+  }
+}

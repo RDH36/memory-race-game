@@ -6,15 +6,15 @@ import Animated, {
   withTiming,
   withSequence,
   withRepeat,
-  runOnJS,
+  Easing,
 } from 'react-native-reanimated';
+import { TornadoSprite } from './TornadoSprite';
 
 interface TornadoOverlayProps {
   onComplete: () => void;
 }
 
 const AnimatedView = Animated.createAnimatedComponent(View);
-const AnimatedText = Animated.createAnimatedComponent(Text);
 
 export function TornadoOverlay({ onComplete }: TornadoOverlayProps) {
   const screenWidth = Dimensions.get('window').width;
@@ -22,9 +22,9 @@ export function TornadoOverlay({ onComplete }: TornadoOverlayProps) {
 
   const warningScale = useSharedValue(1);
   const warningOpacity = useSharedValue(1);
-  const tornadoTranslateX = useSharedValue(-screenWidth);
+  const tornadoTranslateY = useSharedValue(-200);
   const tornadoOpacity = useSharedValue(0);
-  const overlayOpacity = useSharedValue(0.4);
+  const subtitleOpacity = useSharedValue(0);
 
   const warningScaleStyle = useAnimatedStyle(() => ({
     transform: [{ scale: warningScale.value }],
@@ -32,77 +32,67 @@ export function TornadoOverlay({ onComplete }: TornadoOverlayProps) {
   }));
 
   const tornadoStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: tornadoTranslateX.value }],
+    transform: [{ translateY: tornadoTranslateY.value }],
     opacity: tornadoOpacity.value,
   }));
 
-  const overlayStyle = useAnimatedStyle(() => ({
-    opacity: overlayOpacity.value,
+  const subtitleStyle = useAnimatedStyle(() => ({
+    opacity: subtitleOpacity.value,
   }));
 
   useEffect(() => {
-    // Phase 1: Warning banner with pulsing animation (0-800ms)
+    // Phase 1: Warning banner (0-800ms)
     warningScale.value = withRepeat(
       withSequence(
         withTiming(1.05, { duration: 400 }),
-        withTiming(1, { duration: 400 })
+        withTiming(1, { duration: 400 }),
       ),
       1,
-      false
+      false,
     );
 
-    // Phase 2 starts at 800ms: fade out warning and show tornado
+    // Phase 2 (800ms): tornado slides top → bottom
     const phase2Timer = setTimeout(() => {
       warningOpacity.value = withTiming(0, { duration: 200 });
-      tornadoOpacity.value = withTiming(1, { duration: 200 });
-      tornadoTranslateX.value = withTiming(screenWidth + 100, {
-        duration: 1200,
+      tornadoOpacity.value = withTiming(1, { duration: 150 });
+      subtitleOpacity.value = withTiming(0.8, { duration: 300 });
+      tornadoTranslateY.value = withTiming(screenHeight + 200, {
+        duration: 8000,
+        easing: Easing.linear,
       });
     }, 800);
 
-    // Phase 3 starts at 2000ms: fade everything out
+    // Phase 3: fade out
     const phase3Timer = setTimeout(() => {
-      overlayOpacity.value = withTiming(0, { duration: 300 });
       tornadoOpacity.value = withTiming(0, { duration: 300 });
-    }, 2000);
+      subtitleOpacity.value = withTiming(0, { duration: 200 });
+    }, 8800);
 
-    // Call onComplete at 2300ms
     const completeTimer = setTimeout(() => {
       onComplete();
-    }, 2300);
+    }, 9100);
 
     return () => {
       clearTimeout(phase2Timer);
       clearTimeout(phase3Timer);
       clearTimeout(completeTimer);
     };
-  }, [
-    warningScale,
-    warningOpacity,
-    tornadoTranslateX,
-    tornadoOpacity,
-    overlayOpacity,
-    onComplete,
-    screenWidth,
-  ]);
+  }, []);
 
   return (
-    <AnimatedView
-      style={[
-        overlayStyle,
-        {
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: screenWidth,
-          height: screenHeight,
-          backgroundColor: '#000000',
-          justifyContent: 'center',
-          alignItems: 'center',
-        },
-      ]}
+    <View
+      pointerEvents="none"
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: screenWidth,
+        height: screenHeight,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
     >
-      {/* Warning Banner - Phase 1 */}
+      {/* Warning Banner */}
       <AnimatedView
         style={[
           warningScaleStyle,
@@ -112,50 +102,52 @@ export function TornadoOverlay({ onComplete }: TornadoOverlayProps) {
             paddingHorizontal: 32,
             paddingVertical: 16,
             borderRadius: 16,
+            zIndex: 10,
+            shadowColor: '#1A1C17',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 12,
+            elevation: 8,
           },
         ]}
       >
-        <Text
-          style={{
-            color: '#FFFFFF',
-            fontSize: 24,
-            fontWeight: '700',
-          }}
-        >
+        <Text style={{ color: '#FFFFFF', fontSize: 24, fontFamily: 'Fredoka_700Bold' }}>
           ⚠️ Tornade !
         </Text>
       </AnimatedView>
 
-      {/* Tornado with text - Phase 2 */}
+      {/* Tornado Sprite */}
       <AnimatedView
         style={[
           tornadoStyle,
           {
             position: 'absolute',
+            left: screenWidth / 2 - 76,
             alignItems: 'center',
-            gap: 16,
           },
         ]}
       >
-        <Text
-          style={{
-            fontSize: 56,
-          }}
-        >
-          🌪️
-        </Text>
-        <Text
-          style={{
-            color: '#FFFFFF',
-            fontSize: 14,
-            fontWeight: '500',
+        <TornadoSprite />
+      </AnimatedView>
+
+      {/* Subtitle */}
+      <AnimatedView
+        style={[
+          subtitleStyle,
+          {
             position: 'absolute',
-            bottom: -30,
-          }}
-        >
+            bottom: screenHeight * 0.15,
+            backgroundColor: 'rgba(83, 74, 183, 0.85)',
+            paddingHorizontal: 20,
+            paddingVertical: 8,
+            borderRadius: 12,
+          },
+        ]}
+      >
+        <Text style={{ color: '#FFFFFF', fontSize: 14, fontFamily: 'Nunito_600SemiBold' }}>
           Les cartes se mélangent...
         </Text>
       </AnimatedView>
-    </AnimatedView>
+    </View>
   );
 }

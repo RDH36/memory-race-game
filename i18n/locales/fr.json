@@ -1,0 +1,164 @@
+{
+  "tabs": {
+    "home": "Jouer",
+    "leaderboard": "Classement",
+    "settings": "Paramètres",
+    "profile": "Profil"
+  },
+  "home": {
+    "welcome": "Bienvenue",
+    "remaining": "+{{count}} restant",
+    "chooseMode": "Choisir un mode",
+    "myStats": "Mes stats",
+    "chooseDifficulty": "Choisis la difficulté",
+    "modes": {
+      "ranked": "Partie classée",
+      "rankedDesc": "Affronte un joueur réel en ligne. Gagne ou perds de l'ELO.",
+      "rankedBadge": "±ELO · RANKED",
+      "solo": "vs Intelligence A.",
+      "soloDesc": "Entraîne-toi contre une IA. Choisis la difficulté.",
+      "soloBadge": "SANS ELO · SOLO",
+      "casual": "Casual",
+      "casualDesc": "Joue sans pression, sans ELO. Contre un ami ou un random.",
+      "casualBadge": "SANS ELO · LIBRE"
+    },
+    "difficulty": {
+      "easy": "Facile",
+      "easyDesc": "CPU distrait",
+      "medium": "Normal",
+      "mediumDesc": "CPU malin",
+      "hard": "Difficile",
+      "hardDesc": "CPU imbattable"
+    }
+  },
+  "game": {
+    "menu": "Menu",
+    "ia": "IA",
+    "pairs": "PAIRES",
+    "you": "Toi",
+    "player": "Joueur"
+  },
+  "tornado": {
+    "used": "Tornade déjà utilisée",
+    "available": "Tornade disponible",
+    "default": "Tornade",
+    "usedSub": "Tu ne peux l'utiliser qu'une fois par partie",
+    "availableSub": "Mélange les cartes · Termine ton tour",
+    "waitSub": "Attends ton tour pour lancer",
+    "launch": "Lancer"
+  },
+  "feedback": {
+    "playerMatch": "Bien joué !",
+    "cpuMatch": "CPU +1",
+    "playerMiss": "Raté !",
+    "cpuMiss": "Raté !"
+  },
+  "result": {
+    "header": "PARTIE TERMINÉE · VS IA",
+    "youWonTitle": "Tu as",
+    "youWonHighlight": "gagné.",
+    "youLostTitle": "Tu as",
+    "youLostHighlight": "perdu.",
+    "drawTitle": "C'est une",
+    "drawHighlight": "égalité.",
+    "timePerPair": "Temps / paire",
+    "precision": "Précision",
+    "tornadoUsed": "Tornade utilisée",
+    "streak": "Streak",
+    "xpGained": "XP GAGNÉS",
+    "rankUp": "Rang supérieur !",
+    "rematch": "Revanche",
+    "newGame": "Nouvelle",
+    "goHome": "Accueil"
+  },
+  "stats": {
+    "winRate": "Win rate",
+    "streak": "Streak",
+    "games": "Parties"
+  },
+  "leaderboard": {
+    "title": "Classement",
+    "global": "Global",
+    "you": "Toi",
+    "xp": "XP",
+    "level": "Nv.",
+    "wins": "V",
+    "empty": "Aucun joueur pour le moment"
+  },
+  "profile": {
+    "title": "Profil",
+    "guest": "Invité",
+    "guestDesc": "Données stockées localement",
+    "editNickname": "Modifier le pseudo",
+    "nicknamePlaceholder": "Ton pseudo",
+    "linkEmail": "Lier un email",
+    "tapToChange": "Appuie pour changer",
+    "level": "Niveau {{level}}",
+    "totalXp": "XP Total",
+    "gamesPlayed": "Parties jouées",
+    "gamesWon": "Victoires",
+    "bestStreak": "Meilleur streak",
+    "currentStreak": "Streak actuel",
+    "winRate": "Win rate",
+    "rankProgress": "Progression de rang",
+    "nextRank": "Prochain : {{rank}}",
+    "maxRank": "Rang max atteint !",
+    "statsTitle": "Statistiques",
+    "rankTitle": "Rang"
+  },
+  "ranks": {
+    "BRONZE": "Bronze",
+    "SILVER": "Argent",
+    "GOLD": "Or",
+    "PLATINUM": "Platine",
+    "DIAMOND": "Diamant",
+    "MASTER": "Maître"
+  },
+  "auth": {
+    "protectTitle": "Protéger mon compte",
+    "protectSubtitle": "Lie ton email pour retrouver tes données sur un autre appareil.",
+    "emailPlaceholder": "ton@email.com",
+    "sendCode": "Se connecter",
+    "sendError": "Impossible d'envoyer le code",
+    "codeSent": "Code envoyé à {{email}}",
+    "codePlaceholder": "000000",
+    "verify": "Vérifier",
+    "invalidCode": "Code invalide",
+    "changeEmail": "Changer d'email",
+    "successTitle": "Compte protégé !",
+    "successMessage": "Tes données sont liées à {{email}}. Tu pourras les retrouver sur un autre appareil.",
+    "close": "Fermer",
+    "linked": "Compte lié à",
+    "tagline": "Mémorise.\nAffronte.\nDomine !",
+    "loginWithEmail": "Continuer avec une adresse e-mail",
+    "subtitle": "Entre ton email pour recevoir un code de connexion à 6 chiffres.",
+    "emailLabel": "ADRESSE EMAIL",
+    "continueGuest": "Continuer en tant qu'invité",
+    "guestWarning": "En tant qu'invité, <u>ton ELO ne sera pas sauvegardé</u>. Tu pourras créer un compte plus tard.",
+    "legal": "En continuant, tu acceptes nos <conditions>Conditions</conditions> et notre <privacy>Politique de confidentialité</privacy>.",
+    "or": "ou",
+    "back": "Retour"
+  },
+  "setup": {
+    "title": "Avatar",
+    "subtitle": "Choisis ton avatar et ton pseudo",
+    "nicknameLabel": "Pseudo",
+    "continue": "C'est parti !",
+    "nicknameTaken": "Ce pseudo est déjà pris",
+    "saveError": "Erreur lors de la sauvegarde"
+  },
+  "avatarPicker": {
+    "title": "Choisis ton avatar"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "theme": "Apparence",
+    "themeDesc": "Choisis le thème de l'application",
+    "themeSystem": "Système",
+    "themeLight": "Clair",
+    "themeDark": "Sombre",
+    "language": "Langue",
+    "languageDesc": "Choisis la langue de l'application",
+    "comingSoon": "Bientôt disponible"
+  }
+}

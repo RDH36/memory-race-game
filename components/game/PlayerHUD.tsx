@@ -1,169 +1,128 @@
-import { useEffect } from 'react';
 import { Text, View } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-} from 'react-native-reanimated';
+import { shadows } from '../ui/theme';
+import { useTheme } from '../../lib/ThemeContext';
 
-interface PlayerHUDProps {
-  scores: { p1: number; p2: number };
-  tornadoUsed: { p1: boolean; p2: boolean };
-  currentTurn: 1 | 2;
+interface OpponentCardProps {
+  name: string;
+  subtitle: string;
+  avatar: string;
+  pairsMatched: number;
+  totalPairs: number;
+  isActive: boolean;
+  timerSeconds: number;
 }
 
-const AnimatedView = Animated.createAnimatedComponent(View);
-
-export function PlayerHUD({
-  scores,
-  tornadoUsed,
-  currentTurn,
-}: PlayerHUDProps) {
-  const p1PulseOpacity = useSharedValue(1);
-  const p2PulseOpacity = useSharedValue(1);
-
-  useEffect(() => {
-    if (currentTurn === 1) {
-      p1PulseOpacity.value = withRepeat(
-        withTiming(0.5, { duration: 500 }),
-        -1,
-        true
-      );
-      p2PulseOpacity.value = 1;
-    } else {
-      p2PulseOpacity.value = withRepeat(
-        withTiming(0.5, { duration: 500 }),
-        -1,
-        true
-      );
-      p1PulseOpacity.value = 1;
-    }
-  }, [currentTurn, p1PulseOpacity, p2PulseOpacity]);
-
-  const p1PulseStyle = useAnimatedStyle(() => ({
-    opacity: p1PulseOpacity.value,
-  }));
-
-  const p2PulseStyle = useAnimatedStyle(() => ({
-    opacity: p2PulseOpacity.value,
-  }));
-
+function ProgressDots({ filled, total }: { filled: number; total: number }) {
+  const { colors, isDark } = useTheme();
   return (
-    <View className="bg-white rounded-xl shadow-md px-4 py-4">
+    <View style={{ flexDirection: 'row', gap: 4 }}>
+      {Array.from({ length: total }, (_, i) => (
+        <View
+          key={i}
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: i < filled ? colors.primaryContainer : isDark ? '#333' : '#E8E4E4',
+          }}
+        />
+      ))}
+    </View>
+  );
+}
+
+function formatTime(seconds: number) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+export function OpponentCard({
+  name,
+  subtitle,
+  avatar,
+  pairsMatched,
+  totalPairs,
+  isActive,
+  timerSeconds,
+}: OpponentCardProps) {
+  const { colors, isDark } = useTheme();
+  return (
+    <View
+      style={{
+        backgroundColor: colors.surfaceContainer,
+        borderRadius: 16,
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        ...shadows.ambient,
+      }}
+    >
+      {/* Timer */}
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 16,
+          backgroundColor: isActive ? colors.primaryContainerBg : isDark ? '#2A2A2A' : '#F5F2F2',
+          paddingHorizontal: 10,
+          paddingVertical: 6,
+          borderRadius: 10,
         }}
       >
-        {/* Player 1 */}
-        <View
-          className={
-            currentTurn === 1
-              ? 'flex-1 bg-[#E6F1FB] rounded-lg px-4 py-3 border-l-4'
-              : 'flex-1 bg-white rounded-lg px-4 py-3'
-          }
-          style={
-            currentTurn === 1
-              ? { borderLeftColor: '#378ADD' }
-              : undefined
-          }
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: 'Fredoka_600SemiBold',
+            color: isActive ? colors.primaryContainer : colors.onSurfaceVariant,
+          }}
         >
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 8,
-              marginBottom: 8,
-            }}
-          >
-            <Text className="font-medium text-sm" style={{ color: '#378ADD' }}>
-              Joueur
-            </Text>
-            {currentTurn === 1 && (
-              <AnimatedView
-                style={[
-                  p1PulseStyle,
-                  {
-                    width: 8,
-                    height: 8,
-                    borderRadius: 4,
-                    backgroundColor: '#1D9E75',
-                  },
-                ]}
-              />
-            )}
-          </View>
-          <Text className="font-medium text-3xl mb-3" style={{ color: '#378ADD' }}>
-            {scores.p1}
-          </Text>
-          <Text style={{ color: tornadoUsed.p1 ? '#D0D0C8' : '#000' }}>
-            🌪️
-          </Text>
-        </View>
+          {formatTime(timerSeconds)}
+        </Text>
+      </View>
 
-        {/* VS */}
-        <View className="items-center justify-center">
-          <Text className="font-bold text-lg" style={{ color: '#999999' }}>
-            VS
-          </Text>
-        </View>
+      {/* Dots */}
+      <ProgressDots filled={pairsMatched} total={totalPairs} />
 
-        {/* Player 2 */}
-        <View
-          className={
-            currentTurn === 2
-              ? 'flex-1 bg-[#FAECE7] rounded-lg px-4 py-3 border-r-4'
-              : 'flex-1 bg-white rounded-lg px-4 py-3'
-          }
-          style={
-            currentTurn === 2
-              ? { borderRightColor: '#D85A30' }
-              : undefined
-          }
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 8,
-              marginBottom: 8,
-              justifyContent: 'flex-end',
-            }}
-          >
-            <Text className="font-medium text-sm" style={{ color: '#D85A30' }}>
-              CPU
-            </Text>
-            {currentTurn === 2 && (
-              <AnimatedView
-                style={[
-                  p2PulseStyle,
-                  {
-                    width: 8,
-                    height: 8,
-                    borderRadius: 4,
-                    backgroundColor: '#1D9E75',
-                  },
-                ]}
-              />
-            )}
-          </View>
-          <Text
-            className="font-medium text-3xl mb-3 text-right"
-            style={{ color: '#D85A30' }}
-          >
-            {scores.p2}
+      {/* Spacer */}
+      <View style={{ flex: 1 }} />
+
+      {/* Name + ELO */}
+      <View style={{ alignItems: 'flex-end' }}>
+        <Text style={{ fontSize: 14, fontFamily: 'Fredoka_600SemiBold', color: colors.onSurface }}>
+          {name}
+        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 }}>
+          {isActive && (
+            <View
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: 3,
+                backgroundColor: colors.success,
+              }}
+            />
+          )}
+          <Text style={{ fontSize: 11, fontFamily: 'Nunito_400Regular', color: colors.onSurfaceVariant }}>
+            {subtitle}
           </Text>
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text style={{ color: tornadoUsed.p2 ? '#D0D0C8' : '#000' }}>
-              🌪️
-            </Text>
-          </View>
         </View>
+      </View>
+
+      {/* Avatar */}
+      <View
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: 12,
+          backgroundColor: colors.p2Bg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text style={{ fontSize: 22 }}>{avatar}</Text>
       </View>
     </View>
   );
 }
+
+export { ProgressDots, formatTime };

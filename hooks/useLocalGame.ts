@@ -11,11 +11,20 @@ import { CpuMemory, cpuDecide, updateMemory } from "../lib/cpuLogic";
 
 const FLIP_DELAY = 800;
 const CPU_DELAY = 600;
+const FEEDBACK_DURATION = 900;
+
+export type MatchResult = {
+  type: "match" | "mismatch";
+  player: 1 | 2;
+  cards: [number, number];
+} | null;
 
 export function useLocalGame(difficulty: CpuDifficulty) {
   const [game, setGame] = useState<LocalGameState>(initGame);
+  const [lastMatchResult, setLastMatchResult] = useState<MatchResult>(null);
   const cpuMemoryRef = useRef<CpuMemory>({});
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const update = useCallback(
     (patch: Partial<LocalGameState>) =>
@@ -78,21 +87,42 @@ export function useLocalGame(difficulty: CpuDifficulty) {
           [player]: game.scores[player] + 1,
         };
         const finished = isGameFinished(newMatchedBy);
+        setLastMatchResult({ type: "match", player: game.currentTurn, cards: [a, b] });
+
+        // Track P1 stats
+        const isP1 = game.currentTurn === 1;
+        const newStreak = isP1 ? game.p1Streak + 1 : game.p1Streak;
+        const newMaxStreak = isP1 ? Math.max(game.p1MaxStreak, newStreak) : game.p1MaxStreak;
+
         update({
           matchedBy: newMatchedBy,
           scores: newScores,
           selected: [],
           locked: false,
           status: finished ? "finished" : "playing",
+          ...(isP1 && {
+            p1Attempts: game.p1Attempts + 1,
+            p1Streak: newStreak,
+            p1MaxStreak: newMaxStreak,
+          }),
         });
       } else {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        setLastMatchResult({ type: "mismatch", player: game.currentTurn, cards: [a, b] });
+
+        const isP1 = game.currentTurn === 1;
         update({
           selected: [],
           locked: false,
           currentTurn: game.currentTurn === 1 ? 2 : 1,
+          ...(isP1 && {
+            p1Attempts: game.p1Attempts + 1,
+            p1Streak: 0,
+          }),
         });
       }
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = setTimeout(() => setLastMatchResult(null), FEEDBACK_DURATION);
     }, FLIP_DELAY);
 
     return () => {
@@ -228,6 +258,7 @@ export function useLocalGame(difficulty: CpuDifficulty) {
 
   return {
     game,
+    lastMatchResult,
     handleCardPress,
     handleTornado,
     handleTornadoComplete,

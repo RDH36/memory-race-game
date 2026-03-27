@@ -1,5 +1,5 @@
 {
-  "name": "memory-race",
+  "name": "flipia",
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
@@ -9,15 +9,27 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/fredoka": "^0.4.1",
+    "@expo-google-fonts/nunito": "^0.4.2",
+    "@instantdb/react-native": "^0.22.171",
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-community/netinfo": "^12.0.1",
     "expo": "~55.0.8",
+    "expo-font": "^55.0.4",
     "expo-haptics": "^55.0.9",
+    "expo-localization": "^55.0.9",
     "expo-router": "^55.0.7",
+    "expo-splash-screen": "^55.0.12",
     "expo-status-bar": "~55.0.4",
     "expo-system-ui": "^55.0.10",
+    "i18next": "^25.10.10",
     "nativewind": "^4.2.3",
     "react": "19.2.0",
+    "react-i18next": "^16.6.6",
     "react-native": "0.83.2",
     "react-native-gesture-handler": "^2.30.0",
+    "react-native-get-random-values": "^2.0.0",
+    "react-native-keyboard-controller": "^1.21.2",
     "react-native-reanimated": "^4.3.0",
     "react-native-safe-area-context": "^5.7.0",
     "react-native-screens": "^4.24.0",
@@ -25,6 +37,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "instant-cli": "^0.22.171",
     "tailwindcss": "^3.4.19",
     "typescript": "~5.9.2"
   },

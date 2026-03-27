@@ -1,68 +1,89 @@
 import { Pressable, Text, View } from 'react-native';
-import { useCallback, useState } from 'react';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../lib/ThemeContext';
 
 interface ActionBarProps {
   canUseTornado: boolean;
+  tornadoUsed: boolean;
   onTornado: () => void;
 }
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+export function ActionBar({ canUseTornado, tornadoUsed, onTornado }: ActionBarProps) {
+  const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
 
-export function ActionBar({ canUseTornado, onTornado }: ActionBarProps) {
-  const scale = useSharedValue(1);
-  const [isPressed, setIsPressed] = useState(false);
+  const title = tornadoUsed
+    ? `🌪️ ${t('tornado.used')}`
+    : canUseTornado
+      ? `🌪️ ${t('tornado.available')}`
+      : `🌪️ ${t('tornado.default')}`;
 
-  const scaleStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const handlePressIn = useCallback(() => {
-    if (canUseTornado) {
-      setIsPressed(true);
-      scale.value = withTiming(0.95, { duration: 100 });
-    }
-  }, [canUseTornado, scale]);
-
-  const handlePressOut = useCallback(() => {
-    setIsPressed(false);
-    scale.value = withTiming(1, { duration: 100 });
-  }, [scale]);
-
-  const handlePress = useCallback(() => {
-    if (canUseTornado) {
-      onTornado();
-    }
-  }, [canUseTornado, onTornado]);
+  const subtitle = tornadoUsed
+    ? t('tornado.usedSub')
+    : canUseTornado
+      ? t('tornado.availableSub')
+      : t('tornado.waitSub');
 
   return (
-    <View className="px-4 py-4 items-center justify-center">
-      <AnimatedPressable
-        onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        disabled={!canUseTornado}
-        style={[scaleStyle]}
-        className={
-          canUseTornado
-            ? 'bg-[#534AB7] rounded-xl px-6 py-3'
-            : 'bg-gray-300 rounded-xl px-6 py-3'
-        }
-      >
+    <View
+      style={{
+        backgroundColor: colors.surfaceContainer,
+        borderRadius: 16,
+        paddingVertical: 12,
+        paddingLeft: 16,
+        paddingRight: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        opacity: tornadoUsed ? 0.5 : 1,
+        shadowColor: colors.shadow,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.04,
+        shadowRadius: 20,
+        elevation: 2,
+      }}
+    >
+      <View style={{ flex: 1 }}>
         <Text
-          className="font-medium text-base"
           style={{
-            color: canUseTornado ? '#FFFFFF' : '#9CA3AF',
-            opacity: canUseTornado ? 1 : 0.4,
+            fontSize: 14,
+            fontFamily: 'Fredoka_600SemiBold',
+            color: canUseTornado ? colors.onSurface : colors.onSurfaceVariant,
           }}
         >
-          🌪️ Lancer tornade
+          {title}
         </Text>
-      </AnimatedPressable>
+        <Text style={{ fontSize: 11, fontFamily: 'Nunito_400Regular', color: colors.onSurfaceVariant, marginTop: 2 }}>
+          {subtitle}
+        </Text>
+      </View>
+
+      {!tornadoUsed && (
+        <View
+          style={{
+            backgroundColor: canUseTornado ? colors.primaryContainer : isDark ? '#333' : '#D5D1D1',
+            borderRadius: 12,
+            overflow: 'hidden',
+          }}
+        >
+          <Pressable
+            onPress={onTornado}
+            disabled={!canUseTornado}
+            android_ripple={{ color: 'rgba(255,255,255,0.2)' }}
+            style={{ paddingHorizontal: 24, paddingVertical: 14 }}
+          >
+            <Text
+              style={{
+                color: canUseTornado ? '#FFFFFF' : colors.onSurfaceVariant,
+                fontSize: 15,
+                fontFamily: 'Nunito_700Bold',
+              }}
+            >
+              🌪️ {t('tornado.launch')}
+            </Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }
