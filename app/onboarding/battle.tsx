@@ -44,6 +44,14 @@ export default function BattleScreen() {
   const keyRef = useRef(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Refs to avoid stale closures in resolve/cpuTurn chains
+  const matchedByRef = useRef(matchedBy);
+  matchedByRef.current = matchedBy;
+  const scoreP1Ref = useRef(scoreP1);
+  scoreP1Ref.current = scoreP1;
+  const scoreP2Ref = useRef(scoreP2);
+  scoreP2Ref.current = scoreP2;
+
   const showTooltip = useCallback((text: string, type: TooltipData["type"]) => {
     keyRef.current += 1;
     setTooltip({ text, type, key: keyRef.current });
@@ -68,15 +76,18 @@ export default function BattleScreen() {
   const resolve = useCallback((a: number, b: number, player: 1 | 2) => {
     if (EMOJIS[a] === EMOJIS[b]) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      const next = [...matchedBy];
+      const next = [...matchedByRef.current];
       next[a] = player;
       next[b] = player;
       setMatchedBy(next);
+      matchedByRef.current = next;
       setLastMatch({ cards: [a, b], type: "match", player });
 
-      const newP1 = player === 1 ? scoreP1 + 1 : scoreP1;
-      const newP2 = player === 2 ? scoreP2 + 1 : scoreP2;
+      const newP1 = player === 1 ? scoreP1Ref.current + 1 : scoreP1Ref.current;
+      const newP2 = player === 2 ? scoreP2Ref.current + 1 : scoreP2Ref.current;
       if (player === 1) setScoreP1(newP1); else setScoreP2(newP2);
+      scoreP1Ref.current = newP1;
+      scoreP2Ref.current = newP2;
 
       if (newP1 + newP2 >= TOTAL_PAIRS) { goToResult(newP1, newP2); return; }
 
@@ -93,17 +104,17 @@ export default function BattleScreen() {
         lockedRef.current = false;
         if (player === 1) {
           setTurn(2);
-          setTimeout(() => cpuTurn(matchedBy), 800);
+          setTimeout(() => cpuTurn(matchedByRef.current), 800);
         } else {
           setTurn(1);
           showTooltip(t("onboarding.battle.yourTurn"), "info");
         }
       }, 900);
     }
-  }, [matchedBy, scoreP1, scoreP2]);
+  }, []);
 
   const handleCardPress = useCallback((cardId: number) => {
-    if (lockedRef.current || turn !== 1 || matchedBy[cardId] !== -1 || selected.includes(cardId)) return;
+    if (lockedRef.current || turn !== 1 || matchedByRef.current[cardId] !== -1 || selected.includes(cardId)) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const nextSelected = [...selected, cardId];
     setSelected(nextSelected);
@@ -111,7 +122,7 @@ export default function BattleScreen() {
       lockedRef.current = true;
       setTimeout(() => resolve(nextSelected[0], nextSelected[1], 1), 500);
     }
-  }, [turn, selected, matchedBy]);
+  }, [turn, selected]);
 
   const cpuTurn = useCallback((currentMatchedBy: number[]) => {
     showTooltip(t("onboarding.battle.cpuTurn"), "info");

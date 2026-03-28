@@ -1,10 +1,12 @@
 import { ActivityIndicator, Pressable, View, Text, ViewStyle } from "react-native";
+import { ReactNode } from "react";
 import { radii } from "./theme";
 import { useTheme } from "../../lib/ThemeContext";
 
 interface ButtonProps {
   text: string;
   icon?: string;
+  iconNode?: ReactNode;
   onPress: () => void;
   variant?: "primary" | "secondary" | "ghost";
   loading?: boolean;
@@ -16,6 +18,7 @@ interface ButtonProps {
 export function Button({
   text,
   icon,
+  iconNode,
   onPress,
   variant = "primary",
   loading,
@@ -60,7 +63,7 @@ export function Button({
             <ActivityIndicator size="small" color={textColor} />
           ) : (
             <>
-              {icon && <Text style={{ fontSize: 16 }}>{icon}</Text>}
+              {iconNode ?? (icon && <Text style={{ fontSize: 16 }}>{icon}</Text>)}
               <Text style={{ color: textColor, fontSize: 14, fontFamily: "Nunito_700Bold" }}>
                 {text}
               </Text>

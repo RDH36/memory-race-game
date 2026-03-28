@@ -8,7 +8,7 @@ import { Card } from "../ui/Card";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { useCurrentUser, saveProfile } from "../../lib/identity";
-import { EmailLinkSheet } from "./EmailLinkSheet";
+import { GoogleLinkSheet } from "./GoogleLinkSheet";
 
 export function ProfileHeader() {
   const { t } = useTranslation();
@@ -17,7 +17,7 @@ export function ProfileHeader() {
   const { stats, avatar, nickname, profileId, userId, level } = usePlayerStats();
   const { user } = useCurrentUser();
 
-  const [showEmail, setShowEmail] = useState(false);
+  const [showGoogle, setShowGoogle] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
 
@@ -84,16 +84,16 @@ export function ProfileHeader() {
           </Text>
         ) : (
           <Pressable
-            onPress={() => setShowEmail(true)}
+            onPress={() => setShowGoogle(true)}
             style={{
               flexDirection: "row", alignItems: "center", gap: 6,
               backgroundColor: colors.primaryContainerBg,
               paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10,
             }}
           >
-            <Ionicons name="mail-outline" size={14} color={colors.primaryContainer} />
+            <Ionicons name="logo-google" size={14} color={colors.primaryContainer} />
             <Text style={{ fontSize: 13, fontFamily: "Nunito_600SemiBold", color: colors.primaryContainer }}>
-              {t("profile.linkEmail")}
+              {t("profile.linkGoogle")}
             </Text>
           </Pressable>
         )}
@@ -113,7 +113,7 @@ export function ProfileHeader() {
         </View>
       </Card>
 
-      <EmailLinkSheet visible={showEmail} onClose={() => setShowEmail(false)} />
+      <GoogleLinkSheet visible={showGoogle} onClose={() => setShowGoogle(false)} />
     </>
   );
 }

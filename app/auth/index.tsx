@@ -1,22 +1,21 @@
 import { useState, useEffect } from "react";
-import { View, Text, TextInput, Keyboard } from "react-native";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import { View, Text, Keyboard } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, {
-  FadeIn, FadeInDown, SlideInRight, SlideOutLeft,
+  FadeIn, FadeInDown,
   useSharedValue, useAnimatedStyle, withTiming, withDelay,
   withSequence, withSpring, interpolate, runOnJS,
 } from "react-native-reanimated";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { db } from "@/lib/instant";
 import { useTheme } from "@/lib/ThemeContext";
 import { radii } from "../../components/ui/theme";
 import { Button } from "@/components/ui/Button";
-
-type Step = "email" | "code";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 
 const SHUFFLE_EMOJIS = ["🦁", "🌸", "⚡", "🎲", "🍕", "🚀"];
 
@@ -170,24 +169,43 @@ function HeroCards() {
   );
 }
 
+GoogleSignin.configure({
+  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+});
+
 export default function AuthScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors } = useTheme();
 
-  const [step, setStep] = useState<Step>("email");
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [guestLoading, setGuestLoading] = useState(false);
   const [error, setError] = useState("");
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
-  useEffect(() => {
-    const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
-    const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
-    return () => { showSub.remove(); hideSub.remove(); };
-  }, []);
+  const handleGoogle = async () => {
+    setGoogleLoading(true);
+    setError("");
+    try {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      if (response.type === "cancelled") {
+        setGoogleLoading(false);
+        return;
+      }
+      const idToken = response.data?.idToken;
+      if (!idToken) throw new Error("No idToken");
+      await db.auth.signInWithIdToken({
+        clientName: "google-auth",
+        idToken,
+      });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.replace("/");
+    } catch (err: any) {
+      setError(err.body?.message ?? err.message ?? t("auth.googleError"));
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   const handleGuest = async () => {
     setGuestLoading(true);
@@ -200,49 +218,16 @@ export default function AuthScreen() {
     }
   };
 
-  const handleSendCode = async () => {
-    if (!email.trim()) return;
-    setLoading(true);
-    setError("");
-    try {
-      await db.auth.sendMagicCode({ email: email.trim() });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setStep("code");
-    } catch (err: any) {
-      setError(err.body?.message ?? t("auth.sendError"));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyCode = async () => {
-    if (!code.trim()) return;
-    setLoading(true);
-    setError("");
-    try {
-      await db.auth.signInWithMagicCode({ email: email.trim(), code: code.trim() });
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.replace("/auth/setup");
-    } catch (err: any) {
-      setError(err.body?.message ?? t("auth.invalidCode"));
-      setCode("");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const tagline = t("auth.tagline");
   const taglineLines = tagline.split("\n");
   const lastLine = taglineLines[taglineLines.length - 1];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
-      {/* Hero — centered, shifts up when keyboard open */}
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32, paddingTop: keyboardVisible ? 20 : 140 }}>
-        {/* Flip cards — start side by side, then stack like app icon */}
+      {/* Hero — centered */}
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32, paddingTop: 140 }}>
         <HeroCards />
 
-        {/* Tagline */}
         <Animated.Text
           entering={FadeInDown.delay(800).duration(500)}
           style={{
@@ -250,136 +235,49 @@ export default function AuthScreen() {
             textAlign: "center",
           }}
         >
-          {taglineLines.slice(0, -1).join(" · ")}{" "}
+          {taglineLines.slice(0, -1).join(" · ")} ·{" "}
           <Text style={{ color: colors.primaryContainer }}>{lastLine}</Text>
         </Animated.Text>
       </View>
 
-      {/* Form — pinned at bottom, moves with keyboard */}
-     <KeyboardAvoidingView behavior="padding">
+      {/* Auth buttons — pinned at bottom */}
       <View style={{ paddingHorizontal: 24, paddingBottom: 8 }}>
-        {step === "email" && (
-          <Animated.View
-            entering={FadeIn.duration(300)}
-            exiting={SlideOutLeft.duration(200)}
-            style={{ gap: 12 }}
-          >
-            <TextInput
-              placeholder={t("auth.emailPlaceholder")}
-              placeholderTextColor={colors.onSurfaceVariant}
-              value={email}
-              onChangeText={(v) => { setEmail(v); setError(""); }}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              onSubmitEditing={handleSendCode}
-              style={{
-                backgroundColor: colors.surfaceContainerHigh,
-                borderWidth: 1, borderColor: colors.surfaceContainerHigh,
-                color: colors.onSurface,
-                borderRadius: radii.md, paddingHorizontal: 16, paddingVertical: 14,
-                fontSize: 16,
-              }}
-            />
-
-            {error ? (
-              <Animated.View entering={FadeIn.duration(200)} style={{
-                backgroundColor: colors.errorBg,
-                borderRadius: radii.sm, paddingHorizontal: 12, paddingVertical: 10,
-                flexDirection: "row", alignItems: "center", gap: 8,
-              }}>
-                <Ionicons name="alert-circle" size={16} color={colors.error} />
-                <Text style={{ color: colors.error, fontSize: 14, fontFamily: "Nunito_400Regular", flex: 1 }}>{error}</Text>
-              </Animated.View>
-            ) : null}
-
-            <Button
-              text={t("auth.sendCode")}
-              onPress={handleSendCode}
-              loading={loading}
-              disabled={!email.trim()}
-              style={{ marginTop: 4 }}
-            />
-
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 14, marginVertical: 6 }}>
-              <View style={{ flex: 1, height: 1, backgroundColor: colors.surfaceContainerHigh }} />
-              <Text style={{ color: colors.onSurfaceVariant, fontSize: 12, fontFamily: "Nunito_600SemiBold" }}>
-                {t("auth.or")}
-              </Text>
-              <View style={{ flex: 1, height: 1, backgroundColor: colors.surfaceContainerHigh }} />
-            </View>
-
-            <Button
-              text={t("auth.continueGuest")}
-              icon="👤"
-              onPress={handleGuest}
-              variant="secondary"
-              loading={guestLoading}
-            />
-          </Animated.View>
-        )}
-
-        {step === "code" && (
-          <Animated.View
-            entering={SlideInRight.duration(250)}
-            exiting={SlideOutLeft.duration(200)}
-            style={{ gap: 14 }}
-          >
-            <Animated.View entering={FadeIn.duration(300)} style={{
-              backgroundColor: colors.successBg,
+        <Animated.View entering={FadeIn.duration(300)} style={{ gap: 12 }}>
+          {error ? (
+            <Animated.View entering={FadeIn.duration(200)} style={{
+              backgroundColor: colors.errorBg,
               borderRadius: radii.sm, paddingHorizontal: 12, paddingVertical: 10,
               flexDirection: "row", alignItems: "center", gap: 8,
             }}>
-              <Ionicons name="checkmark-circle" size={16} color={colors.success} />
-              <Text style={{ color: colors.onSurface, fontSize: 14, fontFamily: "Nunito_400Regular", flex: 1 }}>
-                {t("auth.codeSent", { email })}
-              </Text>
+              <Ionicons name="alert-circle" size={16} color={colors.error} />
+              <Text style={{ color: colors.error, fontSize: 14, fontFamily: "Nunito_400Regular", flex: 1 }}>{error}</Text>
             </Animated.View>
+          ) : null}
 
-            <TextInput
-              placeholder={t("auth.codePlaceholder")}
-              placeholderTextColor={colors.onSurfaceVariant}
-              value={code}
-              onChangeText={(v) => { setCode(v); setError(""); }}
-              keyboardType="number-pad"
-              maxLength={6}
-              autoFocus
-              onSubmitEditing={handleVerifyCode}
-              style={{
-                backgroundColor: colors.surfaceContainerHigh,
-                borderWidth: 1, borderColor: colors.surfaceContainerHigh,
-                color: colors.onSurface,
-                borderRadius: radii.md, paddingHorizontal: 16, paddingVertical: 14,
-                fontSize: 24, textAlign: "center", letterSpacing: 8,
-              }}
-            />
+          <Button
+            text={t("auth.continueGoogle")}
+            iconNode={<GoogleIcon size={20} />}
+            onPress={handleGoogle}
+            loading={googleLoading}
+            style={{ marginTop: 4 }}
+          />
 
-            {error ? (
-              <Animated.View entering={FadeIn.duration(200)} style={{
-                backgroundColor: colors.errorBg,
-                borderRadius: radii.sm, paddingHorizontal: 12, paddingVertical: 10,
-                flexDirection: "row", alignItems: "center", gap: 8,
-              }}>
-                <Ionicons name="alert-circle" size={16} color={colors.error} />
-                <Text style={{ color: colors.error, fontSize: 14, fontFamily: "Nunito_400Regular", flex: 1 }}>{error}</Text>
-              </Animated.View>
-            ) : null}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 14, marginVertical: 6 }}>
+            <View style={{ flex: 1, height: 1, backgroundColor: colors.surfaceContainerHigh }} />
+            <Text style={{ color: colors.onSurfaceVariant, fontSize: 12, fontFamily: "Nunito_600SemiBold" }}>
+              {t("auth.or")}
+            </Text>
+            <View style={{ flex: 1, height: 1, backgroundColor: colors.surfaceContainerHigh }} />
+          </View>
 
-            <Button
-              text={t("auth.verify")}
-              onPress={handleVerifyCode}
-              loading={loading}
-              disabled={!code.trim()}
-            />
-
-            <Button
-              text={t("auth.changeEmail")}
-              onPress={() => { setStep("email"); setError(""); setCode(""); }}
-              variant="ghost"
-              style={{ marginTop: 4 }}
-            />
-          </Animated.View>
-        )}
+          <Button
+            text={t("auth.continueGuest")}
+            icon="👤"
+            onPress={handleGuest}
+            variant="secondary"
+            loading={guestLoading}
+          />
+        </Animated.View>
       </View>
 
       {/* Legal footer */}
@@ -391,8 +289,6 @@ export default function AuthScreen() {
           {t("auth.legal").replace(/<\/?[a-z]+>/g, "")}
         </Text>
       </View>
-     </KeyboardAvoidingView>
-
     </SafeAreaView>
   );
 }

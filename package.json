@@ -14,6 +14,7 @@
     "@instantdb/react-native": "^0.22.171",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/netinfo": "^12.0.1",
+    "@react-native-google-signin/google-signin": "^16.1.2",
     "expo": "~55.0.8",
     "expo-font": "^55.0.4",
     "expo-haptics": "^55.0.9",
