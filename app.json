@@ -8,21 +8,16 @@
     "userInterfaceStyle": "light",
     "scheme": "flipia",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/adaptive-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F5F5F0"
+      "backgroundColor": "#534AB7"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.rdh36.flipia"
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#F5F5F0",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
+      "adaptiveIcon": "./assets/adaptive-icon.png",
       "package": "com.rdh36.flipia"
     },
     "web": {
