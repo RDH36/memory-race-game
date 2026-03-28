@@ -160,5 +160,66 @@
     "language": "Langue",
     "languageDesc": "Choisis la langue de l'application",
     "comingSoon": "Bientôt disponible"
+  },
+  "onboarding": {
+    "welcome": {
+      "question": "Tu penses avoir\nune bonne mémoire ?",
+      "subtitle": "Découvre Flipia, le jeu de mémoire où chaque carte compte.",
+      "cta": "Découvrir le jeu"
+    },
+    "flip": {
+      "title": "Tape une carte",
+      "subtitle": "pour la retourner",
+      "hint": "Retourne l'autre aussi !",
+      "match": "C'est une paire !"
+    },
+    "match": {
+      "title": "Trouve les paires",
+      "subtitle": "Retourne 2 cartes identiques pour trouver une paire",
+      "bravo": "Bravo !",
+      "allFound": "Tu as trouvé toutes les paires !",
+      "cta": "Continuer"
+    },
+    "tornado": {
+      "title": "Ton arme secrète",
+      "subtitle": "Ton adversaire mémorise les cartes au fil des tours.\nLa Tornade mélange tout et efface sa mémoire !",
+      "hint": "Appuie sur Lancer pour déclencher la Tornade ↓",
+      "wow": "Boom ! Toutes les cartes sont mélangées !",
+      "detail": "Ton adversaire a tout oublié ! Tu as une seule Tornade par partie — utilise-la quand il est en avance pour reprendre le dessus.",
+      "cta": "J'ai compris, allons-y !"
+    },
+    "ready": {
+      "title": "Tu es prêt !",
+      "subtitle": "Tu vas affronter BabyBot pour montrer ta valeur.",
+      "opponents": "Tes adversaires",
+      "babyBot": "BabyBot",
+      "babyBotDesc": "Distrait, parfait pour commencer",
+      "nekoFlash": "NekoFlash",
+      "nekoFlashDesc": "Malin, un vrai défi",
+      "alphaMemory": "AlphaMemory",
+      "alphaMemoryDesc": "Imbattable... ou presque",
+      "cta": "Combattre BabyBot"
+    },
+    "battle": {
+      "you": "Toi",
+      "yourTurn": "Ton tour ! Retourne 2 cartes",
+      "matchFound": "Bien joué ! C'est encore ton tour !",
+      "mismatch": "Raté ! C'est au tour de BabyBot",
+      "cpuTurn": "BabyBot réfléchit...",
+      "cpuMatch": "BabyBot a trouvé une paire !",
+      "cpuMiss": "BabyBot a raté !"
+    },
+    "result": {
+      "won": "Victoire !",
+      "wonSub": "Tu as dominé BabyBot !",
+      "lost": "Défaite...",
+      "lostSub": "BabyBot t'a eu cette fois !",
+      "draw": "Égalité !",
+      "drawSub": "Match serré !",
+      "you": "Toi",
+      "ctaWon": "Écraser les autres joueurs",
+      "ctaLost": "Prendre ma revanche",
+      "ctaDraw": "Prouver que je suis meilleur"
+    }
   }
 }

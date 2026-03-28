@@ -160,5 +160,66 @@
     "language": "Language",
     "languageDesc": "Choose the app language",
     "comingSoon": "Coming soon"
+  },
+  "onboarding": {
+    "welcome": {
+      "question": "Think you have\na good memory?",
+      "subtitle": "Discover Flipia, the memory game where every card counts.",
+      "cta": "Discover the game"
+    },
+    "flip": {
+      "title": "Tap a card",
+      "subtitle": "to flip it over",
+      "hint": "Now flip the other one!",
+      "match": "It's a match!"
+    },
+    "match": {
+      "title": "Find the pairs",
+      "subtitle": "Flip 2 identical cards to find a pair",
+      "bravo": "Well done!",
+      "allFound": "You found all the pairs!",
+      "cta": "Continue"
+    },
+    "tornado": {
+      "title": "Your secret weapon",
+      "subtitle": "Your opponent memorizes cards as they play.\nThe Tornado shuffles everything and wipes their memory!",
+      "hint": "Tap Launch to trigger the Tornado ↓",
+      "wow": "Boom! All cards have been shuffled!",
+      "detail": "Your opponent forgot everything! You get one Tornado per game — use it when they're ahead to turn the tide.",
+      "cta": "Got it, let's go!"
+    },
+    "ready": {
+      "title": "You're ready!",
+      "subtitle": "You'll face BabyBot to prove your worth.",
+      "opponents": "Your opponents",
+      "babyBot": "BabyBot",
+      "babyBotDesc": "Distracted, perfect to start",
+      "nekoFlash": "NekoFlash",
+      "nekoFlashDesc": "Smart, a real challenge",
+      "alphaMemory": "AlphaMemory",
+      "alphaMemoryDesc": "Unbeatable... or almost",
+      "cta": "Fight BabyBot"
+    },
+    "battle": {
+      "you": "You",
+      "yourTurn": "Your turn! Flip 2 cards",
+      "matchFound": "Nice one! It's still your turn!",
+      "mismatch": "Missed! It's BabyBot's turn",
+      "cpuTurn": "BabyBot is thinking...",
+      "cpuMatch": "BabyBot found a pair!",
+      "cpuMiss": "BabyBot missed!"
+    },
+    "result": {
+      "won": "Victory!",
+      "wonSub": "You dominated BabyBot!",
+      "lost": "Defeat...",
+      "lostSub": "BabyBot got you this time!",
+      "draw": "Draw!",
+      "drawSub": "Close match!",
+      "you": "You",
+      "ctaWon": "Crush other players",
+      "ctaLost": "Get my revenge",
+      "ctaDraw": "Prove I'm better"
+    }
   }
 }

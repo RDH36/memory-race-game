@@ -33,6 +33,7 @@ function AppContent() {
         }}
       >
         <Stack.Screen name="index" />
+        <Stack.Screen name="onboarding" options={{ gestureEnabled: false, animation: "fade" }} />
         <Stack.Screen name="auth/index" options={{ gestureEnabled: false }} />
         <Stack.Screen name="auth/setup" options={{ gestureEnabled: false }} />
         <Stack.Screen name="(tabs)" />

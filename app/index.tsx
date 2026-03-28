@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { Redirect } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCurrentUser, useProfile } from "../lib/identity";
 import { useTheme } from "../lib/ThemeContext";
 
@@ -7,6 +9,23 @@ export default function RootIndex() {
   const { user, isLoading: authLoading } = useCurrentUser();
   const { colors } = useTheme();
   const { profile, isLoading: profileLoading } = useProfile(user?.id);
+  const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem("onboarding_complete").then((v) => setOnboardingDone(v === "true"));
+  }, []);
+
+  // Wait for onboarding check first (fast AsyncStorage read)
+  if (onboardingDone === null) {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.surface }}>
+        <ActivityIndicator size="large" color={colors.primaryContainer} />
+      </View>
+    );
+  }
+
+  // Onboarding not completed → tutorial (before auth)
+  if (!onboardingDone) return <Redirect href="/onboarding" />;
 
   // Wait for auth to resolve
   if (authLoading) {
