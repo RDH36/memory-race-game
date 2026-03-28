@@ -6,7 +6,7 @@
     "profile": "Profil"
   },
   "home": {
-    "welcome": "Bienvenue",
+    "welcome": "Bienvenue sur",
     "remaining": "+{{count}} restant",
     "chooseMode": "Choisir un mode",
     "myStats": "Mes stats",
@@ -83,7 +83,12 @@
     "xp": "XP",
     "level": "Nv.",
     "wins": "V",
-    "empty": "Aucun joueur pour le moment"
+    "empty": "Aucun joueur pour le moment",
+    "tabXp": "Expérience",
+    "tabWinRate": "Taux de victoire",
+    "tabRank": "Rang",
+    "winRateValue": "{{value}}%",
+    "comingSoon": "Bientôt"
   },
   "profile": {
     "title": "Profil",
