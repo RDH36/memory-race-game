@@ -28,13 +28,13 @@ export function ActionBar({ canUseTornado, tornadoUsed, onTornado }: ActionBarPr
     <View
       style={{
         backgroundColor: colors.surfaceContainer,
-        borderRadius: 16,
-        paddingVertical: 12,
-        paddingLeft: 16,
-        paddingRight: 12,
+        borderRadius: 12,
+        paddingVertical: 8,
+        paddingLeft: 12,
+        paddingRight: 8,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        gap: 10,
         opacity: tornadoUsed ? 0.5 : 1,
         shadowColor: colors.shadow,
         shadowOffset: { width: 0, height: 10 },
@@ -46,7 +46,7 @@ export function ActionBar({ canUseTornado, tornadoUsed, onTornado }: ActionBarPr
       <View style={{ flex: 1 }}>
         <Text
           style={{
-            fontSize: 14,
+            fontSize: 13,
             fontFamily: 'Fredoka_600SemiBold',
             color: canUseTornado ? colors.onSurface : colors.onSurfaceVariant,
           }}
@@ -70,12 +70,12 @@ export function ActionBar({ canUseTornado, tornadoUsed, onTornado }: ActionBarPr
             onPress={onTornado}
             disabled={!canUseTornado}
             android_ripple={{ color: 'rgba(255,255,255,0.2)' }}
-            style={{ paddingHorizontal: 24, paddingVertical: 14 }}
+            style={{ paddingHorizontal: 16, paddingVertical: 10 }}
           >
             <Text
               style={{
                 color: canUseTornado ? '#FFFFFF' : colors.onSurfaceVariant,
-                fontSize: 15,
+                fontSize: 13,
                 fontFamily: 'Nunito_700Bold',
               }}
             >

@@ -11,7 +11,7 @@ import { TornadoOverlay } from "../../components/game/TornadoOverlay";
 import { MatchFeedback } from "../../components/game/MatchFeedback";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
-import type { CpuDifficulty } from "../../lib/gameLogic";
+import { GRID_CONFIG, type CpuDifficulty } from "../../lib/gameLogic";
 
 const CPU_PROFILES: Record<string, { name: string; avatar: string }> = {
   easy: { name: "BabyBot", avatar: "🐣" },
@@ -66,7 +66,8 @@ export default function GameScreen() {
     !game.tornadoActive &&
     game.status === "playing";
 
-  const totalPairs = 8;
+  const gridConfig = GRID_CONFIG[(difficulty as CpuDifficulty) ?? 'medium'];
+  const totalPairs = gridConfig.totalCards / 2;
   const cpuLevel = t(`home.difficulty.${difficulty}`);
 
   return (
@@ -123,7 +124,7 @@ export default function GameScreen() {
         </View>
 
         {/* Grid */}
-        <View style={{ flex: 1, justifyContent: "center" }}>
+        <View style={{ flex: 1 }}>
           <GameGrid
             positions={game.positions}
             cardEmojis={game.cardEmojis}
@@ -134,6 +135,7 @@ export default function GameScreen() {
             lastMatchResult={lastMatchResult}
             tornadoActive={game.tornadoActive}
             onCardPress={handleCardPress}
+            cols={gridConfig.cols}
           />
           <MatchFeedback result={lastMatchResult} />
         </View>

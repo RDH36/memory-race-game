@@ -30,11 +30,11 @@ export default function HomeScreen() {
     if (loading) return;
     setLoading(difficulty);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push({ pathname: "/game", params: { difficulty, mode: "solo" } });
+    setShowDifficulty(false);
     setTimeout(() => {
-      setShowDifficulty(false);
+      router.push({ pathname: "/game", params: { difficulty, mode: "solo" } });
       setLoading(null);
-    }, 500);
+    }, 350);
   };
 
   return (

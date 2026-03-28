@@ -20,7 +20,7 @@ export type MatchResult = {
 } | null;
 
 export function useLocalGame(difficulty: CpuDifficulty) {
-  const [game, setGame] = useState<LocalGameState>(initGame);
+  const [game, setGame] = useState<LocalGameState>(() => initGame(difficulty));
   const [lastMatchResult, setLastMatchResult] = useState<MatchResult>(null);
   const cpuMemoryRef = useRef<CpuMemory>({});
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -253,7 +253,7 @@ export function useLocalGame(difficulty: CpuDifficulty) {
   // --- Reset ---
   const resetGame = useCallback(() => {
     cpuMemoryRef.current = {};
-    setGame(initGame());
+    setGame(initGame(difficulty));
   }, []);
 
   return {

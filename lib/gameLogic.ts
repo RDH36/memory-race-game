@@ -17,8 +17,15 @@ export interface LocalGameState {
   p1MaxStreak: number;
 }
 
-// 8 animal emojis for pairs
-export const EMOJIS = ['🐶','🐱','🐸','🦊','🐼','🦁','🐯','🦋'];
+// All available emojis for card pairs
+const ALL_EMOJIS = ['🐶','🐱','🐸','🦊','🐼','🦁','🐯','🦋','🐰','🐨','🐷','🦄','🐵','🦉','🐢','🦀'];
+
+// Grid configuration per difficulty
+export const GRID_CONFIG: Record<CpuDifficulty, { cols: number; totalCards: number }> = {
+  easy:   { cols: 4, totalCards: 12 },  // 4×3, 6 pairs
+  medium: { cols: 4, totalCards: 16 },  // 4×4, 8 pairs
+  hard:   { cols: 4, totalCards: 24 },  // 4×6, 12 pairs
+};
 
 // Fisher-Yates standard shuffle
 export function shuffle<T>(arr: T[]): T[] {
@@ -48,12 +55,15 @@ export function seededShuffle<T>(arr: T[], seed: number): T[] {
 }
 
 // Initialize a new game
-export function initGame(): LocalGameState {
-  const pairs = shuffle([...EMOJIS, ...EMOJIS]); // 16 cards
+export function initGame(difficulty: CpuDifficulty = 'medium'): LocalGameState {
+  const config = GRID_CONFIG[difficulty];
+  const numPairs = config.totalCards / 2;
+  const emojis = ALL_EMOJIS.slice(0, numPairs);
+  const pairs = shuffle([...emojis, ...emojis]);
   return {
-    positions: shuffle([...Array(16).keys()]),
+    positions: shuffle([...Array(config.totalCards).keys()]),
     cardEmojis: pairs,
-    matchedBy: Array(16).fill(-1),
+    matchedBy: Array(config.totalCards).fill(-1),
     selected: [],
     scores: { p1: 0, p2: 0 },
     tornadoUsed: { p1: false, p2: false },

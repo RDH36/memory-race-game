@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { LayoutChangeEvent, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -11,6 +11,8 @@ import Animated, {
 import { CardItem } from './CardItem';
 import type { MatchResult } from '../../hooks/useLocalGame';
 
+const GAP = 8;
+
 interface GameGridProps {
   positions: number[];
   cardEmojis: string[];
@@ -21,15 +23,20 @@ interface GameGridProps {
   lastMatchResult: MatchResult;
   tornadoActive: boolean;
   onCardPress: (cardId: number) => void;
+  cols?: number;
 }
 
 function AnimatedCardSlot({
   index,
   tornadoActive,
+  cols,
+  cardSize,
   children,
 }: {
   index: number;
   tornadoActive: boolean;
+  cols: number;
+  cardSize: number;
   children: React.ReactNode;
 }) {
   const impactRotate = useSharedValue(0);
@@ -44,7 +51,7 @@ function AnimatedCardSlot({
       return;
     }
 
-    const row = Math.floor(index / 4);
+    const row = Math.floor(index / cols);
     const rowDelay = 1400 + row * 800;
 
     impactRotate.value = withDelay(
@@ -88,7 +95,7 @@ function AnimatedCardSlot({
   }));
 
   return (
-    <Animated.View style={[style, { width: '22%', aspectRatio: 1 }]}>
+    <Animated.View style={[style, { width: cardSize, height: cardSize }]}>
       {children}
     </Animated.View>
   );
@@ -104,54 +111,76 @@ export function GameGrid({
   lastMatchResult,
   tornadoActive,
   onCardPress,
+  cols = 4,
 }: GameGridProps) {
-  const gridIndices = Array.from({ length: 16 }, (_, i) => i);
+  const [cardSize, setCardSize] = useState(0);
+  const totalCards = positions.length;
+  const rows = Math.ceil(totalCards / cols);
+  const gridIndices = Array.from({ length: totalCards }, (_, i) => i);
+
+  const onLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      const { width, height } = e.nativeEvent.layout;
+      const maxW = (width - (cols - 1) * GAP) / cols;
+      const maxH = (height - (rows - 1) * GAP) / rows;
+      setCardSize(Math.floor(Math.min(maxW, maxH)));
+    },
+    [cols, rows],
+  );
 
   return (
-    <View className="bg-transparent px-4 py-4 justify-center">
-      <View
-        style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          gap: 8,
-          justifyContent: 'center',
-        }}
-      >
-        {gridIndices.map((gridIdx) => {
-          const cardId = positions[gridIdx];
-          const emoji = cardEmojis[cardId];
-          const isFaceUp =
-            selected.includes(cardId) || matchedBy[cardId] !== -1;
-          const isDisabled =
-            matchedBy[cardId] !== -1 || locked || currentTurn !== 1;
+    <View
+      onLayout={onLayout}
+      style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8 }}
+    >
+      {cardSize > 0 && (
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: GAP,
+            justifyContent: 'center',
+            width: cols * cardSize + (cols - 1) * GAP,
+          }}
+        >
+          {gridIndices.map((gridIdx) => {
+            const cardId = positions[gridIdx];
+            const emoji = cardEmojis[cardId];
+            const isFaceUp =
+              selected.includes(cardId) || matchedBy[cardId] !== -1;
+            const isDisabled =
+              matchedBy[cardId] !== -1 || locked || currentTurn !== 1;
 
-          const isJustMatched =
-            lastMatchResult?.type === 'match' &&
-            lastMatchResult.cards.includes(cardId);
-          const isJustMismatched =
-            lastMatchResult?.type === 'mismatch' &&
-            lastMatchResult.cards.includes(cardId);
+            const isJustMatched =
+              lastMatchResult?.type === 'match' &&
+              lastMatchResult.cards.includes(cardId);
+            const isJustMismatched =
+              lastMatchResult?.type === 'mismatch' &&
+              lastMatchResult.cards.includes(cardId);
 
-          return (
-            <AnimatedCardSlot
-              key={gridIdx}
-              index={gridIdx}
-              tornadoActive={tornadoActive}
-            >
-              <CardItem
-                cardId={cardId}
-                emoji={emoji}
-                isFaceUp={isFaceUp}
-                matchedBy={matchedBy[cardId]}
-                isJustMatched={isJustMatched}
-                isJustMismatched={isJustMismatched}
-                onPress={onCardPress}
-                disabled={isDisabled}
-              />
-            </AnimatedCardSlot>
-          );
-        })}
-      </View>
+            return (
+              <AnimatedCardSlot
+                key={gridIdx}
+                index={gridIdx}
+                tornadoActive={tornadoActive}
+                cols={cols}
+                cardSize={cardSize}
+              >
+                <CardItem
+                  cardId={cardId}
+                  emoji={emoji}
+                  isFaceUp={isFaceUp}
+                  matchedBy={matchedBy[cardId]}
+                  isJustMatched={isJustMatched}
+                  isJustMismatched={isJustMismatched}
+                  onPress={onCardPress}
+                  disabled={isDisabled}
+                />
+              </AnimatedCardSlot>
+            );
+          })}
+        </View>
+      )}
     </View>
   );
 }
