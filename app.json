@@ -31,6 +31,13 @@
           "iosUrlScheme": "com.googleusercontent.apps.YOUR_IOS_CLIENT_ID"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b8052045-3b2f-4f69-b86b-66d3a6da0e4c"
+      }
+    },
+    "owner": "rdh36"
   }
 }

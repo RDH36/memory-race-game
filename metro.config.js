@@ -4,6 +4,11 @@ const { withNativeWind } = require("nativewind/metro");
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
 
+// Remove deprecated option that triggers validation warning
+if (config.watcher) {
+  delete config.watcher.unstable_workerThreads;
+}
+
 module.exports = withNativeWind(config, {
   input: "./global.css",
 });
