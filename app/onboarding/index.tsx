@@ -17,12 +17,13 @@ import Animated, {
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 
-const TEASER_EMOJIS = ["🐶", "🐱", "🦊"];
+const TEASER_EMOJIS = ["🐶", "?", "🦊"];
 
 function FloatingCard({ emoji, delay, x }: { emoji: string; delay: number; x: number }) {
   const { colors } = useTheme();
   const translateY = useSharedValue(0);
   const rotate = useSharedValue(0);
+  const isQuestionCard = emoji === "?";
 
   useEffect(() => {
     translateY.value = withDelay(
@@ -65,7 +66,7 @@ function FloatingCard({ emoji, delay, x }: { emoji: string; delay: number; x: nu
           width: 72,
           height: 90,
           borderRadius: 12,
-          backgroundColor: colors.surfaceContainer,
+          backgroundColor: isQuestionCard ? colors.p1Bg : colors.surfaceContainer,
           justifyContent: "center",
           alignItems: "center",
           marginHorizontal: x,
@@ -77,7 +78,11 @@ function FloatingCard({ emoji, delay, x }: { emoji: string; delay: number; x: nu
         },
       ]}
     >
-      <Text style={{ fontSize: 32 }}>{emoji}</Text>
+      {isQuestionCard ? (
+        <Text style={{ fontSize: 28, fontFamily: "Fredoka_700Bold", color: colors.p1 }}>?</Text>
+      ) : (
+        <Text style={{ fontSize: 32 }}>{emoji}</Text>
+      )}
     </Animated.View>
   );
 }

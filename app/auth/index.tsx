@@ -225,7 +225,20 @@ export default function AuthScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
       {/* Hero — centered */}
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32, paddingTop: 140 }}>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 32, paddingTop: 100 }}>
+        <Animated.Text
+          entering={FadeInDown.delay(100).duration(600)}
+          style={{
+            fontSize: 52,
+            fontFamily: "Fredoka_700Bold",
+            color: colors.primaryContainer,
+            textAlign: "center",
+            marginBottom: 52,
+          }}
+        >
+          Flipia
+        </Animated.Text>
+
         <HeroCards />
 
         <Animated.Text

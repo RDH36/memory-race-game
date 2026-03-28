@@ -153,6 +153,7 @@
     "comingSoon": "Bientôt disponible"
   },
   "onboarding": {
+    "skip": "Passer",
     "welcome": {
       "question": "Tu penses avoir\nune bonne mémoire ?",
       "subtitle": "Découvre Flipia, le jeu de mémoire où chaque carte compte.",
@@ -203,10 +204,13 @@
     "result": {
       "won": "Victoire !",
       "wonSub": "Tu as dominé BabyBot !",
+      "wonHook": "Des vrais joueurs t'attendent.\nEs-tu prêt à les affronter ?",
       "lost": "Défaite...",
       "lostSub": "BabyBot t'a eu cette fois !",
+      "lostHook": "BabyBot n'est que le début.\nMontre de quoi tu es capable !",
       "draw": "Égalité !",
       "drawSub": "Match serré !",
+      "drawHook": "Tu peux faire mieux.\nLes vrais défis commencent maintenant !",
       "you": "Toi",
       "ctaWon": "Écraser les autres joueurs",
       "ctaLost": "Prendre ma revanche",

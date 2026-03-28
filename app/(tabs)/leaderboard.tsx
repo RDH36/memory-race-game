@@ -1,10 +1,11 @@
 import { useMemo } from "react";
-import { FlatList, Text, View, ActivityIndicator } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { Label } from "../../components/ui/Label";
+import { LoadingCard } from "../../components/ui/LoadingCard";
 import { db } from "../../lib/instant";
 
 interface LeaderboardEntry {
@@ -179,9 +180,7 @@ export default function LeaderboardScreen() {
       </View>
 
       {isLoading ? (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-          <ActivityIndicator size="large" color={colors.primaryContainer} />
-        </View>
+        <LoadingCard />
       ) : entries.length === 0 ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 40 }}>
           <Text style={{ fontSize: 40, marginBottom: 12 }}>🏆</Text>

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Redirect } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCurrentUser, useProfile } from "../lib/identity";
 import { useTheme } from "../lib/ThemeContext";
+import { LoadingCard } from "../components/ui/LoadingCard";
 
 export default function RootIndex() {
   const { user, isLoading: authLoading } = useCurrentUser();
@@ -18,8 +19,8 @@ export default function RootIndex() {
   // Wait for onboarding check first (fast AsyncStorage read)
   if (onboardingDone === null) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.surface }}>
-        <ActivityIndicator size="large" color={colors.primaryContainer} />
+      <View style={{ flex: 1, backgroundColor: colors.surface }}>
+        <LoadingCard />
       </View>
     );
   }
@@ -30,8 +31,8 @@ export default function RootIndex() {
   // Wait for auth to resolve
   if (authLoading) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.surface }}>
-        <ActivityIndicator size="large" color={colors.primaryContainer} />
+      <View style={{ flex: 1, backgroundColor: colors.surface }}>
+        <LoadingCard />
       </View>
     );
   }
@@ -42,8 +43,8 @@ export default function RootIndex() {
   // Wait for profile query to finish before deciding
   if (profileLoading) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.surface }}>
-        <ActivityIndicator size="large" color={colors.primaryContainer} />
+      <View style={{ flex: 1, backgroundColor: colors.surface }}>
+        <LoadingCard />
       </View>
     );
   }
