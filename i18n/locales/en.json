@@ -29,6 +29,9 @@
       "mediumDesc": "Smart CPU",
       "hard": "Hard",
       "hardDesc": "Unbeatable CPU"
+    },
+    "botModal": {
+      "pairs": "pairs"
     }
   },
   "game": {

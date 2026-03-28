@@ -1,21 +1,21 @@
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { useTranslation } from "react-i18next";
 import { ModeCard } from "../../components/home/ModeCard";
+import { BotSelectCard } from "../../components/home/BotSelectCard";
 import { StatsRow } from "../../components/home/StatsRow";
 import { Label } from "../../components/ui/Label";
-import { Card } from "../../components/ui/Card";
 import { BottomSheet } from "../../components/ui/BottomSheet";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 
-const DIFFICULTY_KEYS = [
-  { key: "easy", icon: "🐣", color: "#1D9E75" },
-  { key: "medium", icon: "🦊", color: "#A2340A" },
-  { key: "hard", icon: "🔥", color: "#534AB7" },
+const BOT_DATA = [
+  { key: "easy", name: "BabyBot", avatar: "🐣", color: "#1D9E75", pairs: 6, power: 1 },
+  { key: "medium", name: "NekoFlash", avatar: "🦊", color: "#A2340A", pairs: 8, power: 2 },
+  { key: "hard", name: "AlphaMemory", avatar: "🤖", color: "#534AB7", pairs: 12, power: 3 },
 ] as const;
 
 export default function HomeScreen() {
@@ -138,39 +138,20 @@ export default function HomeScreen() {
         onClose={() => setShowDifficulty(false)}
         title={t("home.chooseDifficulty")}
       >
-        <View style={{ gap: 10 }}>
-          {DIFFICULTY_KEYS.map((d) => (
-            <Pressable
-              key={d.key}
-              onPress={() => handleSelectDifficulty(d.key)}
-              disabled={loading !== null}
-              style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.97 : 1 }] })}
-            >
-              <Card
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 14,
-                  opacity: loading && loading !== d.key ? 0.4 : 1,
-                  backgroundColor: colors.surfaceContainerHigh,
-                }}
-              >
-                <Text style={{ fontSize: 28 }}>{d.icon}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 16, fontFamily: "Fredoka_600SemiBold", color: d.color }}>
-                    {t(`home.difficulty.${d.key}`)}
-                  </Text>
-                  <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginTop: 2 }}>
-                    {t(`home.difficulty.${d.key}Desc`)}
-                  </Text>
-                </View>
-                {loading === d.key ? (
-                  <Text style={{ fontSize: 14, color: colors.onSurfaceVariant }}>⏳</Text>
-                ) : (
-                  <Text style={{ fontSize: 18, color: d.color }}>→</Text>
-                )}
-              </Card>
-            </Pressable>
+        <View style={{ gap: 12 }}>
+          {BOT_DATA.map((bot, index) => (
+            <BotSelectCard
+              key={bot.key}
+              botKey={bot.key}
+              name={bot.name}
+              avatar={bot.avatar}
+              color={bot.color}
+              pairs={bot.pairs}
+              power={bot.power}
+              index={index}
+              loading={loading}
+              onPress={() => handleSelectDifficulty(bot.key)}
+            />
           ))}
         </View>
       </BottomSheet>

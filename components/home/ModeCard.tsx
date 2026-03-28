@@ -1,4 +1,5 @@
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import * as Haptics from "expo-haptics";
 import { useTranslation } from "react-i18next";
 import { Card } from "../ui/Card";
 import { Badge } from "../ui/Badge";
@@ -31,7 +32,10 @@ export function ModeCard({
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress();
+      }}
       disabled={disabled || loading}
       style={({ pressed }) => ({
         transform: [{ scale: pressed ? 0.97 : 1 }],

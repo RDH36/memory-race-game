@@ -29,6 +29,9 @@
       "mediumDesc": "CPU malin",
       "hard": "Difficile",
       "hardDesc": "CPU imbattable"
+    },
+    "botModal": {
+      "pairs": "paires"
     }
   },
   "game": {
