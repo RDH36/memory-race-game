@@ -153,7 +153,7 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
     }
 
     db.transact(ops);
-  }, [userId, stats, leaderboardId]);
+  }, [userId, stats, leaderboardId, profileId]);
 
   const rankInfo = useMemo(() => {
     let currentIdx = 0;

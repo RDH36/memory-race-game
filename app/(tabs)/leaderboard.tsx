@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { FlatList, Text, View, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
@@ -121,27 +122,33 @@ export default function LeaderboardScreen() {
   const { colors, isDark } = useTheme();
   const { stats, avatar, nickname, userId } = usePlayerStats();
 
-  // Query real leaderboard + profiles from InstantDB
+  // Query leaderboard + all profiles separately (link may not exist)
   const { data, isLoading } = db.useQuery({
     leaderboard: {
       $: { order: { serverCreatedAt: "desc" } },
-      profile: {},
     },
+    profiles: {},
   });
 
-  const entries: LeaderboardEntry[] = (data?.leaderboard ?? [])
-    .map((entry: any) => {
-      const isCurrent = entry.userId === userId;
-      return {
-        id: entry.userId,
-        name: isCurrent ? (nickname || t("leaderboard.you")) : (entry.profile?.[0]?.nickname || "???"),
-        avatar: isCurrent ? avatar : (entry.profile?.[0]?.avatar || "🧠"),
-        xp: entry.points || 0,
-        wins: entry.gamesWon || 0,
-        isCurrentUser: isCurrent,
-      };
-    })
-    .sort((a: LeaderboardEntry, b: LeaderboardEntry) => b.xp - a.xp);
+  const entries: LeaderboardEntry[] = useMemo(() => {
+    const profilesByUserId = new Map(
+      (data?.profiles ?? []).map((p: any) => [p.userId, p]),
+    );
+    return (data?.leaderboard ?? [])
+      .map((entry: any) => {
+        const isCurrent = entry.userId === userId;
+        const profile = profilesByUserId.get(entry.userId);
+        return {
+          id: entry.userId,
+          name: isCurrent ? (nickname || t("leaderboard.you")) : (profile?.nickname || "???"),
+          avatar: isCurrent ? avatar : (profile?.avatar || "🧠"),
+          xp: entry.points || 0,
+          wins: entry.gamesWon || 0,
+          isCurrentUser: isCurrent,
+        };
+      })
+      .sort((a: LeaderboardEntry, b: LeaderboardEntry) => b.xp - a.xp);
+  }, [data, userId, nickname, avatar, t]);
 
   const me: LeaderboardEntry = entries.find((e) => e.isCurrentUser) || {
     id: userId || "me",

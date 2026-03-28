@@ -4,13 +4,13 @@
     "slug": "flipia",
     "version": "0.0.1",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/adaptive-icon.png",
     "userInterfaceStyle": "light",
     "scheme": "flipia",
     "splash": {
-      "image": "./assets/adaptive-icon.png",
+      "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#534AB7"
+      "backgroundColor": "#3f37a6"
     },
     "ios": {
       "supportsTablet": true,
