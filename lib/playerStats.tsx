@@ -11,15 +11,6 @@ interface PlayerStats {
   points: number;
 }
 
-export const RANKS = [
-  { name: "BRONZE", min: 0 },
-  { name: "SILVER", min: 500 },
-  { name: "GOLD", min: 1000 },
-  { name: "PLATINUM", min: 1500 },
-  { name: "DIAMOND", min: 2500 },
-  { name: "MASTER", min: 4000 },
-] as const;
-
 const XP_REWARDS: Record<string, { win: number; loss: number }> = {
   easy: { win: 15, loss: 5 },
   medium: { win: 25, loss: 5 },
@@ -57,10 +48,6 @@ interface StatsContext {
   nickname: string;
   profileId: string | null;
   userId: string | undefined;
-  rank: string;
-  nextRank: string | null;
-  rankProgress: number;
-  pointsToNext: number;
   level: number;
   levelProgress: number;
   xpForNextLevel: number;
@@ -155,21 +142,6 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
     db.transact(ops);
   }, [userId, stats, leaderboardId, profileId]);
 
-  const rankInfo = useMemo(() => {
-    let currentIdx = 0;
-    for (let i = RANKS.length - 1; i >= 0; i--) {
-      if (stats.points >= RANKS[i].min) { currentIdx = i; break; }
-    }
-    const rank = RANKS[currentIdx].name;
-    const next = currentIdx < RANKS.length - 1 ? RANKS[currentIdx + 1] : null;
-    const nextRank = next?.name ?? null;
-    const rangeStart = RANKS[currentIdx].min;
-    const rangeEnd = next?.min ?? RANKS[currentIdx].min;
-    const progress = next ? (stats.points - rangeStart) / (rangeEnd - rangeStart) : 1;
-    const pointsToNext = next ? rangeEnd - stats.points : 0;
-    return { rank, nextRank, rankProgress: progress, pointsToNext };
-  }, [stats.points]);
-
   const levelInfo = useMemo(() => computeLevel(stats.points), [stats.points]);
 
   const winRate = stats.gamesPlayed > 0
@@ -178,13 +150,13 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
 
   const value = useMemo(
     () => ({
-      stats, avatar, nickname, profileId, userId, winRate, lastXpGain, recordGame, ...rankInfo,
+      stats, avatar, nickname, profileId, userId, winRate, lastXpGain, recordGame,
       level: levelInfo.level,
       levelProgress: levelInfo.progress,
       xpForNextLevel: levelInfo.xpForNext,
       xpInLevel: levelInfo.xpInLevel,
     }),
-    [stats, avatar, nickname, profileId, userId, winRate, lastXpGain, recordGame, rankInfo, levelInfo],
+    [stats, avatar, nickname, profileId, userId, winRate, lastXpGain, recordGame, levelInfo],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

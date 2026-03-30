@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
@@ -7,38 +7,48 @@ import { Ionicons } from "@expo/vector-icons";
 import { Card } from "../ui/Card";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
-import { useCurrentUser, saveProfile } from "../../lib/identity";
+import { useCurrentUser } from "../../lib/identity";
 import { GoogleLinkSheet } from "./GoogleLinkSheet";
 
 export function ProfileHeader() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const router = useRouter();
-  const { stats, avatar, nickname, profileId, userId, level } = usePlayerStats();
+  const { stats, avatar, nickname, level } = usePlayerStats();
   const { user } = useCurrentUser();
 
   const [showGoogle, setShowGoogle] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState("");
 
   const hasEmail = !!user?.email;
   const displayName = nickname || t("profile.guest");
 
-  const startEdit = () => { setDraft(nickname); setEditing(true); };
-
-  const saveNickname = () => {
-    setEditing(false);
-    const trimmed = draft.trim();
-    if (!trimmed || !userId) return;
-    saveProfile(userId, profileId, { nickname: trimmed });
+  const goToSetup = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push("/auth/setup");
   };
 
   return (
     <>
-      <Card style={{ alignItems: "center", gap: 12 }}>
-        {/* Avatar — white rounded bg, tap to go to setup */}
+      <Card style={{ alignItems: "center", gap: 12, position: "relative" }}>
+        {/* Edit badge — top right */}
+        <View style={{ position: "absolute", top: 12, right: 12, zIndex: 1 }}>
+          <Pressable
+            onPress={goToSetup}
+            style={({ pressed }) => ({
+              backgroundColor: colors.primaryContainerBg,
+              paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6,
+              transform: [{ scale: pressed ? 0.95 : 1 }],
+            })}
+          >
+            <Text style={{ fontSize: 10, fontFamily: "Nunito_700Bold", color: colors.primaryContainer }}>
+              {t("profile.editNickname")}
+            </Text>
+          </Pressable>
+        </View>
+
+        {/* Avatar — tap to go to setup */}
         <Pressable
-          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/auth/setup"); }}
+          onPress={goToSetup}
           style={({ pressed }) => ({
             width: 80, height: 80, borderRadius: 40,
             backgroundColor: "#FFFFFF",
@@ -51,31 +61,10 @@ export function ProfileHeader() {
           <Text style={{ fontSize: 40 }}>{avatar}</Text>
         </Pressable>
 
-        {/* Nickname (editable inline) */}
-        {editing ? (
-          <TextInput
-            value={draft}
-            onChangeText={setDraft}
-            onBlur={saveNickname}
-            onSubmitEditing={saveNickname}
-            autoFocus
-            maxLength={20}
-            placeholder={t("profile.nicknamePlaceholder")}
-            placeholderTextColor={colors.onSurfaceVariant}
-            style={{
-              fontSize: 22, fontFamily: "Fredoka_700Bold", color: colors.onSurface,
-              textAlign: "center", borderBottomWidth: 2,
-              borderBottomColor: colors.primaryContainer, paddingBottom: 4, minWidth: 120,
-            }}
-          />
-        ) : (
-          <Pressable onPress={startEdit} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-            <Text style={{ fontSize: 22, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
-              {displayName}
-            </Text>
-            <Ionicons name="pencil" size={14} color={colors.onSurfaceVariant} />
-          </Pressable>
-        )}
+        {/* Nickname — tap to go to setup */}
+        <Text style={{ fontSize: 22, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
+          {displayName}
+        </Text>
 
         {/* Email status */}
         {hasEmail ? (
