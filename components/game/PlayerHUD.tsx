@@ -10,6 +10,7 @@ interface OpponentCardProps {
   totalPairs: number;
   isActive: boolean;
   timerSeconds: number;
+  hideTimer?: boolean;
 }
 
 function ProgressDots({ filled, total }: { filled: number; total: number }) {
@@ -45,6 +46,7 @@ export function OpponentCard({
   totalPairs,
   isActive,
   timerSeconds,
+  hideTimer,
 }: OpponentCardProps) {
   const { colors, isDark } = useTheme();
   return (
@@ -61,24 +63,26 @@ export function OpponentCard({
       }}
     >
       {/* Timer */}
-      <View
-        style={{
-          backgroundColor: isActive ? colors.primaryContainerBg : isDark ? '#2A2A2A' : '#F5F2F2',
-          paddingHorizontal: 10,
-          paddingVertical: 6,
-          borderRadius: 10,
-        }}
-      >
-        <Text
+      {!hideTimer && (
+        <View
           style={{
-            fontSize: 14,
-            fontFamily: 'Fredoka_600SemiBold',
-            color: isActive ? colors.primaryContainer : colors.onSurfaceVariant,
+            backgroundColor: isActive ? colors.primaryContainerBg : isDark ? '#2A2A2A' : '#F5F2F2',
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderRadius: 10,
           }}
         >
-          {formatTime(timerSeconds)}
-        </Text>
-      </View>
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: 'Fredoka_600SemiBold',
+              color: isActive ? colors.primaryContainer : colors.onSurfaceVariant,
+            }}
+          >
+            {formatTime(timerSeconds)}
+          </Text>
+        </View>
+      )}
 
       {/* Dots */}
       <ProgressDots filled={pairsMatched} total={totalPairs} />

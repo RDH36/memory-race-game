@@ -19,6 +19,7 @@ import { XpRewardBar } from "../../components/result/XpRewardBar";
 import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { useTheme } from "../../lib/ThemeContext";
+import { deleteRoom } from "../../lib/roomLogic";
 
 const CPU_PROFILES: Record<string, { name: string; avatar: string }> = {
   easy: { name: "BabyBot", avatar: "🐣" },
@@ -37,6 +38,13 @@ export default function ResultScreen() {
     p1Attempts = "0",
     tornadoUsed = "0",
     maxStreak = "0",
+    mode = "solo",
+    roomId,
+    opponentName,
+    opponentAvatar,
+    isHost = "1",
+    forfeit = "0",
+    forfeitWon = "0",
   } = useLocalSearchParams<{
     p1Score?: string;
     p2Score?: string;
@@ -45,6 +53,13 @@ export default function ResultScreen() {
     p1Attempts?: string;
     tornadoUsed?: string;
     maxStreak?: string;
+    mode?: string;
+    roomId?: string;
+    opponentName?: string;
+    opponentAvatar?: string;
+    isHost?: string;
+    forfeit?: string;
+    forfeitWon?: string;
   }>();
   const router = useRouter();
   const { t } = useTranslation();
@@ -54,24 +69,49 @@ export default function ResultScreen() {
 
   const { colors } = useTheme();
 
+  const isCasual = mode === "casual";
+  const iAmHost = isHost === "1";
+  const isForfeit = forfeit === "1";
+  const iWonForfeit = forfeitWon === "1";
+  const roomCleaned = useRef(false);
+
+  const cleanupRoom = () => {
+    if (isCasual && roomId && !roomCleaned.current) {
+      roomCleaned.current = true;
+      deleteRoom(roomId);
+    }
+  };
+
   const s1 = parseInt(p1Score, 10);
   const s2 = parseInt(p2Score, 10);
   const winner: Winner = s1 > s2 ? "p1" : s2 > s1 ? "p2" : "draw";
   const cpu = CPU_PROFILES[difficulty] ?? CPU_PROFILES.medium;
 
-  const resultTitle = winner === "draw" ? t("result.drawTitle") : winner === "p1" ? t("result.youWonTitle") : t("result.youLostTitle");
-  const resultHighlight = winner === "draw" ? t("result.drawHighlight") : winner === "p1" ? t("result.youWonHighlight") : t("result.youLostHighlight");
-  const resultColor = winner === "p1" ? colors.success : winner === "p2" ? colors.error : colors.primaryContainer;
+  const displayOpponentName = isCasual ? (opponentName ?? "Friend") : cpu.name;
+  const displayOpponentAvatar = isCasual ? (opponentAvatar ?? "👤") : cpu.avatar;
+
+  // For forfeit, override winner based on forfeitWon flag
+  const effectiveWinner: Winner = isForfeit
+    ? (iWonForfeit ? "p1" : "p2")
+    : winner;
+
+  const resultTitle = isForfeit
+    ? ""
+    : effectiveWinner === "draw" ? t("result.drawTitle") : effectiveWinner === "p1" ? t("result.youWonTitle") : t("result.youLostTitle");
+  const resultHighlight = isForfeit
+    ? (iWonForfeit ? t("result.forfeitWin") : t("result.forfeitLoss"))
+    : effectiveWinner === "draw" ? t("result.drawHighlight") : effectiveWinner === "p1" ? t("result.youWonHighlight") : t("result.youLostHighlight");
+  const resultColor = effectiveWinner === "p1" ? colors.success : effectiveWinner === "p2" ? colors.error : colors.primaryContainer;
 
   // Record game result once
   useEffect(() => {
     if (!recorded.current) {
       recorded.current = true;
-      recordGame(winner === "p1", difficulty as string, {
+      recordGame(effectiveWinner === "p1", difficulty as string, {
         scoreP1: s1,
         scoreP2: s2,
         duration: timeSec,
-        player2Type: "cpu",
+        player2Type: isCasual ? "human" : "cpu",
       });
     }
   }, []);
@@ -94,9 +134,9 @@ export default function ResultScreen() {
   const opacityButtons = useSharedValue(0);
 
   useEffect(() => {
-    if (winner === "p1") {
+    if (effectiveWinner === "p1") {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } else if (winner === "p2") {
+    } else if (effectiveWinner === "p2") {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     }
     opacityHeader.value = withTiming(1, { duration: 300 });
@@ -117,7 +157,7 @@ export default function ResultScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
-      {winner === "p1" && <ConfettiParticles />}
+      {effectiveWinner === "p1" && <ConfettiParticles />}
 
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32 }}
@@ -125,7 +165,7 @@ export default function ResultScreen() {
       >
         {/* Header label */}
         <Animated.View style={headerStyle}>
-          <Label text={t("result.header")} style={{ marginBottom: 8 }} />
+          <Label text={isCasual ? t("result.headerCasual") : t("result.header")} style={{ marginBottom: 8 }} />
         </Animated.View>
 
         {/* Title */}
@@ -141,8 +181,8 @@ export default function ResultScreen() {
             p1Avatar={avatar}
             p1Name={t("game.you")}
             p1Score={s1}
-            p2Avatar={cpu.avatar}
-            p2Name={cpu.name}
+            p2Avatar={displayOpponentAvatar}
+            p2Name={displayOpponentName}
             p2Score={s2}
           />
         </Animated.View>
@@ -155,7 +195,7 @@ export default function ResultScreen() {
             levelProgress={levelProgress}
             xpInLevel={xpInLevel}
             xpForNextLevel={xpForNextLevel}
-            won={winner === "p1"}
+            won={effectiveWinner === "p1"}
           />
         </Animated.View>
 
@@ -182,7 +222,12 @@ export default function ResultScreen() {
             onPress={() => {
               setLoading("replay");
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.replace({ pathname: "/game", params: { difficulty } });
+              cleanupRoom();
+              if (isCasual) {
+                router.replace("/(tabs)");
+              } else {
+                router.replace({ pathname: "/game", params: { difficulty } });
+              }
             }}
           />
           <Button
@@ -195,6 +240,7 @@ export default function ResultScreen() {
             onPress={() => {
               setLoading("new");
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              cleanupRoom();
               router.replace("/(tabs)");
             }}
           />
@@ -208,6 +254,7 @@ export default function ResultScreen() {
             onPress={() => {
               setLoading("home");
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              cleanupRoom();
               router.replace("/(tabs)");
             }}
           />

@@ -28,6 +28,24 @@ const _schema = i.schema({
       points: i.number().indexed(),
       updatedAt: i.number().indexed(),
     }),
+    rooms: i.entity({
+      code: i.string().unique().indexed(),
+      hostId: i.string().indexed(),
+      guestId: i.string().optional(),
+      hostNickname: i.string(),
+      hostAvatar: i.string(),
+      guestNickname: i.string().optional(),
+      guestAvatar: i.string().optional(),
+      difficulty: i.string(),
+      status: i.string().indexed(), // waiting | playing | finished | forfeit
+      gameState: i.string().optional(), // JSON-serialized LocalGameState
+      currentPlayerId: i.string().optional(),
+      lastMoveAt: i.number().optional(),
+      winnerId: i.string().optional(),
+      startAt: i.number().optional(), // timestamp when game starts (after countdown)
+      appVersion: i.string().optional(), // version of the app that created the room
+      createdAt: i.number().indexed(),
+    }),
   },
   links: {
     profileGames: {

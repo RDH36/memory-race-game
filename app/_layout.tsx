@@ -41,6 +41,12 @@ function AppContent() {
           name="game/index"
           options={{ gestureEnabled: false }}
         />
+        <Stack.Screen
+          name="game/online"
+          options={{ gestureEnabled: false }}
+        />
+        <Stack.Screen name="room/create" />
+        <Stack.Screen name="room/join" />
         <Stack.Screen name="result/index" />
       </Stack>
     </>

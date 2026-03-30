@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
@@ -9,6 +9,7 @@ import { BotSelectCard } from "../../components/home/BotSelectCard";
 import { StatsRow } from "../../components/home/StatsRow";
 import { Label } from "../../components/ui/Label";
 import { BottomSheet } from "../../components/ui/BottomSheet";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 
@@ -18,12 +19,18 @@ const BOT_DATA = [
   { key: "hard", name: "AlphaMemory", avatar: "🤖", color: "#534AB7", pairs: 12, power: 3 },
 ] as const;
 
+const CASUAL_OPTIONS = [
+  { key: "create", icon: "🏠", titleKey: "room.createRoom", descKey: "room.createDesc", color: "#1D9E75" },
+  { key: "join", icon: "🔗", titleKey: "room.joinRoom", descKey: "room.joinDesc", color: "#534AB7" },
+] as const;
+
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { stats, avatar, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
   const { colors, isDark } = useTheme();
   const [showDifficulty, setShowDifficulty] = useState(false);
+  const [showCasual, setShowCasual] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleSelectDifficulty = (difficulty: string) => {
@@ -122,8 +129,7 @@ export default function HomeScreen() {
             desc={t("home.modes.casualDesc")}
             badge={t("home.modes.casualBadge")}
             badgeColor="#1D9E75"
-            disabled
-            onPress={() => {}}
+            onPress={() => setShowCasual(true)}
           />
         </View>
 
@@ -152,6 +158,79 @@ export default function HomeScreen() {
               loading={loading}
               onPress={() => handleSelectDifficulty(bot.key)}
             />
+          ))}
+        </View>
+      </BottomSheet>
+
+      {/* Casual Mode Modal */}
+      <BottomSheet
+        visible={showCasual}
+        onClose={() => setShowCasual(false)}
+        title={t("room.casualTitle")}
+      >
+        <View style={{ gap: 12 }}>
+          {CASUAL_OPTIONS.map((opt, index) => (
+            <Animated.View key={opt.key} entering={FadeInDown.delay(index * 80).duration(350).springify().damping(14)}>
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setShowCasual(false);
+                  setTimeout(() => {
+                    router.push(opt.key === "create" ? "/room/create" : "/room/join");
+                  }, 300);
+                }}
+                style={({ pressed }) => ({
+                  transform: [{ scale: pressed ? 0.96 : 1 }],
+                })}
+              >
+                <View
+                  style={{
+                    backgroundColor: isDark ? colors.surfaceContainerHigh : colors.surfaceContainer,
+                    borderRadius: 16,
+                    borderLeftWidth: 4,
+                    borderLeftColor: opt.color,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingHorizontal: 16,
+                    paddingVertical: 18,
+                    gap: 14,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 52,
+                      height: 52,
+                      borderRadius: 26,
+                      backgroundColor: opt.color + "18",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ fontSize: 26 }}>{opt.icon}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 17, fontFamily: "Fredoka_700Bold", color: opt.color }}>
+                      {t(opt.titleKey)}
+                    </Text>
+                    <Text style={{ fontSize: 12, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceVariant, marginTop: 3 }}>
+                      {t(opt.descKey)}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 16,
+                      backgroundColor: opt.color + "14",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ fontSize: 16, color: opt.color, fontFamily: "Fredoka_700Bold" }}>{">"}</Text>
+                  </View>
+                </View>
+              </Pressable>
+            </Animated.View>
           ))}
         </View>
       </BottomSheet>

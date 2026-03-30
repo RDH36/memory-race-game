@@ -130,7 +130,7 @@ export default function GameScreen() {
             cardEmojis={game.cardEmojis}
             selected={game.selected}
             matchedBy={game.matchedBy}
-            locked={game.locked}
+            locked={game.locked || game.currentTurn !== 1}
             currentTurn={game.currentTurn}
             lastMatchResult={lastMatchResult}
             tornadoActive={game.tornadoActive}

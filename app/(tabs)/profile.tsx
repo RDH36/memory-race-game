@@ -8,8 +8,7 @@ import { useTheme } from "../../lib/ThemeContext";
 import { ProfileHeader } from "../../components/profile/ProfileHeader";
 import { ProfileStats } from "../../components/profile/ProfileStats";
 import { Card } from "../../components/ui/Card";
-
-const APP_VERSION = "0.0.1";
+import { APP_VERSION } from "../../lib/constants";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();

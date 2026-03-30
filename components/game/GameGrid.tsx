@@ -149,7 +149,7 @@ export function GameGrid({
             const isFaceUp =
               selected.includes(cardId) || matchedBy[cardId] !== -1;
             const isDisabled =
-              matchedBy[cardId] !== -1 || locked || currentTurn !== 1;
+              matchedBy[cardId] !== -1 || locked;
 
             const isJustMatched =
               lastMatchResult?.type === 'match' &&
