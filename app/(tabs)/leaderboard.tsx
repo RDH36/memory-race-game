@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "expo-router";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { LoadingCard } from "../../components/ui/LoadingCard";
@@ -10,14 +11,14 @@ import { TabBar, TabKey } from "../../components/leaderboard/TabBar";
 import {
   LeaderboardEntry,
   LeaderboardRow,
-  getWinRate,
 } from "../../components/leaderboard/LeaderboardRow";
 
 export default function LeaderboardScreen() {
   const { t } = useTranslation();
   const { colors, isDark } = useTheme();
+  const router = useRouter();
   const { stats, avatar, nickname, userId } = usePlayerStats();
-  const [activeTab, setActiveTab] = useState<TabKey>("winRate");
+  const [activeTab, setActiveTab] = useState<TabKey>("xp");
 
   const { data, isLoading } = db.useQuery({
     leaderboard: {
@@ -46,18 +47,8 @@ export default function LeaderboardScreen() {
       };
     });
 
-    if (activeTab === "winRate") {
-      return mapped
-        .sort((a, b) => {
-          const wrA = getWinRate(a);
-          const wrB = getWinRate(b);
-          if (wrB !== wrA) return wrB - wrA;
-          return b.wins - a.wins;
-        })
-        .slice(0, 200);
-    }
     return mapped.sort((a, b) => b.xp - a.xp).slice(0, 200);
-  }, [data, userId, nickname, avatar, t, activeTab]);
+  }, [data, userId, nickname, avatar, t]);
 
   const me: LeaderboardEntry = entries.find((e) => e.isCurrentUser) || {
     id: userId || "me",
@@ -128,10 +119,16 @@ export default function LeaderboardScreen() {
             <LeaderboardRow
               item={item}
               rank={index + 1}
-              activeTab={activeTab}
               colors={colors}
               isDark={isDark}
               t={t}
+              onPress={() => {
+                if (item.isCurrentUser) {
+                  router.push("/(tabs)/profile");
+                } else {
+                  router.push(`/player/${item.id}`);
+                }
+              }}
             />
           )}
           showsVerticalScrollIndicator={false}
@@ -151,10 +148,10 @@ export default function LeaderboardScreen() {
         <LeaderboardRow
           item={me}
           rank={myRank}
-          activeTab={activeTab}
           colors={colors}
           isDark={isDark}
           t={t}
+          onPress={() => router.push("/(tabs)/profile")}
         />
       </View>
     </SafeAreaView>

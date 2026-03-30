@@ -111,11 +111,17 @@
     "bestStreak": "Best streak",
     "currentStreak": "Current streak",
     "winRate": "Win rate",
-    "rankProgress": "Rank progress",
-    "nextRank": "Next: {{rank}}",
-    "maxRank": "Max rank reached!",
     "statsTitle": "Statistics",
-    "rankTitle": "Rank"
+    "levelTitle": "Progress",
+    "rankTitle": "Rank",
+    "rankComingSoon": "Available in V2",
+    "tabGlobal": "Global",
+    "tabVsAi": "VS AI",
+    "tabVsFriends": "VS Friends",
+    "aiEasy": "Easy",
+    "aiMedium": "Normal",
+    "aiHard": "Hard",
+    "noGames": "No games yet"
   },
   "ranks": {
     "BRONZE": "Bronze",

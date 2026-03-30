@@ -13,23 +13,22 @@ export default function SettingsScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }} edges={["top"]}>
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 24 }}>
           <Pressable
-            onPress={() => router.replace("/(tabs)/profile")}
-            style={({ pressed }) => ({
+            onPress={() => router.back()}
+            style={{
               width: 40,
               height: 40,
               borderRadius: 12,
               backgroundColor: colors.surfaceContainer,
               alignItems: "center",
               justifyContent: "center",
-              transform: [{ scale: pressed ? 0.9 : 1 }],
-            })}
+            }}
           >
             <Ionicons name="arrow-back" size={20} color={colors.onSurfaceVariant} />
           </Pressable>

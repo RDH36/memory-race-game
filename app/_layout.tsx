@@ -48,6 +48,7 @@ function AppContent() {
         <Stack.Screen name="room/create" />
         <Stack.Screen name="room/join" />
         <Stack.Screen name="result/index" />
+        <Stack.Screen name="player/[id]" />
       </Stack>
     </>
   );

@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 
-export type TabKey = "winRate" | "xp" | "rank";
+export type TabKey = "xp" | "rank";
 
 export function TabBar({
   activeTab,
@@ -17,7 +17,6 @@ export function TabBar({
 }) {
   const tabs: { key: TabKey; label: string; disabled?: boolean }[] = [
     { key: "xp", label: t("leaderboard.tabXp") },
-    { key: "winRate", label: t("leaderboard.tabWinRate") },
     { key: "rank", label: t("leaderboard.tabRank"), disabled: true },
   ];
 
