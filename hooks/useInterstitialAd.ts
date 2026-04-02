@@ -16,16 +16,16 @@ function createAndLoadAd() {
   interstitial = InterstitialAd.createForAdRequest(AD_UNIT_ID);
 
   interstitial.addAdEventListener(AdEventType.LOADED, () => {
-    console.log("[Ad] Interstitial loaded");
+
     isAdLoaded = true;
   });
 
   interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
-    console.log("[Ad] Interstitial error:", error.message);
+
     isAdLoaded = false;
   });
 
-  console.log("[Ad] Loading interstitial...");
+
   interstitial.load();
 }
 
@@ -33,11 +33,11 @@ function createAndLoadAd() {
 mobileAds()
   .initialize()
   .then(() => {
-    console.log("[Ad] SDK initialized");
+
     createAndLoadAd();
   })
   .catch((err) => {
-    console.log("[Ad] SDK init error:", err);
+
   });
 
 /**
@@ -47,14 +47,14 @@ mobileAds()
  */
 export function showInterstitialThen(onComplete: () => void) {
   if (!isAdLoaded || !interstitial) {
-    console.log("[Ad] No ad ready, skipping");
+
     onComplete();
     return;
   }
 
-  console.log("[Ad] Showing interstitial before navigation");
+
   const unsubClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-    console.log("[Ad] Interstitial closed, navigating");
+
     unsubClosed();
     isAdLoaded = false;
     createAndLoadAd();
