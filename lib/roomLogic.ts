@@ -20,6 +20,7 @@ export interface RoomData {
   winnerId?: string;
   startAt?: number;
   appVersion?: string;
+  matchmaking?: boolean;
   createdAt: number;
 }
 
@@ -163,6 +164,89 @@ export async function forfeitRoom(roomId: string, winnerId: string) {
 
 export async function deleteRoom(roomId: string) {
   await db.transact(tx.rooms[roomId].delete());
+}
+
+const DIFFICULTIES: CpuDifficulty[] = ["easy", "medium", "hard"];
+
+function randomDifficulty(): CpuDifficulty {
+  return DIFFICULTIES[Math.floor(Math.random() * DIFFICULTIES.length)];
+}
+
+export async function findMatchmakingRoom(
+  userId: string,
+): Promise<RoomData | null> {
+  const { data } = await db.queryOnce({
+    rooms: {
+      $: {
+        where: {
+          matchmaking: true,
+          status: "waiting",
+        },
+      },
+    },
+  });
+
+  const rooms = (data?.rooms ?? []) as RoomData[];
+  // Find a room where we're not the host and no guest yet
+  return rooms.find((r) => r.hostId !== userId && !r.guestId) ?? null;
+}
+
+export async function createMatchmakingRoom(
+  hostId: string,
+  hostNickname: string,
+  hostAvatar: string,
+): Promise<{ roomId: string; code: string; difficulty: CpuDifficulty }> {
+  const roomId = id();
+  const code = generateRoomCode();
+  const difficulty = randomDifficulty();
+
+  await db.transact(
+    tx.rooms[roomId].update({
+      code,
+      hostId,
+      hostNickname,
+      hostAvatar,
+      difficulty,
+      status: "waiting",
+      matchmaking: true,
+      appVersion: APP_VERSION,
+      createdAt: Date.now(),
+    }),
+  );
+
+  return { roomId, code, difficulty };
+}
+
+export async function joinMatchmakingRoom(
+  room: RoomData,
+  guestId: string,
+  guestNickname: string,
+  guestAvatar: string,
+): Promise<{ roomId: string; error?: string }> {
+  // Re-check room is still available
+  const { data } = await db.queryOnce({
+    rooms: { $: { where: { id: room.id } } },
+  });
+  const current = data?.rooms?.[0] as RoomData | undefined;
+  if (!current || current.guestId || current.status !== "waiting") {
+    return { roomId: "", error: "full" };
+  }
+
+  // Version check
+  if (current.appVersion && current.appVersion !== APP_VERSION) {
+    if (current.appVersion > APP_VERSION) return { roomId: "", error: "versionOld" };
+    return { roomId: "", error: "versionNew" };
+  }
+
+  await db.transact(
+    tx.rooms[room.id].update({
+      guestId,
+      guestNickname,
+      guestAvatar,
+    }),
+  );
+
+  return { roomId: room.id };
 }
 
 export function useRoom(code: string | undefined) {

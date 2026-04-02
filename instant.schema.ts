@@ -44,6 +44,7 @@ const _schema = i.schema({
       winnerId: i.string().optional(),
       startAt: i.number().optional(), // timestamp when game starts (after countdown)
       appVersion: i.string().optional(), // version of the app that created the room
+      matchmaking: i.boolean().optional(), // true if room is for random matchmaking
       createdAt: i.number().indexed(),
     }),
   },

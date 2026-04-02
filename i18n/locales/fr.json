@@ -190,6 +190,11 @@
     "quitCancel": "Continuer",
     "quitConfirm": "Abandonner",
     "forfeit": "Forfait ! Temps écoulé",
+    "matchmaking": "Matchmaking",
+    "matchmakingDesc": "Trouve un adversaire au hasard",
+    "searching": "Recherche d'un adversaire...",
+    "searchingDesc": "Patiente, on te trouve un adversaire",
+    "found": "Adversaire trouvé !",
     "errorTitle": "Oups !",
     "error": {
       "notFound": "Room introuvable",
@@ -198,6 +203,10 @@
       "versionOld": "Mets à jour Flipia pour rejoindre cette room",
       "versionNew": "L'autre joueur doit mettre à jour Flipia"
     }
+  },
+  "promo": {
+    "mitsitsy": "Gère ton argent facilement. 100% gratuit et hors-ligne.",
+    "download": "Essayer"
   },
   "settings": {
     "title": "Paramètres",

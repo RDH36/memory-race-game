@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { useOnlineGame } from "../../hooks/useOnlineGame";
+import { useBotPlayer } from "../../hooks/useBotPlayer";
 import { useRoom, forfeitRoom, deleteRoom } from "../../lib/roomLogic";
 import { GameGrid } from "../../components/game/GameGrid";
 import { OpponentCard, ProgressDots } from "../../components/game/PlayerHUD";
@@ -16,6 +17,7 @@ import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { GRID_CONFIG, type CpuDifficulty } from "../../lib/gameLogic";
+import { showInterstitialThen } from "../../hooks/useInterstitialAd";
 
 const TURN_TIMEOUT = 60;
 
@@ -29,10 +31,12 @@ function Tooltip({ text }: { text: string }) {
 }
 
 export default function OnlineGameScreen() {
-  const { roomCode, difficulty = "medium" } = useLocalSearchParams<{
+  const { roomCode, difficulty = "medium", botMode: botModeParam } = useLocalSearchParams<{
     roomCode: string;
     difficulty?: string;
+    botMode?: string;
   }>();
+  const isBotMode = botModeParam === "1";
   const router = useRouter();
   const { t } = useTranslation();
   const { colors, isDark } = useTheme();
@@ -43,6 +47,9 @@ export default function OnlineGameScreen() {
     game, isHost, myTurn, lastMatchResult,
     handleCardPress, handleTornado, handleTornadoComplete,
   } = useOnlineGame(room, userId);
+
+  // Ghost bot plays as guest when botMode is active
+  useBotPlayer(room, game, difficulty as CpuDifficulty, isBotMode);
 
   const gameStartRef = useRef(Date.now());
   const [turnTimer, setTurnTimer] = useState(TURN_TIMEOUT);
@@ -81,7 +88,7 @@ export default function OnlineGameScreen() {
   // --- Quit confirmation ---
   const confirmQuit = () => {
     if (!room || !game || game.status !== "playing") {
-      router.back();
+      showInterstitialThen(() => router.back());
       return;
     }
     setShowQuitModal(true);
@@ -89,7 +96,7 @@ export default function OnlineGameScreen() {
 
   const handleAbandon = () => {
     setShowQuitModal(false);
-    if (!room || !game) { router.back(); return; }
+    if (!room || !game) { showInterstitialThen(() => router.back()); return; }
 
     const winnerId = isHost ? room.guestId! : room.hostId;
     forfeitRoom(room.id, winnerId);
@@ -98,23 +105,26 @@ export default function OnlineGameScreen() {
     const myScore = isHost ? game.scores.p1 : game.scores.p2;
     const theirScore = isHost ? game.scores.p2 : game.scores.p1;
 
-    router.replace({
-      pathname: "/result",
-      params: {
-        p1Score: myScore.toString(),
-        p2Score: theirScore.toString(),
-        difficulty,
-        totalTime: totalTimeSec.toString(),
-        p1Attempts: game.p1Attempts.toString(),
-        tornadoUsed: (isHost ? game.tornadoUsed.p1 : game.tornadoUsed.p2) ? "1" : "0",
-        maxStreak: game.p1MaxStreak.toString(),
-        mode: "casual",
-        roomId: room.id,
-        opponentName, opponentAvatar,
-        isHost: isHost ? "1" : "0",
-        forfeit: "1",
-        forfeitWon: "0",
-      },
+    showInterstitialThen(() => {
+      router.replace({
+        pathname: "/result",
+        params: {
+          p1Score: myScore.toString(),
+          p2Score: theirScore.toString(),
+          difficulty,
+          totalTime: totalTimeSec.toString(),
+          p1Attempts: game.p1Attempts.toString(),
+          tornadoUsed: (isHost ? game.tornadoUsed.p1 : game.tornadoUsed.p2) ? "1" : "0",
+          maxStreak: game.p1MaxStreak.toString(),
+          mode: "casual",
+          roomId: room.id,
+          opponentName, opponentAvatar,
+          isHost: isHost ? "1" : "0",
+          forfeit: "1",
+          forfeitWon: "0",
+          ...(isBotMode && { matchmaking: "1" }),
+        },
+      });
     });
   };
 
@@ -140,23 +150,26 @@ export default function OnlineGameScreen() {
       const theirScore = isHost ? game.scores.p2 : game.scores.p1;
       const iWonForfeit = room.status === "forfeit" && room.winnerId === userId;
 
-      router.replace({
-        pathname: "/result",
-        params: {
-          p1Score: myScore.toString(),
-          p2Score: theirScore.toString(),
-          difficulty,
-          totalTime: totalTimeSec.toString(),
-          p1Attempts: game.p1Attempts.toString(),
-          tornadoUsed: (isHost ? game.tornadoUsed.p1 : game.tornadoUsed.p2) ? "1" : "0",
-          maxStreak: game.p1MaxStreak.toString(),
-          mode: "casual",
-          roomId: room.id,
-          opponentName, opponentAvatar,
-          isHost: isHost ? "1" : "0",
-          forfeit: room.status === "forfeit" ? "1" : "0",
-          forfeitWon: iWonForfeit ? "1" : "0",
-        },
+      showInterstitialThen(() => {
+        router.replace({
+          pathname: "/result",
+          params: {
+            p1Score: myScore.toString(),
+            p2Score: theirScore.toString(),
+            difficulty,
+            totalTime: totalTimeSec.toString(),
+            p1Attempts: game.p1Attempts.toString(),
+            tornadoUsed: (isHost ? game.tornadoUsed.p1 : game.tornadoUsed.p2) ? "1" : "0",
+            maxStreak: game.p1MaxStreak.toString(),
+            mode: "casual",
+            roomId: room.id,
+            opponentName, opponentAvatar,
+            isHost: isHost ? "1" : "0",
+            forfeit: room.status === "forfeit" ? "1" : "0",
+            forfeitWon: iWonForfeit ? "1" : "0",
+            ...(isBotMode && { matchmaking: "1" }),
+          },
+        });
       });
     }
   }, [game?.status, room?.status]);

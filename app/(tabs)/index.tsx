@@ -12,6 +12,7 @@ import { BottomSheet } from "../../components/ui/BottomSheet";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
+import { MitsitsyCard } from "../../components/promo/MitsitsyCard";
 
 const BOT_DATA = [
   { key: "easy", name: "BabyBot", avatar: "🐣", color: "#1D9E75", pairs: 6, power: 1 },
@@ -20,6 +21,7 @@ const BOT_DATA = [
 ] as const;
 
 const CASUAL_OPTIONS = [
+  { key: "matchmaking", icon: "🎲", titleKey: "room.matchmaking", descKey: "room.matchmakingDesc", color: "#D4820A" },
   { key: "create", icon: "🏠", titleKey: "room.createRoom", descKey: "room.createDesc", color: "#1D9E75" },
   { key: "join", icon: "🔗", titleKey: "room.joinRoom", descKey: "room.joinDesc", color: "#534AB7" },
 ] as const;
@@ -136,6 +138,11 @@ export default function HomeScreen() {
         {/* Stats */}
         <Label text={t("home.myStats")} />
         <StatsRow />
+
+        {/* Cross-promo Mitsitsy */}
+        <View style={{ marginTop: 28 }}>
+          <MitsitsyCard />
+        </View>
       </ScrollView>
 
       {/* Difficulty Modal */}
@@ -176,7 +183,12 @@ export default function HomeScreen() {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   setShowCasual(false);
                   setTimeout(() => {
-                    router.push(opt.key === "create" ? "/room/create" : "/room/join");
+                    const routes = {
+                      matchmaking: "/room/matchmaking",
+                      create: "/room/create",
+                      join: "/room/join",
+                    } as const;
+                    router.push(routes[opt.key]);
                   }, 300);
                 }}
                 style={({ pressed }) => ({

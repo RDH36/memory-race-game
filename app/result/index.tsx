@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, Pressable } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
@@ -12,6 +12,7 @@ import Animated, {
   withDelay,
   withSpring,
 } from "react-native-reanimated";
+import { Linking } from "react-native";
 import { ConfettiParticles } from "../../components/result/ConfettiParticles";
 import { ScoreCard } from "../../components/result/ScoreCard";
 import { StatItem } from "../../components/result/StatItem";
@@ -20,6 +21,7 @@ import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { useTheme } from "../../lib/ThemeContext";
 import { deleteRoom } from "../../lib/roomLogic";
+import { MitsitsyCard } from "../../components/promo/MitsitsyCard";
 
 const CPU_PROFILES: Record<string, { name: string; avatar: string }> = {
   easy: { name: "BabyBot", avatar: "🐣" },
@@ -45,6 +47,7 @@ export default function ResultScreen() {
     isHost = "1",
     forfeit = "0",
     forfeitWon = "0",
+    matchmaking = "0",
   } = useLocalSearchParams<{
     p1Score?: string;
     p2Score?: string;
@@ -60,6 +63,7 @@ export default function ResultScreen() {
     isHost?: string;
     forfeit?: string;
     forfeitWon?: string;
+    matchmaking?: string;
   }>();
   const router = useRouter();
   const { t } = useTranslation();
@@ -67,9 +71,10 @@ export default function ResultScreen() {
   const { avatar, recordGame, lastXpGain, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
   const recorded = useRef(false);
 
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
 
   const isCasual = mode === "casual";
+  const isMatchmaking = matchmaking === "1";
   const iAmHost = isHost === "1";
   const isForfeit = forfeit === "1";
   const iWonForfeit = forfeitWon === "1";
@@ -213,27 +218,29 @@ export default function ResultScreen() {
 
         {/* Action buttons */}
         <Animated.View style={[buttonsStyle, { flexDirection: "row", gap: 8, width: "100%" }]}>
-          <Button
-            icon="🎮"
-            text={t("result.rematch")}
-            loading={loading === "replay"}
-            disabled={loading !== null && loading !== "replay"}
-            style={{ flex: 1 }}
-            onPress={() => {
-              setLoading("replay");
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              cleanupRoom();
-              if (isCasual) {
-                router.replace("/(tabs)");
-              } else {
-                router.replace({ pathname: "/game", params: { difficulty } });
-              }
-            }}
-          />
+          {!isMatchmaking && (
+            <Button
+              icon="🎮"
+              text={t("result.rematch")}
+              loading={loading === "replay"}
+              disabled={loading !== null && loading !== "replay"}
+              style={{ flex: 1 }}
+              onPress={() => {
+                setLoading("replay");
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                cleanupRoom();
+                if (isCasual) {
+                  router.replace("/(tabs)");
+                } else {
+                  router.replace({ pathname: "/game", params: { difficulty } });
+                }
+              }}
+            />
+          )}
           <Button
             icon="🔀"
             text={t("result.newGame")}
-            variant="secondary"
+            variant={isMatchmaking ? "primary" : "secondary"}
             loading={loading === "new"}
             disabled={loading !== null && loading !== "new"}
             style={{ flex: 1 }}
@@ -241,7 +248,11 @@ export default function ResultScreen() {
               setLoading("new");
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               cleanupRoom();
-              router.replace("/(tabs)");
+              if (isMatchmaking) {
+                router.replace("/room/matchmaking");
+              } else {
+                router.replace("/(tabs)");
+              }
             }}
           />
           <Button
@@ -258,6 +269,11 @@ export default function ResultScreen() {
               router.replace("/(tabs)");
             }}
           />
+        </Animated.View>
+
+        {/* Cross-promo Mitsitsy */}
+        <Animated.View style={[buttonsStyle, { marginTop: 28 }]}>
+          <MitsitsyCard />
         </Animated.View>
       </ScrollView>
     </SafeAreaView>

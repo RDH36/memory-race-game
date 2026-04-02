@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { BackHandler, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -9,9 +9,11 @@ import { OpponentCard, ProgressDots, formatTime } from "../../components/game/Pl
 import { ActionBar } from "../../components/game/ActionBar";
 import { TornadoOverlay } from "../../components/game/TornadoOverlay";
 import { MatchFeedback } from "../../components/game/MatchFeedback";
+import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { GRID_CONFIG, type CpuDifficulty } from "../../lib/gameLogic";
+import { showInterstitialThen } from "../../hooks/useInterstitialAd";
 
 const CPU_PROFILES: Record<string, { name: string; avatar: string }> = {
   easy: { name: "BabyBot", avatar: "🐣" },
@@ -30,6 +32,7 @@ export default function GameScreen() {
 
   const cpu = CPU_PROFILES[difficulty] ?? CPU_PROFILES.medium;
   const [turnTimer, setTurnTimer] = useState(0);
+  const [showQuitModal, setShowQuitModal] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const gameStartRef = useRef(Date.now());
 
@@ -44,19 +47,46 @@ export default function GameScreen() {
     if (game.status === "finished") {
       if (timerRef.current) clearInterval(timerRef.current);
       const totalTimeSec = Math.round((Date.now() - gameStartRef.current) / 1000);
-      router.replace({
-        pathname: "/result",
-        params: {
-          p1Score: game.scores.p1.toString(),
-          p2Score: game.scores.p2.toString(),
-          difficulty,
-          totalTime: totalTimeSec.toString(),
-          p1Attempts: game.p1Attempts.toString(),
-          tornadoUsed: game.tornadoUsed.p1 ? "1" : "0",
-          maxStreak: game.p1MaxStreak.toString(),
-        },
+      showInterstitialThen(() => {
+        router.replace({
+          pathname: "/result",
+          params: {
+            p1Score: game.scores.p1.toString(),
+            p2Score: game.scores.p2.toString(),
+            difficulty,
+            totalTime: totalTimeSec.toString(),
+            p1Attempts: game.p1Attempts.toString(),
+            tornadoUsed: game.tornadoUsed.p1 ? "1" : "0",
+            maxStreak: game.p1MaxStreak.toString(),
+          },
+        });
       });
     }
+  }, [game.status]);
+
+  const confirmQuit = () => {
+    if (game.status !== "playing") {
+      showInterstitialThen(() => router.back());
+      return;
+    }
+    setShowQuitModal(true);
+  };
+
+  const handleAbandon = () => {
+    setShowQuitModal(false);
+    showInterstitialThen(() => router.back());
+  };
+
+  // Android back button
+  useEffect(() => {
+    const handler = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (game.status === "playing") {
+        confirmQuit();
+        return true;
+      }
+      return false;
+    });
+    return () => handler.remove();
   }, [game.status]);
 
   const canUseTornado =
@@ -76,7 +106,7 @@ export default function GameScreen() {
         {/* Header — back button */}
         <View style={{ marginBottom: 10 }}>
           <Pressable
-            onPress={() => router.back()}
+            onPress={confirmQuit}
             hitSlop={16}
             style={{
               flexDirection: "row",
@@ -189,6 +219,18 @@ export default function GameScreen() {
       {game.tornadoActive && (
         <TornadoOverlay onComplete={handleTornadoComplete} />
       )}
+
+      <ConfirmModal
+        visible={showQuitModal}
+        icon="🏳️"
+        title={t("room.quitTitle")}
+        message={t("room.quitMessage")}
+        cancelText={t("room.quitCancel")}
+        confirmText={t("room.quitConfirm")}
+        confirmIcon="🚪"
+        onCancel={() => setShowQuitModal(false)}
+        onConfirm={handleAbandon}
+      />
     </SafeAreaView>
   );
 }

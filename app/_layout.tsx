@@ -10,6 +10,7 @@ import { useFonts } from "expo-font";
 import { Fredoka_500Medium, Fredoka_600SemiBold, Fredoka_700Bold } from "@expo-google-fonts/fredoka";
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold } from "@expo-google-fonts/nunito";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import "../hooks/useInterstitialAd";
 import { PlayerStatsProvider } from "../lib/playerStats";
 import { ThemeProvider, useTheme } from "../lib/ThemeContext";
 
@@ -47,6 +48,7 @@ function AppContent() {
         />
         <Stack.Screen name="room/create" />
         <Stack.Screen name="room/join" />
+        <Stack.Screen name="room/matchmaking" />
         <Stack.Screen name="result/index" />
         <Stack.Screen name="player/[id]" />
       </Stack>

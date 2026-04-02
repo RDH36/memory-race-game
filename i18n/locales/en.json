@@ -190,6 +190,11 @@
     "quitCancel": "Continue",
     "quitConfirm": "Abandon",
     "forfeit": "Forfeit! Time's up",
+    "matchmaking": "Matchmaking",
+    "matchmakingDesc": "Find a random opponent",
+    "searching": "Searching for an opponent...",
+    "searchingDesc": "Hang on, finding you an opponent",
+    "found": "Opponent found!",
     "errorTitle": "Oops!",
     "error": {
       "notFound": "Room not found",
@@ -198,6 +203,10 @@
       "versionOld": "Update Flipia to join this room",
       "versionNew": "The other player needs to update Flipia"
     }
+  },
+  "promo": {
+    "mitsitsy": "Manage your money easily. 100% free and offline.",
+    "download": "Try it"
   },
   "settings": {
     "title": "Settings",

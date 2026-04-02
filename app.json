@@ -1,4 +1,7 @@
 {
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-8114482764700286~9864366044"
+  },
   "expo": {
     "name": "Flipia",
     "slug": "flipia",
@@ -29,6 +32,12 @@
         "@react-native-google-signin/google-signin",
         {
           "iosUrlScheme": "com.googleusercontent.apps.YOUR_IOS_CLIENT_ID"
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-8114482764700286~9864366044"
         }
       ]
     ],
