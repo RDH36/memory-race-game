@@ -45,3 +45,5 @@ yarn-error.*
 .mcp.json
 skills-lock.json
 .env
+
+/private
