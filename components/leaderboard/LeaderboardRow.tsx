@@ -8,6 +8,7 @@ export interface LeaderboardEntry {
   wins: number;
   gamesPlayed: number;
   isCurrentUser?: boolean;
+  isBot?: boolean;
 }
 
 function computeLevel(xp: number) {
@@ -20,6 +21,12 @@ function computeLevel(xp: number) {
     level++;
   }
 }
+
+const PODIUM_COLORS: Record<number, { border: string; bg: string; bgDark: string; accent: string }> = {
+  1: { border: "#F5C542", bg: "#FFF7DC", bgDark: "#3A2E10", accent: "#B8860B" },
+  2: { border: "#C0C6CE", bg: "#F3F5F8", bgDark: "#2C2F33", accent: "#7A828C" },
+  3: { border: "#D48A5A", bg: "#FDEEE2", bgDark: "#3A2618", accent: "#8A4A1F" },
+};
 
 export function LeaderboardRow({
   item,
@@ -38,6 +45,16 @@ export function LeaderboardRow({
 }) {
   const level = computeLevel(item.xp);
   const isPodium = rank <= 3;
+  const podium = isPodium ? PODIUM_COLORS[rank] : null;
+
+  const baseBackground = item.isCurrentUser
+    ? colors.primaryContainerBg
+    : colors.surfaceContainer;
+  const background = podium
+    ? isDark
+      ? podium.bgDark
+      : podium.bg
+    : baseBackground;
 
   return (
     <Pressable onPress={onPress}>
@@ -45,19 +62,26 @@ export function LeaderboardRow({
         style={{
           flexDirection: "row",
           alignItems: "center",
-          paddingVertical: 12,
+          paddingVertical: podium ? 16 : 12,
           paddingHorizontal: 16,
           marginHorizontal: 20,
-          marginBottom: 6,
-          borderRadius: 12,
-          backgroundColor: item.isCurrentUser
-            ? colors.primaryContainerBg
-            : colors.surfaceContainer,
+          marginBottom: podium ? 10 : 6,
+          borderRadius: 16,
+          backgroundColor: background,
+          borderWidth: podium ? 1.5 : 0,
+          borderColor: podium?.border,
+          ...(podium && {
+            shadowColor: podium.border,
+            shadowOpacity: isDark ? 0.35 : 0.18,
+            shadowRadius: 10,
+            shadowOffset: { width: 0, height: 3 },
+            elevation: 3,
+          }),
         }}
       >
-        <View style={{ width: 32, alignItems: "center" }}>
-          {isPodium ? (
-            <Text style={{ fontSize: 18 }}>
+        <View style={{ width: podium ? 36 : 32, alignItems: "center" }}>
+          {podium ? (
+            <Text style={{ fontSize: 24 }}>
               {rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉"}
             </Text>
           ) : (
@@ -75,9 +99,9 @@ export function LeaderboardRow({
 
         <View
           style={{
-            width: 36,
-            height: 36,
-            borderRadius: 18,
+            width: podium ? 44 : 36,
+            height: podium ? 44 : 36,
+            borderRadius: podium ? 22 : 18,
             backgroundColor: item.isCurrentUser
               ? colors.primaryContainer + "22"
               : isDark
@@ -86,21 +110,25 @@ export function LeaderboardRow({
             alignItems: "center",
             justifyContent: "center",
             marginLeft: 8,
+            borderWidth: podium ? 2 : 0,
+            borderColor: podium?.border,
           }}
         >
-          <Text style={{ fontSize: 18 }}>{item.avatar}</Text>
+          <Text style={{ fontSize: podium ? 22 : 18 }}>{item.avatar}</Text>
         </View>
 
         <View style={{ flex: 1, marginLeft: 12 }}>
           <Text
             style={{
-              fontSize: 14,
-              fontFamily: item.isCurrentUser
+              fontSize: podium ? 16 : 14,
+              fontFamily: podium || item.isCurrentUser
                 ? "Fredoka_700Bold"
                 : "Nunito_600SemiBold",
-              color: item.isCurrentUser
-                ? colors.primaryContainer
-                : colors.onSurface,
+              color: podium
+                ? podium.accent
+                : item.isCurrentUser
+                  ? colors.primaryContainer
+                  : colors.onSurface,
             }}
           >
             {item.name}
@@ -114,17 +142,19 @@ export function LeaderboardRow({
             }}
           >
             {t("leaderboard.level")}
-            {level} · {item.wins} {t("leaderboard.wins")}
+            {level}
           </Text>
         </View>
 
         <Text
           style={{
-            fontSize: 14,
+            fontSize: podium ? 15 : 14,
             fontFamily: "Nunito_700Bold",
-            color: item.isCurrentUser
-              ? colors.primaryContainer
-              : colors.onSurface,
+            color: podium
+              ? podium.accent
+              : item.isCurrentUser
+                ? colors.primaryContainer
+                : colors.onSurface,
           }}
         >
           {`${item.xp.toLocaleString()} ${t("leaderboard.xp")}`}

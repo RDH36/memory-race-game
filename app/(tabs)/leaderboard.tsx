@@ -7,6 +7,7 @@ import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { LoadingCard } from "../../components/ui/LoadingCard";
 import { db } from "../../lib/instant";
+import { generateBotLeaderboard } from "../../lib/fakeLeaderboard";
 import { TabBar, TabKey } from "../../components/leaderboard/TabBar";
 import {
   LeaderboardEntry,
@@ -27,11 +28,11 @@ export default function LeaderboardScreen() {
     profiles: {},
   });
 
-  const entries: LeaderboardEntry[] = useMemo(() => {
+  const { entries, fullRanking } = useMemo(() => {
     const profilesByUserId = new Map(
       (data?.profiles ?? []).map((p: any) => [p.userId, p]),
     );
-    const mapped = (data?.leaderboard ?? []).map((entry: any) => {
+    const mapped: LeaderboardEntry[] = (data?.leaderboard ?? []).map((entry: any) => {
       const isCurrent = entry.userId === userId;
       const profile = profilesByUserId.get(entry.userId);
       return {
@@ -47,10 +48,18 @@ export default function LeaderboardScreen() {
       };
     });
 
-    return mapped.sort((a, b) => b.xp - a.xp).slice(0, 200);
+    // Pad with bots so the board never feels empty. Bots have a modest XP
+    // ceiling so an active real player naturally rises above them.
+    const bots = generateBotLeaderboard();
+    const all: LeaderboardEntry[] = [...mapped, ...bots];
+    const sorted = all.sort((a, b) => b.xp - a.xp);
+
+    // Full ranking is computed on the complete list so the current user's
+    // real rank is accurate even if they're outside the visible top 30.
+    return { entries: sorted.slice(0, 30), fullRanking: sorted };
   }, [data, userId, nickname, avatar, t]);
 
-  const me: LeaderboardEntry = entries.find((e) => e.isCurrentUser) || {
+  const me: LeaderboardEntry = fullRanking.find((e) => e.isCurrentUser) || {
     id: userId || "me",
     name: nickname || t("leaderboard.you"),
     avatar,
@@ -61,7 +70,7 @@ export default function LeaderboardScreen() {
   };
 
   const myRank =
-    entries.findIndex((e) => e.isCurrentUser) + 1 || entries.length + 1;
+    fullRanking.findIndex((e) => e.isCurrentUser) + 1 || fullRanking.length + 1;
 
   return (
     <SafeAreaView
@@ -123,6 +132,7 @@ export default function LeaderboardScreen() {
               isDark={isDark}
               t={t}
               onPress={() => {
+                if (item.isBot) return;
                 if (item.isCurrentUser) {
                   router.push("/(tabs)/profile");
                 } else {

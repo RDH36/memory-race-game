@@ -14,6 +14,7 @@ import { ActionBar } from "../../components/game/ActionBar";
 import { TornadoOverlay } from "../../components/game/TornadoOverlay";
 import { MatchFeedback } from "../../components/game/MatchFeedback";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
+import { LoadingCard } from "../../components/ui/LoadingCard";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { GRID_CONFIG, type CpuDifficulty } from "../../lib/gameLogic";
@@ -177,10 +178,8 @@ export default function OnlineGameScreen() {
   // --- Loading ---
   if (!game || !room) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface, alignItems: "center", justifyContent: "center" }}>
-        <Text style={{ fontSize: 16, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceVariant }}>
-          {t("room.loading")}
-        </Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
+        <LoadingCard />
       </SafeAreaView>
     );
   }

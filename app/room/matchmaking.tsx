@@ -247,6 +247,8 @@ export default function MatchmakingScreen() {
 
   const handleCountdownComplete = () => {
     if (!room) return;
+    // Prevent unmount cleanup from deleting the room during navigation
+    startedRef.current = true;
     router.replace({
       pathname: "/game/online",
       params: {
