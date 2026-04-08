@@ -51,6 +51,7 @@ function AppContent() {
         <Stack.Screen name="room/matchmaking" />
         <Stack.Screen name="result/index" />
         <Stack.Screen name="player/[id]" />
+        <Stack.Screen name="history" />
       </Stack>
     </>
   );

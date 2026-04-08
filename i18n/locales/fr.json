@@ -123,6 +123,17 @@
     "aiHard": "Difficile",
     "noGames": "Aucune partie"
   },
+  "history": {
+    "title": "Historique",
+    "empty": "Aucune partie jouée",
+    "loading": "Chargement...",
+    "win": "VICTOIRE",
+    "loss": "DÉFAITE",
+    "vsAiEasy": "vs IA · Facile",
+    "vsAiMedium": "vs IA · Normal",
+    "vsAiHard": "vs IA · Difficile",
+    "vsHuman": "vs Joueur"
+  },
   "ranks": {
     "BRONZE": "Bronze",
     "SILVER": "Argent",

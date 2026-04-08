@@ -123,6 +123,17 @@
     "aiHard": "Hard",
     "noGames": "No games yet"
   },
+  "history": {
+    "title": "History",
+    "empty": "No matches played yet",
+    "loading": "Loading...",
+    "win": "WIN",
+    "loss": "LOSS",
+    "vsAiEasy": "vs AI · Easy",
+    "vsAiMedium": "vs AI · Normal",
+    "vsAiHard": "vs AI · Hard",
+    "vsHuman": "vs Player"
+  },
   "ranks": {
     "BRONZE": "Bronze",
     "SILVER": "Silver",

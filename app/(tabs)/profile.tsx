@@ -26,20 +26,36 @@ export default function ProfileScreen() {
           <Text style={{ fontSize: 28, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
             {t("profile.title")}
           </Text>
-          <Pressable
-            onPress={() => router.push("/(tabs)/settings")}
-            style={({ pressed }) => ({
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              backgroundColor: colors.surfaceContainer,
-              alignItems: "center",
-              justifyContent: "center",
-              transform: [{ scale: pressed ? 0.9 : 1 }],
-            })}
-          >
-            <Ionicons name="settings" size={20} color={colors.onSurfaceVariant} />
-          </Pressable>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <Pressable
+              onPress={() => router.push("/history")}
+              style={({ pressed }) => ({
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                backgroundColor: colors.surfaceContainer,
+                alignItems: "center",
+                justifyContent: "center",
+                transform: [{ scale: pressed ? 0.9 : 1 }],
+              })}
+            >
+              <Ionicons name="time-outline" size={20} color={colors.onSurfaceVariant} />
+            </Pressable>
+            <Pressable
+              onPress={() => router.push("/(tabs)/settings")}
+              style={({ pressed }) => ({
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                backgroundColor: colors.surfaceContainer,
+                alignItems: "center",
+                justifyContent: "center",
+                transform: [{ scale: pressed ? 0.9 : 1 }],
+              })}
+            >
+              <Ionicons name="settings" size={20} color={colors.onSurfaceVariant} />
+            </Pressable>
+          </View>
         </View>
 
         <View style={{ marginBottom: 24 }}>
