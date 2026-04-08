@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { LanguageSelector } from "../../components/settings/LanguageSelector";
+import { LegalLinks } from "../../components/settings/LegalLinks";
 import { ThemeSelector } from "../../components/settings/ThemeSelector";
 import { useTheme } from "../../lib/ThemeContext";
 
@@ -42,6 +43,10 @@ export default function SettingsScreen() {
         <View style={{ marginTop: 24 }} />
 
         <LanguageSelector />
+
+        <View style={{ marginTop: 24 }} />
+
+        <LegalLinks />
       </ScrollView>
     </SafeAreaView>
   );

@@ -217,7 +217,11 @@
     "themeDark": "Dark",
     "language": "Language",
     "languageDesc": "Choose the app language",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "legal": "Legal",
+    "legalDesc": "Read our policies",
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions"
   },
   "onboarding": {
     "skip": "Skip",
