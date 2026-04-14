@@ -89,7 +89,7 @@ export default function OnlineGameScreen() {
   // --- Quit confirmation ---
   const confirmQuit = () => {
     if (!room || !game || game.status !== "playing") {
-      showInterstitialThen(() => router.back());
+      router.back();
       return;
     }
     setShowQuitModal(true);
@@ -97,7 +97,7 @@ export default function OnlineGameScreen() {
 
   const handleAbandon = () => {
     setShowQuitModal(false);
-    if (!room || !game) { showInterstitialThen(() => router.back()); return; }
+    if (!room || !game) { router.back(); return; }
 
     const winnerId = isHost ? room.guestId! : room.hostId;
     forfeitRoom(room.id, winnerId);
@@ -106,26 +106,24 @@ export default function OnlineGameScreen() {
     const myScore = isHost ? game.scores.p1 : game.scores.p2;
     const theirScore = isHost ? game.scores.p2 : game.scores.p1;
 
-    showInterstitialThen(() => {
-      router.replace({
-        pathname: "/result",
-        params: {
-          p1Score: myScore.toString(),
-          p2Score: theirScore.toString(),
-          difficulty,
-          totalTime: totalTimeSec.toString(),
-          p1Attempts: game.p1Attempts.toString(),
-          tornadoUsed: (isHost ? game.tornadoUsed.p1 : game.tornadoUsed.p2) ? "1" : "0",
-          maxStreak: game.p1MaxStreak.toString(),
-          mode: "casual",
-          roomId: room.id,
-          opponentName, opponentAvatar,
-          isHost: isHost ? "1" : "0",
-          forfeit: "1",
-          forfeitWon: "0",
-          ...(isBotMode && { matchmaking: "1" }),
-        },
-      });
+    router.replace({
+      pathname: "/result",
+      params: {
+        p1Score: myScore.toString(),
+        p2Score: theirScore.toString(),
+        difficulty,
+        totalTime: totalTimeSec.toString(),
+        p1Attempts: game.p1Attempts.toString(),
+        tornadoUsed: (isHost ? game.tornadoUsed.p1 : game.tornadoUsed.p2) ? "1" : "0",
+        maxStreak: game.p1MaxStreak.toString(),
+        mode: "casual",
+        roomId: room.id,
+        opponentName, opponentAvatar,
+        isHost: isHost ? "1" : "0",
+        forfeit: "1",
+        forfeitWon: "0",
+        ...(isBotMode && { matchmaking: "1" }),
+      },
     });
   };
 

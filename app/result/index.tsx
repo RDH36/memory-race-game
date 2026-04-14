@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, Pressable } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { useTranslation } from "react-i18next";
 import { usePlayerStats } from "../../lib/playerStats";
+import { useRewardedAd } from "../../hooks/useRewardedAd";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -48,6 +49,7 @@ export default function ResultScreen() {
     forfeit = "0",
     forfeitWon = "0",
     matchmaking = "0",
+    xpBoost = "0",
   } = useLocalSearchParams<{
     p1Score?: string;
     p2Score?: string;
@@ -64,12 +66,21 @@ export default function ResultScreen() {
     forfeit?: string;
     forfeitWon?: string;
     matchmaking?: string;
+    xpBoost?: string;
   }>();
   const router = useRouter();
   const { t } = useTranslation();
   const [loading, setLoading] = useState<"replay" | "new" | "home" | null>(null);
-  const { avatar, recordGame, lastXpGain, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
+  const [bonusClaimed, setBonusClaimed] = useState(false);
+  const { avatar, recordGame, addBonusXp, lastXpGain, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
   const recorded = useRef(false);
+
+  const onBonusReward = useCallback(() => {
+    addBonusXp(10);
+    setBonusClaimed(true);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, [addBonusXp]);
+  const { isLoaded: rewardedLoaded, showAd: showRewardedAd } = useRewardedAd(onBonusReward);
 
   const { colors, isDark } = useTheme();
 
@@ -117,7 +128,7 @@ export default function ResultScreen() {
         scoreP2: s2,
         duration: timeSec,
         player2Type: isCasual ? "human" : "cpu",
-      });
+      }, { xpBoost: xpBoost === "1" ? 1.5 : 1 });
     }
   }, []);
 
@@ -203,6 +214,52 @@ export default function ResultScreen() {
             won={effectiveWinner === "p1"}
           />
         </Animated.View>
+
+        {/* Rewarded bonus after defeat */}
+        {effectiveWinner === "p2" && !bonusClaimed && (
+          <Animated.View style={[statsStyle, { marginBottom: 12 }]}>
+            <Pressable
+              onPress={() => {
+                if (rewardedLoaded) showRewardedAd();
+              }}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                backgroundColor: "#D4820A" + "18",
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: "#D4820A" + "40",
+                paddingVertical: 12,
+                paddingHorizontal: 16,
+                opacity: rewardedLoaded ? 1 : 0.5,
+              }}
+            >
+              <Text style={{ fontSize: 18 }}>🎬</Text>
+              <Text style={{ fontSize: 14, fontFamily: "Fredoka_700Bold", color: "#D4820A" }}>
+                {t("result.watchAdBonus")}
+              </Text>
+            </Pressable>
+          </Animated.View>
+        )}
+        {bonusClaimed && (
+          <Animated.View style={[statsStyle, { marginBottom: 12 }]}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                paddingVertical: 8,
+              }}
+            >
+              <Text style={{ fontSize: 14, fontFamily: "Nunito_700Bold", color: colors.success }}>
+                ✓ {t("result.bonusClaimed")}
+              </Text>
+            </View>
+          </Animated.View>
+        )}
 
         {/* Stats grid */}
         <Animated.View style={statsStyle}>

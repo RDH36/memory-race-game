@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import mobileAds, {
   InterstitialAd,
   AdEventType,
@@ -9,22 +10,28 @@ const AD_UNIT_ID = __DEV__
   ? TEST_AD_UNIT_ID
   : process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_ID ?? TEST_AD_UNIT_ID;
 
+const GAMES_PER_AD = 3;
+const STORAGE_KEY = "interstitial_game_count";
+
 let interstitial: InterstitialAd | null = null;
 let isAdLoaded = false;
+let gameCount = 0;
+
+// Restore counter from storage
+AsyncStorage.getItem(STORAGE_KEY).then((val) => {
+  gameCount = val ? parseInt(val, 10) || 0 : 0;
+});
 
 function createAndLoadAd() {
   interstitial = InterstitialAd.createForAdRequest(AD_UNIT_ID);
 
   interstitial.addAdEventListener(AdEventType.LOADED, () => {
-
     isAdLoaded = true;
   });
 
-  interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
-
+  interstitial.addAdEventListener(AdEventType.ERROR, () => {
     isAdLoaded = false;
   });
-
 
   interstitial.load();
 }
@@ -33,28 +40,25 @@ function createAndLoadAd() {
 mobileAds()
   .initialize()
   .then(() => {
-
     createAndLoadAd();
   })
-  .catch((err) => {
-
-  });
+  .catch(() => {});
 
 /**
- * Show interstitial ad then call onComplete.
- * If no ad is loaded, calls onComplete immediately (no blocking).
+ * Show interstitial ad after a game ends, limited to 1 ad per 3 games.
+ * If no ad is loaded or limit not reached, calls onComplete immediately.
  * After ad closes, preloads the next one.
  */
 export function showInterstitialThen(onComplete: () => void) {
-  if (!isAdLoaded || !interstitial) {
+  gameCount++;
+  AsyncStorage.setItem(STORAGE_KEY, gameCount.toString());
 
+  if (gameCount % GAMES_PER_AD !== 0 || !isAdLoaded || !interstitial) {
     onComplete();
     return;
   }
 
-
   const unsubClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-
     unsubClosed();
     isAdLoaded = false;
     createAndLoadAd();

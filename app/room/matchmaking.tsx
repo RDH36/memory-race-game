@@ -27,7 +27,6 @@ import { id, tx } from "@instantdb/react-native";
 import { db } from "../../lib/instant";
 import type { CpuDifficulty } from "../../lib/gameLogic";
 import { randomFakeName, randomFakeAvatar } from "../../lib/fakeNames";
-import { showInterstitialThen } from "../../hooks/useInterstitialAd";
 
 // Random timeout between 30s and 60s so players don't notice the pattern
 const BOT_TIMEOUT_MIN = 30;
@@ -261,7 +260,7 @@ export default function MatchmakingScreen() {
 
   const handleCancel = () => {
     if (roomId) deleteRoom(roomId);
-    showInterstitialThen(() => router.back());
+    router.back();
   };
 
   // Countdown overlay

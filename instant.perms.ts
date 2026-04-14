@@ -4,33 +4,33 @@ const rules = {
   profiles: {
     allow: {
       view: "true",
-      create: "true",
-      update: "true",
-      delete: "true",
+      create: "auth.id != null",
+      update: "auth.id == data.userId",
+      delete: "false",
     },
   },
   games: {
     allow: {
       view: "true",
-      create: "true",
-      update: "true",
-      delete: "true",
+      create: "auth.id != null",
+      update: "false",
+      delete: "false",
     },
   },
   leaderboard: {
     allow: {
       view: "true",
-      create: "true",
-      update: "true",
-      delete: "true",
+      create: "auth.id != null",
+      update: "auth.id == data.userId",
+      delete: "false",
     },
   },
   rooms: {
     allow: {
       view: "true",
-      create: "true",
-      update: "true",
-      delete: "true",
+      create: "auth.id != null",
+      update: "auth.id == data.hostId || auth.id == data.guestId",
+      delete: "auth.id == data.hostId",
     },
   },
 } satisfies InstantRules;

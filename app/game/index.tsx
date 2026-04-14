@@ -22,7 +22,7 @@ const CPU_PROFILES: Record<string, { name: string; avatar: string }> = {
 };
 
 export default function GameScreen() {
-  const { difficulty = "medium" } = useLocalSearchParams<{ difficulty?: string }>();
+  const { difficulty = "medium", xpBoost = "0" } = useLocalSearchParams<{ difficulty?: string; xpBoost?: string }>();
   const router = useRouter();
   const { t } = useTranslation();
   const { colors, isDark } = useTheme();
@@ -58,6 +58,7 @@ export default function GameScreen() {
             p1Attempts: game.p1Attempts.toString(),
             tornadoUsed: game.tornadoUsed.p1 ? "1" : "0",
             maxStreak: game.p1MaxStreak.toString(),
+            xpBoost,
           },
         });
       });
@@ -66,7 +67,7 @@ export default function GameScreen() {
 
   const confirmQuit = () => {
     if (game.status !== "playing") {
-      showInterstitialThen(() => router.back());
+      router.back();
       return;
     }
     setShowQuitModal(true);
@@ -74,7 +75,7 @@ export default function GameScreen() {
 
   const handleAbandon = () => {
     setShowQuitModal(false);
-    showInterstitialThen(() => router.back());
+    router.back();
   };
 
   // Android back button

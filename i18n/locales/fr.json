@@ -32,7 +32,12 @@
     },
     "botModal": {
       "pairs": "paires"
-    }
+    },
+    "xpBoost": "XP x1.5 (pub 30s)",
+    "xpBoostDesc": "Regarde une pub pour gagner 50% de XP en plus",
+    "dailyReward": "+15 XP",
+    "dailyRewardClaimed": "Reviens demain !"
+
   },
   "game": {
     "menu": "Menu",
@@ -75,7 +80,9 @@
     "rankUp": "Rang supérieur !",
     "rematch": "Revanche",
     "newGame": "Nouvelle",
-    "goHome": "Accueil"
+    "goHome": "Accueil",
+    "watchAdBonus": "+10 XP (pub)",
+    "bonusClaimed": "Bonus récupéré !"
   },
   "stats": {
     "winRate": "Win rate",

@@ -42,6 +42,10 @@ interface GameData {
   player2Type?: "cpu" | "human";
 }
 
+interface RecordGameOptions {
+  xpBoost?: number;
+}
+
 interface StatsContext {
   stats: PlayerStats;
   avatar: string;
@@ -54,7 +58,8 @@ interface StatsContext {
   xpInLevel: number;
   winRate: number;
   lastXpGain: number;
-  recordGame: (won: boolean, difficulty?: string, gameData?: GameData) => void;
+  recordGame: (won: boolean, difficulty?: string, gameData?: GameData, options?: RecordGameOptions) => void;
+  addBonusXp: (amount: number) => void;
 }
 
 const DEFAULT_STATS: PlayerStats = {
@@ -92,11 +97,30 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
       }
     : DEFAULT_STATS;
 
-  const recordGame = useCallback((won: boolean, difficulty = "medium", gameData?: GameData) => {
+  const addBonusXp = useCallback((amount: number) => {
+    if (!userId) return;
+
+    const lbId = leaderboardId ?? id();
+    db.transact([
+      tx.leaderboard[lbId].update({
+        userId,
+        gamesPlayed: stats.gamesPlayed,
+        gamesWon: stats.gamesWon,
+        currentStreak: stats.currentStreak,
+        bestStreak: stats.bestStreak,
+        points: stats.points + amount,
+        updatedAt: Date.now(),
+      }),
+    ]);
+    setLastXpGain(amount);
+  }, [userId, stats, leaderboardId]);
+
+  const recordGame = useCallback((won: boolean, difficulty = "medium", gameData?: GameData, options?: RecordGameOptions) => {
     if (!userId) return;
 
     const rewards = XP_REWARDS[difficulty] ?? XP_REWARDS.medium;
-    const xp = won ? rewards.win : rewards.loss;
+    const baseXp = won ? rewards.win : rewards.loss;
+    const xp = Math.round(baseXp * (options?.xpBoost ?? 1));
     setLastXpGain(xp);
 
     const newStreak = won ? stats.currentStreak + 1 : 0;
@@ -150,13 +174,13 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
 
   const value = useMemo(
     () => ({
-      stats, avatar, nickname, profileId, userId, winRate, lastXpGain, recordGame,
+      stats, avatar, nickname, profileId, userId, winRate, lastXpGain, recordGame, addBonusXp,
       level: levelInfo.level,
       levelProgress: levelInfo.progress,
       xpForNextLevel: levelInfo.xpForNext,
       xpInLevel: levelInfo.xpInLevel,
     }),
-    [stats, avatar, nickname, profileId, userId, winRate, lastXpGain, recordGame, levelInfo],
+    [stats, avatar, nickname, profileId, userId, winRate, lastXpGain, recordGame, addBonusXp, levelInfo],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

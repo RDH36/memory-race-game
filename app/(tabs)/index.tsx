@@ -1,50 +1,48 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { useTranslation } from "react-i18next";
-import { ModeCard } from "../../components/home/ModeCard";
-import { BotSelectCard } from "../../components/home/BotSelectCard";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { StatsRow } from "../../components/home/StatsRow";
 import { Label } from "../../components/ui/Label";
-import { BottomSheet } from "../../components/ui/BottomSheet";
-import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { MitsitsyCard } from "../../components/promo/MitsitsyCard";
 
-const BOT_DATA = [
-  { key: "easy", name: "BabyBot", avatar: "🐣", color: "#1D9E75", pairs: 6, power: 1 },
-  { key: "medium", name: "NekoFlash", avatar: "🦊", color: "#A2340A", pairs: 8, power: 2 },
-  { key: "hard", name: "AlphaMemory", avatar: "🤖", color: "#534AB7", pairs: 12, power: 3 },
-] as const;
+const DAILY_REWARD_KEY = "daily_reward_last_claimed";
+const DAILY_REWARD_XP = 15;
 
-const CASUAL_OPTIONS = [
-  { key: "matchmaking", icon: "🎲", titleKey: "room.matchmaking", descKey: "room.matchmakingDesc", color: "#D4820A" },
-  { key: "create", icon: "🏠", titleKey: "room.createRoom", descKey: "room.createDesc", color: "#1D9E75" },
-  { key: "join", icon: "🔗", titleKey: "room.joinRoom", descKey: "room.joinDesc", color: "#534AB7" },
-] as const;
+function isSameDay(ts1: number, ts2: number) {
+  const d1 = new Date(ts1);
+  const d2 = new Date(ts2);
+  return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+}
 
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { stats, avatar, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
+  const { stats, avatar, level, levelProgress, xpInLevel, xpForNextLevel, addBonusXp } = usePlayerStats();
   const { colors, isDark } = useTheme();
-  const [showDifficulty, setShowDifficulty] = useState(false);
-  const [showCasual, setShowCasual] = useState(false);
-  const [loading, setLoading] = useState<string | null>(null);
+  const [dailyClaimed, setDailyClaimed] = useState(true);
 
-  const handleSelectDifficulty = (difficulty: string) => {
-    if (loading) return;
-    setLoading(difficulty);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setShowDifficulty(false);
-    setTimeout(() => {
-      router.push({ pathname: "/game", params: { difficulty, mode: "solo" } });
-      setLoading(null);
-    }, 350);
-  };
+  useEffect(() => {
+    AsyncStorage.getItem(DAILY_REWARD_KEY).then((val) => {
+      if (!val || !isSameDay(parseInt(val, 10), Date.now())) {
+        setDailyClaimed(false);
+      }
+    });
+  }, []);
+
+  const claimDailyReward = useCallback(() => {
+    if (dailyClaimed) return;
+    addBonusXp(DAILY_REWARD_XP);
+    setDailyClaimed(true);
+    AsyncStorage.setItem(DAILY_REWARD_KEY, Date.now().toString());
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, [dailyClaimed, addBonusXp]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }} edges={["top"]}>
@@ -105,147 +103,213 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* Mode selection */}
-        <Label text={t("home.chooseMode")} />
-        <View style={{ gap: 12, marginBottom: 28 }}>
-          <ModeCard
-            icon="🏆"
-            title={t("home.modes.ranked")}
-            desc={t("home.modes.rankedDesc")}
-            badge={t("home.modes.rankedBadge")}
-            badgeColor="#A2340A"
-            disabled
-            onPress={() => {}}
-          />
-          <ModeCard
-            icon="🎮"
-            title={t("home.modes.solo")}
-            desc={t("home.modes.soloDesc")}
-            badge={t("home.modes.soloBadge")}
-            badgeColor="#534AB7"
-            onPress={() => setShowDifficulty(true)}
-          />
-          <ModeCard
-            icon="🔥"
-            title={t("home.modes.casual")}
-            desc={t("home.modes.casualDesc")}
-            badge={t("home.modes.casualBadge")}
-            badgeColor="#1D9E75"
-            onPress={() => setShowCasual(true)}
-          />
+        {/* Daily Reward */}
+        {!dailyClaimed && (
+          <Animated.View entering={FadeInDown.duration(400)}>
+            <Pressable
+              onPress={claimDailyReward}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                backgroundColor: "#D4820A" + "18",
+                borderRadius: 14,
+                borderWidth: 1,
+                borderColor: "#D4820A" + "40",
+                paddingVertical: 12,
+                paddingHorizontal: 16,
+                marginBottom: 20,
+              }}
+            >
+              <Text style={{ fontSize: 22 }}>🎁</Text>
+              <Text style={{ fontSize: 15, fontFamily: "Fredoka_700Bold", color: "#D4820A" }}>
+                {t("home.dailyReward")}
+              </Text>
+            </Pressable>
+          </Animated.View>
+        )}
+
+        {/* Hero mode — Casual (primary CTA) */}
+        <Animated.View entering={FadeInDown.delay(50).duration(400).springify().damping(14)}>
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push("/mode/casual");
+            }}
+            style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.97 : 1 }] })}
+          >
+            <View
+              style={{
+                backgroundColor: "#1D9E75",
+                borderRadius: 20,
+                paddingVertical: 28,
+                paddingHorizontal: 24,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 16,
+                shadowColor: "#1D9E75",
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 20,
+                elevation: 8,
+              }}
+            >
+              <View
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: 32,
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ fontSize: 32 }}>🔥</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 22, fontFamily: "Fredoka_700Bold", color: "#FFF" }}>
+                  {t("home.modes.casual")}
+                </Text>
+                <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: "rgba(255,255,255,0.75)", marginTop: 4, lineHeight: 17 }}>
+                  {t("home.modes.casualDesc")}
+                </Text>
+              </View>
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ fontSize: 20, color: "#FFF", fontFamily: "Fredoka_700Bold" }}>{">"}</Text>
+              </View>
+            </View>
+          </Pressable>
+        </Animated.View>
+
+        {/* Secondary modes — 2 columns */}
+        <View style={{ flexDirection: "row", gap: 12, marginTop: 12 }}>
+          {/* Solo */}
+          <Animated.View entering={FadeInDown.delay(150).duration(400).springify().damping(14)} style={{ flex: 1 }}>
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push("/mode/solo");
+              }}
+              style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.96 : 1 }] })}
+            >
+              <View
+                style={{
+                  backgroundColor: isDark ? colors.surfaceContainerHigh : colors.surfaceContainer,
+                  borderRadius: 18,
+                  paddingVertical: 20,
+                  paddingHorizontal: 16,
+                  alignItems: "center",
+                  borderWidth: 1.5,
+                  borderColor: "#534AB7" + "25",
+                }}
+              >
+                <View
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: 26,
+                    backgroundColor: "#534AB7" + "14",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 10,
+                  }}
+                >
+                  <Text style={{ fontSize: 26 }}>🎮</Text>
+                </View>
+                <Text style={{ fontSize: 16, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
+                  {t("home.modes.solo")}
+                </Text>
+                <Text style={{ fontSize: 10, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginTop: 4, textAlign: "center" }} numberOfLines={2}>
+                  {t("home.modes.soloDesc")}
+                </Text>
+                <View
+                  style={{
+                    backgroundColor: "#534AB7" + "14",
+                    paddingHorizontal: 8,
+                    paddingVertical: 3,
+                    borderRadius: 6,
+                    marginTop: 10,
+                  }}
+                >
+                  <Text style={{ fontSize: 9, fontFamily: "Nunito_700Bold", color: "#534AB7", letterSpacing: 0.4 }}>
+                    {t("home.modes.soloBadge")}
+                  </Text>
+                </View>
+              </View>
+            </Pressable>
+          </Animated.View>
+
+          {/* Ranked (disabled) */}
+          <Animated.View entering={FadeInDown.delay(250).duration(400).springify().damping(14)} style={{ flex: 1 }}>
+            <View
+              style={{
+                backgroundColor: isDark ? colors.surfaceContainerHigh : colors.surfaceContainer,
+                borderRadius: 18,
+                paddingVertical: 20,
+                paddingHorizontal: 16,
+                alignItems: "center",
+                opacity: 0.45,
+                borderWidth: 1.5,
+                borderColor: "#A2340A" + "25",
+              }}
+            >
+              <View
+                style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: 26,
+                  backgroundColor: "#A2340A" + "14",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 10,
+                }}
+              >
+                <Text style={{ fontSize: 26 }}>🏆</Text>
+              </View>
+              <Text style={{ fontSize: 16, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
+                {t("home.modes.ranked")}
+              </Text>
+              <Text style={{ fontSize: 10, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginTop: 4, textAlign: "center" }} numberOfLines={2}>
+                {t("home.modes.rankedDesc")}
+              </Text>
+              <View
+                style={{
+                  backgroundColor: colors.onSurfaceVariant,
+                  paddingHorizontal: 8,
+                  paddingVertical: 3,
+                  borderRadius: 6,
+                  marginTop: 10,
+                }}
+              >
+                <Text style={{ fontSize: 9, fontFamily: "Nunito_700Bold", color: "#fff", letterSpacing: 0.4 }}>
+                  {t("settings.comingSoon").toUpperCase()}
+                </Text>
+              </View>
+            </View>
+          </Animated.View>
         </View>
 
         {/* Stats */}
-        <Label text={t("home.myStats")} />
-        <StatsRow />
+        <View style={{ marginTop: 28 }}>
+          <Label text={t("home.myStats")} />
+          <StatsRow />
+        </View>
 
-        {/* Cross-promo Mitsitsy */}
+        {/* Cross-promo */}
         <View style={{ marginTop: 28 }}>
           <MitsitsyCard />
         </View>
       </ScrollView>
-
-      {/* Difficulty Modal */}
-      <BottomSheet
-        visible={showDifficulty}
-        onClose={() => setShowDifficulty(false)}
-        title={t("home.chooseDifficulty")}
-      >
-        <View style={{ gap: 12 }}>
-          {BOT_DATA.map((bot, index) => (
-            <BotSelectCard
-              key={bot.key}
-              botKey={bot.key}
-              name={bot.name}
-              avatar={bot.avatar}
-              color={bot.color}
-              pairs={bot.pairs}
-              power={bot.power}
-              index={index}
-              loading={loading}
-              onPress={() => handleSelectDifficulty(bot.key)}
-            />
-          ))}
-        </View>
-      </BottomSheet>
-
-      {/* Casual Mode Modal */}
-      <BottomSheet
-        visible={showCasual}
-        onClose={() => setShowCasual(false)}
-        title={t("room.casualTitle")}
-      >
-        <View style={{ gap: 12 }}>
-          {CASUAL_OPTIONS.map((opt, index) => (
-            <Animated.View key={opt.key} entering={FadeInDown.delay(index * 80).duration(350).springify().damping(14)}>
-              <Pressable
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setShowCasual(false);
-                  setTimeout(() => {
-                    const routes = {
-                      matchmaking: "/room/matchmaking",
-                      create: "/room/create",
-                      join: "/room/join",
-                    } as const;
-                    router.push(routes[opt.key]);
-                  }, 300);
-                }}
-                style={({ pressed }) => ({
-                  transform: [{ scale: pressed ? 0.96 : 1 }],
-                })}
-              >
-                <View
-                  style={{
-                    backgroundColor: isDark ? colors.surfaceContainerHigh : colors.surfaceContainer,
-                    borderRadius: 16,
-                    borderLeftWidth: 4,
-                    borderLeftColor: opt.color,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingHorizontal: 16,
-                    paddingVertical: 18,
-                    gap: 14,
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 52,
-                      height: 52,
-                      borderRadius: 26,
-                      backgroundColor: opt.color + "18",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text style={{ fontSize: 26 }}>{opt.icon}</Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 17, fontFamily: "Fredoka_700Bold", color: opt.color }}>
-                      {t(opt.titleKey)}
-                    </Text>
-                    <Text style={{ fontSize: 12, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceVariant, marginTop: 3 }}>
-                      {t(opt.descKey)}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
-                      backgroundColor: opt.color + "14",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text style={{ fontSize: 16, color: opt.color, fontFamily: "Fredoka_700Bold" }}>{">"}</Text>
-                  </View>
-                </View>
-              </Pressable>
-            </Animated.View>
-          ))}
-        </View>
-      </BottomSheet>
     </SafeAreaView>
   );
 }

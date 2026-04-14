@@ -32,7 +32,11 @@
     },
     "botModal": {
       "pairs": "pairs"
-    }
+    },
+    "xpBoost": "XP x1.5 (ad 30s)",
+    "xpBoostDesc": "Watch an ad to earn 50% more XP",
+    "dailyReward": "+15 XP",
+    "dailyRewardClaimed": "Come back tomorrow!"
   },
   "game": {
     "menu": "Menu",
@@ -75,7 +79,9 @@
     "rankUp": "Rank up!",
     "rematch": "Rematch",
     "newGame": "New",
-    "goHome": "Home"
+    "goHome": "Home",
+    "watchAdBonus": "+10 XP (ad)",
+    "bonusClaimed": "Bonus claimed!"
   },
   "stats": {
     "winRate": "Win rate",
