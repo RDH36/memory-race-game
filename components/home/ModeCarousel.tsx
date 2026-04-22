@@ -84,11 +84,6 @@ function CarouselCard({
             backgroundColor: isDark ? colors.surfaceContainerHigh : colors.surfaceContainer,
             borderRadius: 22,
             overflow: "hidden",
-            shadowColor: item.accentColor,
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.12,
-            shadowRadius: 20,
-            elevation: 6,
           }}
         >
           {/* Colored header band */}

@@ -11,6 +11,8 @@
     "chooseMode": "Choose a mode",
     "myStats": "My stats",
     "chooseDifficulty": "Choose difficulty",
+    "chooseYourGame": "Choose your game",
+    "difficultyLabel": "Difficulty",
     "modes": {
       "ranked": "Ranked Game",
       "rankedDesc": "Face a real player online. Win or lose ELO.",
@@ -19,7 +21,7 @@
       "soloDesc": "Train against an AI. Choose the difficulty.",
       "soloBadge": "NO ELO · SOLO",
       "casual": "Casual",
-      "casualDesc": "Play without pressure, no ELO. Against a friend or random.",
+      "casualDesc": "Play without pressure · Friend or random",
       "casualBadge": "NO ELO · FREE"
     },
     "difficulty": {
@@ -33,6 +35,7 @@
     "botModal": {
       "pairs": "pairs"
     },
+    "featuredMode": "FEATURED MODE",
     "xpBoost": "XP x1.5 (ad 30s)",
     "xpBoostDesc": "Watch an ad to earn 50% more XP",
     "dailyReward": "+15 XP",
@@ -100,7 +103,8 @@
     "tabWinRate": "Win Rate",
     "tabRank": "Rank",
     "winRateValue": "{{value}}%",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "yourRank": "Your rank"
   },
   "profile": {
     "title": "Profile",
@@ -109,6 +113,8 @@
     "editNickname": "Edit nickname",
     "nicknamePlaceholder": "Your nickname",
     "linkGoogle": "Link Google",
+    "linkShort": "Link",
+    "protectSubtitle": "Link Google to save your data",
     "tapToChange": "Tap to change",
     "level": "Level {{level}}",
     "totalXp": "Total XP",
@@ -131,6 +137,8 @@
   },
   "history": {
     "title": "History",
+    "recent": "Recent history",
+    "viewAll": "View all",
     "empty": "No matches played yet",
     "loading": "Loading...",
     "win": "WIN",
@@ -238,7 +246,39 @@
     "legal": "Legal",
     "legalDesc": "Read our policies",
     "privacy": "Privacy Policy",
-    "terms": "Terms & Conditions"
+    "terms": "Terms & Conditions",
+    "feedback": "Feedback & Support",
+    "feedbackDesc": "Report a bug or suggest an improvement",
+    "developedBy": "Developed by"
+  },
+  "notifications": {
+    "dailyRewardTitle": "🎁 Your daily reward is ready!",
+    "dailyRewardBody": "Claim your +15 XP and jump into a match."
+  },
+  "feedback": {
+    "title": "Feedback & Support",
+    "subtitle": "Help us make Flipia better",
+    "category": {
+      "bug": "Bug",
+      "feature": "Feature",
+      "question": "Question",
+      "other": "Other"
+    },
+    "messageLabel": "Your message",
+    "messagePlaceholder": "Describe the bug, your idea, or ask a question...",
+    "emailLabel": "Email (optional)",
+    "emailPlaceholder": "you@example.com",
+    "submit": "Send",
+    "submitting": "Sending...",
+    "success": "Thanks!",
+    "successMessage": "We read every message and will follow up if needed.",
+    "error": "Failed to send. Please try again.",
+    "errorRequired": "Please write a message"
+  },
+  "offline": {
+    "title": "No Internet Connection",
+    "message": "This feature requires an internet connection. Please connect to Wi-Fi or mobile data and try again.",
+    "ok": "OK"
   },
   "onboarding": {
     "skip": "Skip",

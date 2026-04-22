@@ -91,11 +91,6 @@ export default function PlayerProfileScreen() {
               backgroundColor: "#FFFFFF",
               alignItems: "center",
               justifyContent: "center",
-              shadowColor: colors.shadow,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.06,
-              shadowRadius: 12,
-              elevation: 2,
             }}
           >
             <Text style={{ fontSize: 40 }}>{avatar}</Text>

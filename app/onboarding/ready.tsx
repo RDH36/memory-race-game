@@ -163,11 +163,6 @@ export default function ReadyScreen() {
               borderRadius: 16,
               paddingVertical: 18,
               alignItems: "center",
-              shadowColor: colors.primaryContainer,
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.3,
-              shadowRadius: 16,
-              elevation: 4,
             }}
           >
             <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: "#FFFFFF" }}>

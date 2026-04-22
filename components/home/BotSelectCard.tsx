@@ -35,7 +35,7 @@ export function BotSelectCard({
   const filledDots = botKey === "easy" ? 1 : botKey === "medium" ? 2 : 3;
 
   return (
-    <Animated.View entering={FadeInDown.delay(index * 80).duration(350).springify().damping(14)}>
+    <Animated.View entering={FadeInDown.delay(index * 80).duration(350)}>
       <Pressable
         onPress={onPress}
         disabled={loading !== null}

@@ -70,11 +70,6 @@ function FloatingCard({ emoji, delay, x }: { emoji: string; delay: number; x: nu
           justifyContent: "center",
           alignItems: "center",
           marginHorizontal: x,
-          shadowColor: colors.shadow,
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.08,
-          shadowRadius: 16,
-          elevation: 3,
         },
       ]}
     >

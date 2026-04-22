@@ -86,11 +86,6 @@ function PulsingCta({
               borderRadius: 16,
               paddingVertical: 18,
               alignItems: "center",
-              shadowColor: bgColor,
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.35,
-              shadowRadius: 16,
-              elevation: 5,
             },
           ]}
         >
@@ -194,11 +189,6 @@ export default function ResultScreen() {
               borderRadius: 16,
               paddingHorizontal: 28,
               paddingVertical: 16,
-              shadowColor: colors.shadow,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.06,
-              shadowRadius: 12,
-              elevation: 2,
             }}
           >
             {/* Player */}

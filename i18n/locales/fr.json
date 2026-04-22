@@ -11,6 +11,8 @@
     "chooseMode": "Choisir un mode",
     "myStats": "Mes stats",
     "chooseDifficulty": "Choisis la difficulté",
+    "chooseYourGame": "Choisis ta partie",
+    "difficultyLabel": "Difficulté",
     "modes": {
       "ranked": "Partie classée",
       "rankedDesc": "Affronte un joueur réel en ligne. Gagne ou perds de l'ELO.",
@@ -19,7 +21,7 @@
       "soloDesc": "Entraîne-toi contre une IA. Choisis la difficulté.",
       "soloBadge": "SANS ELO · SOLO",
       "casual": "Casual",
-      "casualDesc": "Joue sans pression, sans ELO. Contre un ami ou un random.",
+      "casualDesc": "Joue sans pression · Ami ou random",
       "casualBadge": "SANS ELO · LIBRE"
     },
     "difficulty": {
@@ -33,6 +35,7 @@
     "botModal": {
       "pairs": "paires"
     },
+    "featuredMode": "MODE VEDETTE",
     "xpBoost": "XP x1.5 (pub 30s)",
     "xpBoostDesc": "Regarde une pub pour gagner 50% de XP en plus",
     "dailyReward": "+15 XP",
@@ -101,7 +104,8 @@
     "tabWinRate": "Taux de victoire",
     "tabRank": "Rang",
     "winRateValue": "{{value}}%",
-    "comingSoon": "Bientôt"
+    "comingSoon": "Bientôt",
+    "yourRank": "Ton rang"
   },
   "profile": {
     "title": "Profil",
@@ -110,6 +114,8 @@
     "editNickname": "Modifier le pseudo",
     "nicknamePlaceholder": "Ton pseudo",
     "linkGoogle": "Lier Google",
+    "linkShort": "Lier",
+    "protectSubtitle": "Lier Google pour sauvegarder",
     "tapToChange": "Appuie pour changer",
     "level": "Niveau {{level}}",
     "totalXp": "XP Total",
@@ -132,6 +138,8 @@
   },
   "history": {
     "title": "Historique",
+    "recent": "Historique récent",
+    "viewAll": "Voir tout",
     "empty": "Aucune partie jouée",
     "loading": "Chargement...",
     "win": "VICTOIRE",
@@ -239,7 +247,39 @@
     "legal": "Mentions légales",
     "legalDesc": "Consulte nos politiques",
     "privacy": "Politique de confidentialité",
-    "terms": "Conditions d'utilisation"
+    "terms": "Conditions d'utilisation",
+    "feedback": "Retour & Support",
+    "feedbackDesc": "Signaler un bug ou proposer une amélioration",
+    "developedBy": "Développé par"
+  },
+  "notifications": {
+    "dailyRewardTitle": "🎁 Ta récompense quotidienne t'attend !",
+    "dailyRewardBody": "Réclame tes +15 XP et lance une partie."
+  },
+  "feedback": {
+    "title": "Retour & Support",
+    "subtitle": "Aide-nous à améliorer Flipia",
+    "category": {
+      "bug": "Bug",
+      "feature": "Idée",
+      "question": "Question",
+      "other": "Autre"
+    },
+    "messageLabel": "Ton message",
+    "messagePlaceholder": "Décris le bug, ton idée ou pose ta question...",
+    "emailLabel": "Email (optionnel)",
+    "emailPlaceholder": "toi@exemple.com",
+    "submit": "Envoyer",
+    "submitting": "Envoi...",
+    "success": "Merci !",
+    "successMessage": "On lit chaque message et on revient vers toi si besoin.",
+    "error": "Échec de l'envoi. Réessaye.",
+    "errorRequired": "Écris un message"
+  },
+  "offline": {
+    "title": "Pas de connexion Internet",
+    "message": "Cette fonctionnalité nécessite une connexion Internet. Connecte-toi au Wi-Fi ou aux données mobiles et réessaye.",
+    "ok": "OK"
   },
   "onboarding": {
     "skip": "Passer",

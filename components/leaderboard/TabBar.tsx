@@ -45,19 +45,12 @@ export function TabBar({
               justifyContent: "center",
               backgroundColor: isActive ? colors.surface : "transparent",
               opacity: tab.disabled ? 0.4 : 1,
-              shadowColor: isActive ? "#000" : "transparent",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: isActive ? 0.08 : 0,
-              shadowRadius: 2,
-              elevation: isActive ? 2 : 0,
             }}
           >
             <Text
               style={{
                 fontSize: 13,
-                fontFamily: isActive
-                  ? "Nunito_700Bold"
-                  : "Nunito_600SemiBold",
+                fontFamily: isActive ? "Nunito_700Bold" : "Nunito_600SemiBold",
                 color: isActive ? colors.onSurface : colors.onSurfaceVariant,
               }}
             >

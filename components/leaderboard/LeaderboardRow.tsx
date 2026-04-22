@@ -70,13 +70,6 @@ export function LeaderboardRow({
           backgroundColor: background,
           borderWidth: podium ? 1.5 : 0,
           borderColor: podium?.border,
-          ...(podium && {
-            shadowColor: podium.border,
-            shadowOpacity: isDark ? 0.35 : 0.18,
-            shadowRadius: 10,
-            shadowOffset: { width: 0, height: 3 },
-            elevation: 3,
-          }),
         }}
       >
         <View style={{ width: podium ? 36 : 32, alignItems: "center" }}>

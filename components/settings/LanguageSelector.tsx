@@ -1,8 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { LANGUAGES, setLanguage } from "../../i18n";
-import { Card } from "../ui/Card";
-import { Label } from "../ui/Label";
 import { useTheme } from "../../lib/ThemeContext";
 
 export function LanguageSelector() {
@@ -10,43 +8,77 @@ export function LanguageSelector() {
   const { colors } = useTheme();
 
   return (
-    <View>
-      <Label text={t("settings.language")} />
-      <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginBottom: 12, marginTop: -4 }}>
+    <View style={{ marginBottom: 20 }}>
+      <Text
+        style={{
+          fontSize: 12,
+          fontFamily: "Nunito_700Bold",
+          color: colors.onSurfaceMuted,
+          letterSpacing: 0.6,
+          textTransform: "uppercase",
+          marginBottom: 4,
+        }}
+      >
+        {t("settings.language")}
+      </Text>
+      <Text
+        style={{
+          fontSize: 11,
+          fontFamily: "Nunito_400Regular",
+          color: colors.onSurfaceMuted,
+          marginBottom: 10,
+        }}
+      >
         {t("settings.languageDesc")}
       </Text>
-      <View style={{ gap: 8 }}>
-        {LANGUAGES.map(({ code, label, flag }) => {
+      <View
+        style={{
+          backgroundColor: colors.surfaceContainer,
+          borderRadius: 16,
+          paddingHorizontal: 16,
+        }}
+      >
+        {LANGUAGES.map(({ code, label }, index) => {
           const isActive = i18n.language === code;
+          const isLast = index === LANGUAGES.length - 1;
           return (
-            <Pressable
-              key={code}
-              onPress={() => setLanguage(code)}
-              style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.97 : 1 }] })}
-            >
-              <Card
+            <Pressable key={code} onPress={() => setLanguage(code)}>
+              <View
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  gap: 12,
-                  backgroundColor: isActive ? colors.primaryContainerBg : colors.surfaceContainer,
+                  justifyContent: "space-between",
+                  paddingVertical: 14,
+                  borderBottomWidth: isLast ? 0 : 1,
+                  borderBottomColor: colors.ghostBorder,
                 }}
               >
-                <Text style={{ fontSize: 24 }}>{flag}</Text>
                 <Text
                   style={{
-                    flex: 1,
                     fontSize: 15,
-                    fontFamily: isActive ? "Nunito_700Bold" : "Nunito_600SemiBold",
-                    color: isActive ? colors.primaryContainer : colors.onSurface,
+                    fontFamily: "Nunito_600SemiBold",
+                    color: colors.onSurface,
                   }}
                 >
                   {label}
                 </Text>
                 {isActive && (
-                  <Text style={{ fontSize: 16, color: colors.primaryContainer }}>✓</Text>
+                  <View
+                    style={{
+                      width: 22,
+                      height: 22,
+                      borderRadius: 11,
+                      backgroundColor: colors.primaryContainer,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text style={{ color: "#FFF", fontSize: 13, fontFamily: "Nunito_700Bold" }}>
+                      ✓
+                    </Text>
+                  </View>
                 )}
-              </Card>
+              </View>
             </Pressable>
           );
         })}

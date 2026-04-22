@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,7 +7,8 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../lib/ThemeContext";
 import { ProfileHeader } from "../../components/profile/ProfileHeader";
-import { ProfileStats } from "../../components/profile/ProfileStats";
+import { ProfileStats, type StatsTab } from "../../components/profile/ProfileStats";
+import { RecentMatches } from "../../components/profile/RecentMatches";
 import { Card } from "../../components/ui/Card";
 import { APP_VERSION } from "../../lib/constants";
 
@@ -14,6 +16,7 @@ export default function ProfileScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<StatsTab>("global");
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }} edges={["top"]}>
@@ -62,7 +65,13 @@ export default function ProfileScreen() {
           <ProfileHeader />
         </View>
 
-        <ProfileStats />
+        <ProfileStats
+          showProgress={false}
+          activeTab={activeTab}
+          onChangeTab={setActiveTab}
+        />
+
+        <RecentMatches tab={activeTab} />
 
         <View style={{ flex: 1 }} />
 

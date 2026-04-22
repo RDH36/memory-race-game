@@ -1,13 +1,10 @@
 import { Linking, Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { Ionicons } from "@expo/vector-icons";
-import { Card } from "../ui/Card";
-import { Label } from "../ui/Label";
 import { useTheme } from "../../lib/ThemeContext";
 
-const LINKS: { url: string; icon: keyof typeof Ionicons.glyphMap; labelKey: string }[] = [
-  { url: "https://flipia-landing.vercel.app/privacy", icon: "shield-checkmark-outline", labelKey: "settings.privacy" },
-  { url: "https://flipia-landing.vercel.app/terms", icon: "document-text-outline", labelKey: "settings.terms" },
+const LINKS: { url: string; labelKey: string }[] = [
+  { url: "https://flipia-landing.vercel.app/privacy", labelKey: "settings.privacy" },
+  { url: "https://flipia-landing.vercel.app/terms", labelKey: "settings.terms" },
 ];
 
 export function LegalLinks() {
@@ -15,41 +12,64 @@ export function LegalLinks() {
   const { colors } = useTheme();
 
   return (
-    <View>
-      <Label text={t("settings.legal")} />
-      <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginBottom: 12, marginTop: -4 }}>
+    <View style={{ marginBottom: 20 }}>
+      <Text
+        style={{
+          fontSize: 12,
+          fontFamily: "Nunito_700Bold",
+          color: colors.onSurfaceMuted,
+          letterSpacing: 0.6,
+          textTransform: "uppercase",
+          marginBottom: 4,
+        }}
+      >
+        {t("settings.legal")}
+      </Text>
+      <Text
+        style={{
+          fontSize: 11,
+          fontFamily: "Nunito_400Regular",
+          color: colors.onSurfaceMuted,
+          marginBottom: 10,
+        }}
+      >
         {t("settings.legalDesc")}
       </Text>
-      <View style={{ gap: 8 }}>
-        {LINKS.map(({ url, icon, labelKey }) => (
-          <Pressable
-            key={url}
-            onPress={() => Linking.openURL(url)}
-            style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.97 : 1 }] })}
-          >
-            <Card
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 12,
-                backgroundColor: colors.surfaceContainer,
-              }}
-            >
-              <Ionicons name={icon} size={22} color={colors.onSurfaceVariant} />
-              <Text
+      <View
+        style={{
+          backgroundColor: colors.surfaceContainer,
+          borderRadius: 16,
+          paddingHorizontal: 16,
+        }}
+      >
+        {LINKS.map(({ url, labelKey }, index) => {
+          const isLast = index === LINKS.length - 1;
+          return (
+            <Pressable key={url} onPress={() => Linking.openURL(url)}>
+              <View
                 style={{
-                  flex: 1,
-                  fontSize: 15,
-                  fontFamily: "Nunito_600SemiBold",
-                  color: colors.onSurface,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingVertical: 14,
+                  borderBottomWidth: isLast ? 0 : 1,
+                  borderBottomColor: colors.ghostBorder,
                 }}
               >
-                {t(labelKey)}
-              </Text>
-              <Ionicons name="open-outline" size={18} color={colors.onSurfaceVariant} />
-            </Card>
-          </Pressable>
-        ))}
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontFamily: "Nunito_600SemiBold",
+                    color: colors.onSurface,
+                  }}
+                >
+                  {t(labelKey)}
+                </Text>
+                <Text style={{ color: colors.onSurfaceMuted, fontSize: 18 }}>›</Text>
+              </View>
+            </Pressable>
+          );
+        })}
       </View>
     </View>
   );

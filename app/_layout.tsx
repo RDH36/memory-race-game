@@ -13,6 +13,8 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import "../hooks/useInterstitialAd";
 import { PlayerStatsProvider } from "../lib/playerStats";
 import { ThemeProvider, useTheme } from "../lib/ThemeContext";
+import { ConnectivityProvider } from "../lib/ConnectivityContext";
+import { setupDailyReminder } from "../lib/notifications";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -71,14 +73,20 @@ export default function RootLayout() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
+  useEffect(() => {
+    setupDailyReminder();
+  }, []);
+
   if (!fontsLoaded) return null;
 
   return (
     <KeyboardProvider>
       <ThemeProvider>
-        <PlayerStatsProvider>
-          <AppContent />
-        </PlayerStatsProvider>
+        <ConnectivityProvider>
+          <PlayerStatsProvider>
+            <AppContent />
+          </PlayerStatsProvider>
+        </ConnectivityProvider>
       </ThemeProvider>
     </KeyboardProvider>
   );

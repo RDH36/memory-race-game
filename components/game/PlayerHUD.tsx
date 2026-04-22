@@ -1,5 +1,4 @@
 import { Text, View } from 'react-native';
-import { shadows } from '../ui/theme';
 import { useTheme } from '../../lib/ThemeContext';
 
 interface OpponentCardProps {
@@ -59,7 +58,6 @@ export function OpponentCard({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
-        ...shadows.ambient,
       }}
     >
       {/* Timer */}

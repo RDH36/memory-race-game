@@ -7,7 +7,7 @@ import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { useGameModeStats, type GameModeStats } from "../../lib/gameModeStats";
 
-type StatsTab = "global" | "vsAi" | "vsFriends";
+export type StatsTab = "global" | "vsAi" | "vsFriends";
 
 export interface ExternalStats {
   gamesPlayed: number;
@@ -68,11 +68,6 @@ function StatsTabBar({ active, onChange }: { active: StatsTab; onChange: (t: Sta
               borderRadius: 10,
               alignItems: "center",
               backgroundColor: isActive ? colors.surface : "transparent",
-              shadowColor: isActive ? "#000" : "transparent",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: isActive ? 0.08 : 0,
-              shadowRadius: 2,
-              elevation: isActive ? 2 : 0,
             }}
           >
             <Text
@@ -227,12 +222,22 @@ function VsFriendsTab({ modeStats }: { modeStats: GameModeStats | null }) {
 }
 
 /** Shared stats tabs — works for current user (no props) or external player (with props) */
-export function ProfileStats({ externalData, externalModeStats, showProgress = true }: {
+export function ProfileStats({
+  externalData,
+  externalModeStats,
+  showProgress = true,
+  activeTab: controlledTab,
+  onChangeTab,
+}: {
   externalData?: ExternalStats;
   externalModeStats?: GameModeStats | null;
   showProgress?: boolean;
+  activeTab?: StatsTab;
+  onChangeTab?: (tab: StatsTab) => void;
 } = {}) {
-  const [activeTab, setActiveTab] = useState<StatsTab>("global");
+  const [internalTab, setInternalTab] = useState<StatsTab>("global");
+  const activeTab = controlledTab ?? internalTab;
+  const setActiveTab = onChangeTab ?? setInternalTab;
 
   // Current user fallback
   const playerStats = usePlayerStats();

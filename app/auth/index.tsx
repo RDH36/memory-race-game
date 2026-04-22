@@ -13,6 +13,7 @@ import Animated, {
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { db } from "@/lib/instant";
 import { useTheme } from "@/lib/ThemeContext";
+import { useConnectivity } from "@/lib/ConnectivityContext";
 import { radii } from "../../components/ui/theme";
 import { Button } from "@/components/ui/Button";
 import { GoogleIcon } from "@/components/ui/GoogleIcon";
@@ -177,6 +178,7 @@ export default function AuthScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { colors } = useTheme();
+  const { isOnline, requireOnline } = useConnectivity();
 
   const [googleLoading, setGoogleLoading] = useState(false);
   const [guestLoading, setGuestLoading] = useState(false);
@@ -270,8 +272,9 @@ export default function AuthScreen() {
           <Button
             text={t("auth.continueGoogle")}
             iconNode={<GoogleIcon size={20} />}
-            onPress={handleGoogle}
+            onPress={() => requireOnline(handleGoogle)}
             loading={googleLoading}
+            disabled={!isOnline}
             style={{ marginTop: 4 }}
           />
 
@@ -286,9 +289,10 @@ export default function AuthScreen() {
           <Button
             text={t("auth.continueGuest")}
             icon="👤"
-            onPress={handleGuest}
+            onPress={() => requireOnline(handleGuest)}
             variant="secondary"
             loading={guestLoading}
+            disabled={!isOnline}
           />
         </Animated.View>
       </View>

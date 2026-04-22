@@ -1,13 +1,11 @@
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { Card } from "../ui/Card";
-import { Label } from "../ui/Label";
 import { useTheme, type ThemeMode } from "../../lib/ThemeContext";
 
 const THEME_OPTIONS: { mode: ThemeMode; icon: string; labelKey: string }[] = [
-  { mode: "system", icon: "📱", labelKey: "settings.themeSystem" },
-  { mode: "light", icon: "☀️", labelKey: "settings.themeLight" },
-  { mode: "dark", icon: "🌙", labelKey: "settings.themeDark" },
+  { mode: "light", icon: "☀", labelKey: "settings.themeLight" },
+  { mode: "dark", icon: "☾", labelKey: "settings.themeDark" },
+  { mode: "system", icon: "◐", labelKey: "settings.themeSystem" },
 ];
 
 export function ThemeSelector() {
@@ -15,44 +13,78 @@ export function ThemeSelector() {
   const { colors, themeMode, setThemeMode } = useTheme();
 
   return (
-    <View>
-      <Label text={t("settings.theme")} />
-      <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginBottom: 12, marginTop: -4 }}>
+    <View style={{ marginBottom: 20 }}>
+      <Text
+        style={{
+          fontSize: 12,
+          fontFamily: "Nunito_700Bold",
+          color: colors.onSurfaceMuted,
+          letterSpacing: 0.6,
+          textTransform: "uppercase",
+          marginBottom: 4,
+        }}
+      >
+        {t("settings.theme")}
+      </Text>
+      <Text
+        style={{
+          fontSize: 11,
+          fontFamily: "Nunito_400Regular",
+          color: colors.onSurfaceMuted,
+          marginBottom: 10,
+        }}
+      >
         {t("settings.themeDesc")}
       </Text>
-      <View style={{ gap: 8 }}>
-        {THEME_OPTIONS.map(({ mode, icon, labelKey }) => {
+      <View
+        style={{
+          backgroundColor: colors.surfaceContainer,
+          borderRadius: 16,
+          padding: 10,
+          flexDirection: "row",
+        }}
+      >
+        {THEME_OPTIONS.map(({ mode, icon, labelKey }, index) => {
           const isActive = themeMode === mode;
+          const isLast = index === THEME_OPTIONS.length - 1;
           return (
-            <Pressable
+            <View
               key={mode}
-              onPress={() => setThemeMode(mode)}
-              style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.97 : 1 }] })}
+              style={{
+                flex: 1,
+                marginRight: isLast ? 0 : 8,
+              }}
             >
-              <Card
+              <Pressable
+                onPress={() => setThemeMode(mode)}
                 style={{
-                  flexDirection: "row",
+                  backgroundColor: isActive ? colors.primaryContainer : colors.surfaceContainerLow,
+                  borderRadius: 14,
+                  paddingVertical: 18,
+                  paddingHorizontal: 8,
                   alignItems: "center",
-                  gap: 12,
-                  backgroundColor: isActive ? colors.primaryContainerBg : colors.surfaceContainer,
                 }}
               >
-                <Text style={{ fontSize: 24 }}>{icon}</Text>
                 <Text
                   style={{
-                    flex: 1,
-                    fontSize: 15,
-                    fontFamily: isActive ? "Nunito_700Bold" : "Nunito_600SemiBold",
-                    color: isActive ? colors.primaryContainer : colors.onSurface,
+                    fontSize: 22,
+                    color: isActive ? "#FFF" : colors.onSurface,
+                    marginBottom: 6,
+                  }}
+                >
+                  {icon}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontFamily: "Nunito_600SemiBold",
+                    color: isActive ? "#FFF" : colors.onSurface,
                   }}
                 >
                   {t(labelKey)}
                 </Text>
-                {isActive && (
-                  <Text style={{ fontSize: 16, color: colors.primaryContainer }}>✓</Text>
-                )}
-              </Card>
-            </Pressable>
+              </Pressable>
+            </View>
           );
         })}
       </View>

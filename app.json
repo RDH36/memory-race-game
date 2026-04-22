@@ -39,6 +39,13 @@
         {
           "androidAppId": "ca-app-pub-8114482764700286~9864366044"
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/adaptive-icon.png",
+          "color": "#534AB7"
+        }
       ]
     ],
     "extra": {

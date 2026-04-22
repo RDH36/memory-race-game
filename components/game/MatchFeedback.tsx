@@ -84,11 +84,6 @@ export function MatchFeedback({ result }: MatchFeedbackProps) {
             paddingHorizontal: 24,
             paddingVertical: 12,
             borderRadius: 20,
-            shadowColor: colors.shadow,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.2,
-            shadowRadius: 8,
-            elevation: 6,
           },
         ]}
       >

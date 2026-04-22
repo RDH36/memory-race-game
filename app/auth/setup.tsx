@@ -72,8 +72,6 @@ export default function SetupScreen() {
             width: 100, height: 100, borderRadius: 50,
             backgroundColor: "#FFFFFF",
             alignItems: "center", justifyContent: "center",
-            shadowColor: colors.shadow, shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.08, shadowRadius: 24, elevation: 4,
           }}>
             <Text style={{ fontSize: 52 }}>{selectedAvatar}</Text>
           </View>
@@ -100,8 +98,6 @@ export default function SetupScreen() {
                   borderColor: colors.primaryContainer,
                   alignItems: "center", justifyContent: "center",
                   transform: [{ scale: pressed ? 0.9 : 1 }],
-                  shadowColor: colors.shadow, shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.04, shadowRadius: 8, elevation: 1,
                 })}
               >
                 <Text style={{ fontSize: 26 }}>{emoji}</Text>

@@ -103,11 +103,6 @@ export function TornadoOverlay({ onComplete }: TornadoOverlayProps) {
             paddingVertical: 16,
             borderRadius: 16,
             zIndex: 10,
-            shadowColor: '#1A1C17',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 12,
-            elevation: 8,
           },
         ]}
       >
