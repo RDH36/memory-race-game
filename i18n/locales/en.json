@@ -38,7 +38,9 @@
     "featuredMode": "FEATURED MODE",
     "xpBoost": "XP x1.5 (ad 30s)",
     "xpBoostDesc": "Watch an ad to earn 50% more XP",
-    "dailyReward": "+15 XP",
+    "dailyReward": "Daily reward",
+    "dailyRewardSubtitle": "Claim your +{{xp}} XP for free",
+    "dailyRewardClaim": "Claim",
     "dailyRewardClaimed": "Come back tomorrow!"
   },
   "game": {

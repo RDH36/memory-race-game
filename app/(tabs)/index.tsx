@@ -183,60 +183,52 @@ export default function HomeScreen() {
           <Animated.View entering={FadeInDown.duration(400)}>
             <Pressable
               onPress={claimDailyReward}
-              style={({ pressed }) => ({
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 14,
-                backgroundColor: colors.warningBg,
-                borderRadius: 16,
-                paddingVertical: 16,
-                paddingHorizontal: 18,
-                marginBottom: 20,
-                opacity: pressed ? 0.85 : 1,
-              })}
+              className={`mb-5 flex-row items-center gap-3 rounded-2xl border px-3.5 py-3.5 active:opacity-85 ${
+                isDark
+                  ? "bg-[#2A1810] border-[#3A2418]"
+                  : "bg-[#FFF4EC] border-[#FCD9BD]"
+              }`}
             >
               <View
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  backgroundColor: "#FFFFFF",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className={`h-11 w-11 items-center justify-center rounded-xl ${
+                  isDark ? "bg-[#3A2418]" : "bg-white"
+                }`}
               >
-                <Text style={{ fontSize: 20 }}>🎁</Text>
+                <Text className="text-2xl">🎁</Text>
               </View>
-              <View style={{ flex: 1 }}>
+              <View className="flex-1">
                 <Text
-                  style={{
-                    fontSize: 13,
-                    fontFamily: "Fredoka_600SemiBold",
-                    color: colors.warning,
-                  }}
+                  className={`font-display text-[14px] ${
+                    isDark ? "text-[#FB923C]" : "text-[#EA580C]"
+                  }`}
                 >
                   {t("home.dailyReward")}
                 </Text>
                 <Text
-                  style={{
-                    fontSize: 11,
-                    fontFamily: "Nunito_400Regular",
-                    color: colors.onSurfaceMuted,
-                    marginTop: 1,
-                  }}
+                  className="mt-0.5 font-body text-[11px]"
+                  style={{ color: colors.onSurfaceMuted }}
                 >
-                  Réclame tes +{DAILY_REWARD_XP} XP gratuits
+                  {t("home.dailyRewardSubtitle", { xp: DAILY_REWARD_XP })}
                 </Text>
               </View>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontFamily: "Fredoka_700Bold",
-                  color: colors.warning,
-                }}
-              >
-                +{DAILY_REWARD_XP} →
-              </Text>
+              <View className="flex-row items-center gap-2">
+                <Text
+                  className={`font-display text-[16px] ${
+                    isDark ? "text-[#FB923C]" : "text-[#EA580C]"
+                  }`}
+                >
+                  +{DAILY_REWARD_XP}
+                </Text>
+                <View
+                  className={`rounded-full px-3 py-1.5 ${
+                    isDark ? "bg-[#FB923C]" : "bg-[#EA580C]"
+                  }`}
+                >
+                  <Text className="font-display text-[12px] text-white">
+                    {t("home.dailyRewardClaim")}
+                  </Text>
+                </View>
+              </View>
             </Pressable>
           </Animated.View>
         )}

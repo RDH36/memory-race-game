@@ -38,7 +38,9 @@
     "featuredMode": "MODE VEDETTE",
     "xpBoost": "XP x1.5 (pub 30s)",
     "xpBoostDesc": "Regarde une pub pour gagner 50% de XP en plus",
-    "dailyReward": "+15 XP",
+    "dailyReward": "Récompense quotidienne",
+    "dailyRewardSubtitle": "Réclame tes +{{xp}} XP gratuits",
+    "dailyRewardClaim": "Réclamer",
     "dailyRewardClaimed": "Reviens demain !"
 
   },
