@@ -47,7 +47,7 @@ export default function OnlineGameScreen() {
   const {
     game, isHost, myTurn, lastMatchResult,
     handleCardPress, handleTornado, handleTornadoComplete,
-  } = useOnlineGame(room, userId);
+  } = useOnlineGame(room, userId, isBotMode);
 
   // Ghost bot plays as guest when botMode is active
   useBotPlayer(room, game, difficulty as CpuDifficulty, isBotMode);

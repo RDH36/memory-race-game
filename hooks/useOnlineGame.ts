@@ -23,6 +23,7 @@ export type MatchResult = {
 export function useOnlineGame(
   room: RoomData | null,
   myUserId: string | undefined,
+  isBotMode: boolean = false,
 ) {
   const [lastMatchResult, setLastMatchResult] = useState<MatchResult>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -214,14 +215,16 @@ export function useOnlineGame(
       tornadoSeed: null,
     };
 
-    // Only the player whose turn it NOW is writes the completion
+    // In bot mode, the host always writes completion — no separate bot client exists
+    // to write it, so gating on iAmNext would leave tornadoActive stuck when it's the
+    // bot's turn (e.g. after the host launches tornado).
     const iAmNext =
       (isHost && game.currentTurn === 1) ||
       (!isHost && game.currentTurn === 2);
-    if (iAmNext) {
+    if (iAmNext || (isBotMode && isHost)) {
       updateRoomGameState(room.id, newState, room.currentPlayerId!);
     }
-  }, [game, room, isHost]);
+  }, [game, room, isHost, isBotMode]);
 
   return {
     game,
