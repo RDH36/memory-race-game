@@ -20,6 +20,7 @@ import { usePlayerStats } from "../../lib/playerStats";
 import { GRID_CONFIG, type CpuDifficulty } from "../../lib/gameLogic";
 import { showInterstitialThen } from "../../hooks/useInterstitialAd";
 import { usePremium } from "../../hooks/useEntitlements";
+import { getCardSkin } from "../../lib/skins";
 
 const TURN_TIMEOUT = 60;
 
@@ -42,8 +43,9 @@ export default function OnlineGameScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { colors, isDark } = useTheme();
-  const { avatar, userId, nickname } = usePlayerStats();
+  const { avatar, userId, nickname, selectedTable } = usePlayerStats();
   const premium = usePremium();
+  const skin = getCardSkin(selectedTable);
   const { room } = useRoom(roomCode);
 
   const {
@@ -251,6 +253,7 @@ export default function OnlineGameScreen() {
             tornadoActive={game.tornadoActive}
             onCardPress={handleCardPress}
             cols={gridConfig.cols}
+            skin={skin}
           />
           <MatchFeedback result={lastMatchResult} />
         </View>

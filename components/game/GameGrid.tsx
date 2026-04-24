@@ -8,7 +8,10 @@ import Animated, {
   withTiming,
   withSpring,
 } from 'react-native-reanimated';
-import { CardItem } from './CardItem';
+import { CardItem, type CardSkin } from './CardItem';
+import { RoyalBoardBackground } from './royal/RoyalBoardBackground';
+import { InfernoBoardBackground } from './inferno/InfernoBoardBackground';
+import { HeavenBoardBackground } from './heaven/HeavenBoardBackground';
 import type { MatchResult } from '../../hooks/useLocalGame';
 
 const GAP = 8;
@@ -24,6 +27,7 @@ interface GameGridProps {
   tornadoActive: boolean;
   onCardPress: (cardId: number) => void;
   cols?: number;
+  skin?: CardSkin;
 }
 
 function AnimatedCardSlot({
@@ -112,6 +116,7 @@ export function GameGrid({
   tornadoActive,
   onCardPress,
   cols = 4,
+  skin = 'classic',
 }: GameGridProps) {
   const [cardSize, setCardSize] = useState(0);
   const totalCards = positions.length;
@@ -128,7 +133,7 @@ export function GameGrid({
     [cols, rows],
   );
 
-  return (
+  const grid = (
     <View
       onLayout={onLayout}
       style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8 }}
@@ -175,6 +180,7 @@ export function GameGrid({
                   isJustMismatched={isJustMismatched}
                   onPress={onCardPress}
                   disabled={isDisabled}
+                  skin={skin}
                 />
               </AnimatedCardSlot>
             );
@@ -183,4 +189,15 @@ export function GameGrid({
       )}
     </View>
   );
+
+  if (skin === 'royal') {
+    return <RoyalBoardBackground>{grid}</RoyalBoardBackground>;
+  }
+  if (skin === 'inferno') {
+    return <InfernoBoardBackground>{grid}</InfernoBoardBackground>;
+  }
+  if (skin === 'heaven') {
+    return <HeavenBoardBackground>{grid}</HeavenBoardBackground>;
+  }
+  return grid;
 }

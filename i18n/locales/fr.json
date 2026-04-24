@@ -400,7 +400,8 @@
           "title": "Plateau Royal",
           "description": "Plateau de jeu doré exclusif"
         }
-      }
+      },
+      "pitch": "Joue libre, pour la vie. Plus jamais de pubs et tout débloqué."
     },
     "angel": {
       "title": "Pack Ange",
@@ -414,7 +415,8 @@
           "title": "Plateau Heaven",
           "description": "Plateau céleste exclusif"
         }
-      }
+      },
+      "pitch": "Affiche ton style céleste. Avatar et plateau exclusifs."
     },
     "demon": {
       "title": "Pack Démon",
@@ -428,11 +430,19 @@
           "title": "Plateau Inferno",
           "description": "Plateau ardent exclusif"
         }
-      }
+      },
+      "pitch": "Embrasse ton côté obscur. Avatar et plateau exclusifs."
     }
   },
   "pack": {
-    "includes": "CE QUE TU OBTIENS"
+    "includes": "CE QUE TU OBTIENS",
+    "boardPreview": "APERÇU DU PLATEAU",
+    "lifetimeBadge": "À VIE · UN PAIEMENT",
+    "yourLoot": "TON BUTIN",
+    "trustLifetime": "À vie",
+    "trustNoSubscription": "Sans abonnement",
+    "trustRestore": "Restaurable",
+    "bottomTagline": "Achat unique · À vie · Sans abonnement"
   },
   "common": {
     "error": "Erreur"

@@ -13,13 +13,16 @@ interface Props {
 
 /**
  * Round avatar tile — pastel hue background + emoji centered.
- * Lock overlay = dark scrim + golden lock pastille (per design).
+ * Locked: emoji visible (slightly faded) + small gold lock badge in the corner
+ * so users can preview what they'd unlock.
  */
 export function AvatarTile({ avatar, size = 44, ring, showLock = true }: Props) {
   const bg = avatar.neutral ? "#F0EAE6" : `hsl(${avatar.hue}, 60%, 88%)`;
   const ringWidth = ring ? 3 : 0;
   const outerSize = size + ringWidth * 2;
   const emojiSize = size * 0.6;
+  const isLocked = showLock && !avatar.unlocked;
+  const lockBadgeSize = Math.max(14, size * 0.32);
 
   return (
     <View
@@ -40,32 +43,35 @@ export function AvatarTile({ avatar, size = 44, ring, showLock = true }: Props) 
           backgroundColor: bg,
           alignItems: "center",
           justifyContent: "center",
-          overflow: "hidden",
+          overflow: "visible",
         }}
       >
-        <Text style={{ fontSize: emojiSize, lineHeight: emojiSize * 1.18 }}>{avatar.emoji}</Text>
-        {showLock && !avatar.unlocked && (
+        <Text
+          style={{
+            fontSize: emojiSize,
+            lineHeight: emojiSize * 1.18,
+            opacity: isLocked ? 0.7 : 1,
+          }}
+        >
+          {avatar.emoji}
+        </Text>
+        {isLocked && (
           <View
             style={{
               position: "absolute",
-              top: 0, left: 0, right: 0, bottom: 0,
-              backgroundColor: "rgba(26, 28, 23, 0.55)",
+              bottom: -2,
+              right: -2,
+              width: lockBadgeSize,
+              height: lockBadgeSize,
+              borderRadius: lockBadgeSize / 2,
+              backgroundColor: "#FFD366",
               alignItems: "center",
               justifyContent: "center",
+              borderWidth: 1.5,
+              borderColor: "#FFFFFF",
             }}
           >
-            <View
-              style={{
-                width: size * 0.42,
-                height: size * 0.42,
-                borderRadius: size * 0.21,
-                backgroundColor: "#FFD366",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Ionicons name="lock-closed" size={size * 0.22} color="#1A1C17" />
-            </View>
+            <Ionicons name="lock-closed" size={lockBadgeSize * 0.55} color="#1A1C17" />
           </View>
         )}
       </View>

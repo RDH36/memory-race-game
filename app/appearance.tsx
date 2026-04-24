@@ -13,6 +13,7 @@ import {
   useUnlockedAvatars,
   useUnlockedTables,
   entitlementToPackId,
+  getCardSkin,
   type EntitlementKey,
   type AvatarSkin,
 } from "../lib/skins";
@@ -240,6 +241,7 @@ export default function AppearanceScreen() {
                       back={tbl.preview.back}
                       face={tbl.preview.face}
                       locked={!tbl.unlocked}
+                      skin={getCardSkin(tbl.id)}
                     />
 
                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 6, marginTop: 10 }}>

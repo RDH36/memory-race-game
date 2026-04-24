@@ -54,12 +54,12 @@ export const AVATAR_SKINS: AvatarSkin[] = [
 export const TABLE_SKINS: TableSkin[] = [
   { id: "classic", name: "Classic", requires: null,
     preview: { frame: "#FAF1F1", back: "#534AB7", face: "#B4A7E8" } },
-  { id: "premium", name: "Royal", requires: ENTITLEMENT.PREMIUM,
-    preview: { frame: "#1A1A2E", back: "#FFD366", face: "#4A3F6B" } },
-  { id: "angel", name: "Heaven", requires: ENTITLEMENT.PACK_ANGEL,
-    preview: { frame: "#EAF5FF", back: "#3B82F6", face: "#A0CCFF" } },
-  { id: "demon", name: "Inferno", requires: ENTITLEMENT.PACK_DEMON,
-    preview: { frame: "#2D0F0F", back: "#F97316", face: "#A02408" } },
+  { id: "premium", name: "Imperial Damask", requires: ENTITLEMENT.PREMIUM,
+    preview: { frame: "#2A060D", back: "#6B0F1A", face: "#8B1727" } },
+  { id: "angel", name: "Ivory Temple", requires: ENTITLEMENT.PACK_ANGEL,
+    preview: { frame: "#F8F5EC", back: "#B8A574", face: "#EDE4C8" } },
+  { id: "demon", name: "Blood & Sulfur", requires: ENTITLEMENT.PACK_DEMON,
+    preview: { frame: "#0F0303", back: "#3D0606", face: "#6B0A0A" } },
 ];
 
 // Backwards-compat: array of free avatar emojis only
@@ -96,6 +96,107 @@ export function useIsAvatarUnlocked(avatarId: string): boolean {
   const ents = useEntitlements();
   const skin = AVATAR_SKINS.find((s) => s.id === avatarId);
   return isUnlocked(skin?.requires ?? null, ents);
+}
+
+/**
+ * Royal plateau theme (V2 Damas Impérial — rouge + or).
+ * Used by the in-game and preview royal renderers.
+ */
+export const ROYAL_THEME = {
+  // frame
+  frame: "#2A060D",
+  frameAccent: "#4A0D18",
+  ink: "#1A0509",
+  // cards
+  back: "#6B0F1A",
+  face: "#8B1727",
+  // gold
+  gold: "#F4DA8A",
+  goldBright: "#FBEAB2",
+  goldDeep: "#8C6A1F",
+  goldAntique: "#B8913D",
+  // accents
+  parchment: "#F8EFD0",
+  // matched states
+  matchedP1: "#A02537",
+  matchedP1Border: "#F4DA8A",
+  matchedP2: "#4A0D18",
+  matchedP2Border: "#E8C76A",
+} as const;
+
+/**
+ * Inferno plateau theme (V3 Sang & Soufre — rouge sang + accent soufre vert).
+ * Used by the in-game and preview inferno renderers.
+ */
+export const INFERNO_THEME = {
+  // frame
+  frame: "#0F0303",
+  frameAccent: "#2A0606",
+  ink: "#030000",
+  // cards
+  back: "#3D0606",
+  face: "#6B0A0A",
+  // accents
+  ember: "#DC2626",
+  emberBright: "#F87171",
+  emberDeep: "#7F1D1D",
+  sulfur: "#BEF264",       // signature green/yellow accent
+  hotCore: "#EAB308",
+  ash: "#FCA5A5",
+  // matched states
+  matchedP1: "#B91C1C",
+  matchedP1Border: "#F87171",
+  matchedP2: "#2A0606",
+  matchedP2Border: "#DC2626",
+} as const;
+
+/**
+ * Heaven plateau theme (V2 Temple d'Ivoire — ivoire + or antique).
+ */
+export const HEAVEN_THEME = {
+  // frame
+  frame: "#F8F5EC",
+  frameAccent: "#FFFFFF",
+  ink: "#5C4A1E",
+  cloud: "#F4EFDE",
+  // cards
+  back: "#B8A574",
+  face: "#EDE4C8",
+  // accents — gold antique
+  halo: "#B8860B",
+  haloBright: "#FEF3C7",
+  haloDeep: "#7C5E14",
+  gold: "#DAA520",
+  goldBright: "#FFF3B0",
+  goldDeep: "#8B6914",
+  // matched states
+  matchedP1: "#DAA520",
+  matchedP1Border: "#FFF3B0",
+  matchedP2: "#F4EFDE",
+  matchedP2Border: "#DAA520",
+} as const;
+
+export type CardSkin = "classic" | "royal" | "inferno" | "heaven";
+
+/**
+ * Maps a TABLE_SKINS id to the rendering skin used by GameGrid + CardItem.
+ */
+export function getCardSkin(tableId: string | undefined): CardSkin {
+  if (tableId === "premium") return "royal";
+  if (tableId === "demon") return "inferno";
+  if (tableId === "angel") return "heaven";
+  return "classic";
+}
+
+/**
+ * Full-screen background color for a given skin. Returns null for classic
+ * (so caller can fall back to theme `colors.surface`).
+ */
+export function getSkinBgColor(skin: CardSkin): string | null {
+  if (skin === "royal") return ROYAL_THEME.frame;
+  if (skin === "inferno") return INFERNO_THEME.frame;
+  if (skin === "heaven") return HEAVEN_THEME.frame;
+  return null;
 }
 
 export type PackId = "premium" | "angel" | "demon";

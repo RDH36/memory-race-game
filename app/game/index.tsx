@@ -15,6 +15,7 @@ import { usePlayerStats } from "../../lib/playerStats";
 import { GRID_CONFIG, type CpuDifficulty } from "../../lib/gameLogic";
 import { showInterstitialThen } from "../../hooks/useInterstitialAd";
 import { usePremium } from "../../hooks/useEntitlements";
+import { getCardSkin } from "../../lib/skins";
 
 const CPU_PROFILES: Record<string, { name: string; avatar: string }> = {
   easy: { name: "BabyBot", avatar: "🐣" },
@@ -27,8 +28,9 @@ export default function GameScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { colors, isDark } = useTheme();
-  const { avatar } = usePlayerStats();
+  const { avatar, selectedTable } = usePlayerStats();
   const premium = usePremium();
+  const skin = getCardSkin(selectedTable);
   const { game, lastMatchResult, handleCardPress, handleTornado, handleTornadoComplete } =
     useLocalGame(difficulty as CpuDifficulty);
 
@@ -169,6 +171,7 @@ export default function GameScreen() {
             tornadoActive={game.tornadoActive}
             onCardPress={handleCardPress}
             cols={gridConfig.cols}
+            skin={skin}
           />
           <MatchFeedback result={lastMatchResult} />
         </View>

@@ -400,7 +400,8 @@
           "title": "Royal Board",
           "description": "Exclusive gold game board"
         }
-      }
+      },
+      "pitch": "Play free, for life. No more ads and everything unlocked."
     },
     "angel": {
       "title": "Angel Pack",
@@ -414,7 +415,8 @@
           "title": "Heaven Board",
           "description": "Celestial exclusive board"
         }
-      }
+      },
+      "pitch": "Show your celestial style. Exclusive avatar and board."
     },
     "demon": {
       "title": "Demon Pack",
@@ -428,11 +430,19 @@
           "title": "Inferno Board",
           "description": "Fiery exclusive board"
         }
-      }
+      },
+      "pitch": "Embrace your dark side. Exclusive avatar and board."
     }
   },
   "pack": {
-    "includes": "WHAT YOU GET"
+    "includes": "WHAT YOU GET",
+    "boardPreview": "BOARD PREVIEW",
+    "lifetimeBadge": "LIFETIME · ONE PAYMENT",
+    "yourLoot": "WHAT YOU GET",
+    "trustLifetime": "Lifetime",
+    "trustNoSubscription": "No subscription",
+    "trustRestore": "Restorable",
+    "bottomTagline": "One-time purchase · Lifetime · No subscription"
   },
   "common": {
     "error": "Error"
