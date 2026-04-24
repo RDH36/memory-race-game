@@ -46,10 +46,18 @@ mobileAds()
 
 /**
  * Show interstitial ad after a game ends, limited to 1 ad per 3 games.
- * If no ad is loaded or limit not reached, calls onComplete immediately.
- * After ad closes, preloads the next one.
+ * If no ad is loaded, limit not reached, or `skip` is true (e.g. premium user),
+ * calls onComplete immediately. After ad closes, preloads the next one.
  */
-export function showInterstitialThen(onComplete: () => void) {
+export function showInterstitialThen(
+  onComplete: () => void,
+  options?: { skip?: boolean },
+) {
+  if (options?.skip) {
+    onComplete();
+    return;
+  }
+
   gameCount++;
   AsyncStorage.setItem(STORAGE_KEY, gameCount.toString());
 

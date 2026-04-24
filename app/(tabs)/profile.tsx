@@ -61,8 +61,64 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <View style={{ marginBottom: 24 }}>
+        <View style={{ marginBottom: 16 }}>
           <ProfileHeader />
+        </View>
+
+        <View
+          style={{
+            marginBottom: 24,
+            backgroundColor: colors.surfaceContainer,
+            borderRadius: 14,
+            paddingVertical: 12,
+            paddingHorizontal: 14,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              backgroundColor: colors.primaryContainerBg,
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: 12,
+            }}
+          >
+            <Text style={{ fontSize: 18 }}>🎨</Text>
+          </View>
+          <View style={{ flex: 1, marginRight: 12 }}>
+            <Text style={{ fontSize: 13, fontFamily: "Fredoka_600SemiBold", color: colors.onSurface }}>
+              {t("profile.appearance", "Apparence")}
+            </Text>
+            <Text
+              style={{
+                fontSize: 11,
+                fontFamily: "Nunito_400Regular",
+                color: colors.onSurfaceVariant,
+                marginTop: 1,
+              }}
+            >
+              {t("profile.appearanceDesc", "Avatar, plateau & skins")}
+            </Text>
+          </View>
+          <Pressable
+            onPress={() => router.push("/appearance")}
+            style={{
+              backgroundColor: colors.primary,
+              paddingHorizontal: 18,
+              paddingVertical: 10,
+              borderRadius: 999,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ fontSize: 13, fontFamily: "Nunito_700Bold", color: "#FFF" }}>
+              {t("profile.appearanceCta", "Modifier")}
+            </Text>
+          </Pressable>
         </View>
 
         <ProfileStats

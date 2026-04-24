@@ -6,17 +6,20 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import * as Haptics from "expo-haptics";
 import { useTheme } from "../../lib/ThemeContext";
-import { usePlayerStats, AVATARS } from "../../lib/playerStats";
+import { usePlayerStats } from "../../lib/playerStats";
+import { useUnlockedAvatars, entitlementToPackId } from "../../lib/skins";
 import { saveProfile } from "../../lib/identity";
 import { db } from "../../lib/instant";
 import { radii } from "../../components/ui/theme";
 import { Button } from "../../components/ui/Button";
+import { LockBadge } from "../../components/ui/LockBadge";
 
 export default function SetupScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const router = useRouter();
   const { avatar: currentAvatar, nickname: currentNickname, userId, profileId } = usePlayerStats();
+  const avatars = useUnlockedAvatars();
 
   const [selectedAvatar, setSelectedAvatar] = useState(currentAvatar || "🧠");
   const [nickname, setNickname] = useState(currentNickname || "");
@@ -82,14 +85,19 @@ export default function SetupScreen() {
           flexDirection: "row", flexWrap: "wrap", gap: 10,
           justifyContent: "center", marginBottom: 32,
         }}>
-          {AVATARS.map((emoji) => {
-            const isActive = emoji === selectedAvatar;
+          {avatars.map((skin) => {
+            const isActive = skin.id === selectedAvatar;
             return (
               <Pressable
-                key={emoji}
+                key={skin.id}
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setSelectedAvatar(emoji);
+                  if (!skin.unlocked) {
+                    const packId = entitlementToPackId(skin.requires);
+                    if (packId) router.push(`/pack/${packId}`);
+                    return;
+                  }
+                  setSelectedAvatar(skin.id);
                 }}
                 style={({ pressed }) => ({
                   width: 52, height: 52, borderRadius: 26,
@@ -98,9 +106,11 @@ export default function SetupScreen() {
                   borderColor: colors.primaryContainer,
                   alignItems: "center", justifyContent: "center",
                   transform: [{ scale: pressed ? 0.9 : 1 }],
+                  opacity: skin.unlocked ? 1 : 0.55,
                 })}
               >
-                <Text style={{ fontSize: 26 }}>{emoji}</Text>
+                <Text style={{ fontSize: 26 }}>{skin.emoji}</Text>
+                {!skin.unlocked && <LockBadge size={14} />}
               </Pressable>
             );
           })}

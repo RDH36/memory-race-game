@@ -14,6 +14,7 @@ import "../hooks/useInterstitialAd";
 import { PlayerStatsProvider } from "../lib/playerStats";
 import { ThemeProvider, useTheme } from "../lib/ThemeContext";
 import { ConnectivityProvider } from "../lib/ConnectivityContext";
+import { RevenueCatProvider } from "../lib/revenuecat";
 import { setupDailyReminder } from "../lib/notifications";
 
 SplashScreen.preventAutoHideAsync();
@@ -54,6 +55,9 @@ function AppContent() {
         <Stack.Screen name="result/index" />
         <Stack.Screen name="player/[id]" />
         <Stack.Screen name="history" />
+        <Stack.Screen name="pack/[id]" />
+        <Stack.Screen name="appearance" />
+        <Stack.Screen name="plateau-preview/[id]" />
       </Stack>
     </>
   );
@@ -83,9 +87,11 @@ export default function RootLayout() {
     <KeyboardProvider>
       <ThemeProvider>
         <ConnectivityProvider>
-          <PlayerStatsProvider>
-            <AppContent />
-          </PlayerStatsProvider>
+          <RevenueCatProvider>
+            <PlayerStatsProvider>
+              <AppContent />
+            </PlayerStatsProvider>
+          </RevenueCatProvider>
         </ConnectivityProvider>
       </ThemeProvider>
     </KeyboardProvider>

@@ -134,6 +134,15 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="achievements"
+        options={{
+          title: t("tabs.achievements", "Succès"),
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="medal" size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title: t("tabs.home"),
@@ -142,6 +151,15 @@ export default function TabsLayout() {
               onPress={() => props.onPress?.({} as any)}
               color={colors.primaryContainer}
             />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="shop"
+        options={{
+          title: t("tabs.shop", "Boutique"),
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="bag-handle" size={22} color={color} />
           ),
         }}
       />

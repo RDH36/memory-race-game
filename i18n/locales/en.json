@@ -2,6 +2,8 @@
   "tabs": {
     "home": "Play",
     "leaderboard": "Leaderboard",
+    "achievements": "Achievements",
+    "shop": "Shop",
     "settings": "Settings",
     "profile": "Profile"
   },
@@ -60,10 +62,24 @@
     "launch": "Launch"
   },
   "feedback": {
-    "playerMatch": "Nice one!",
-    "cpuMatch": "CPU +1",
-    "playerMiss": "Missed!",
-    "cpuMiss": "Missed!"
+    "title": "Feedback & Support",
+    "subtitle": "Help us make Flipia better",
+    "category": {
+      "bug": "Bug",
+      "feature": "Feature",
+      "question": "Question",
+      "other": "Other"
+    },
+    "messageLabel": "Your message",
+    "messagePlaceholder": "Describe the bug, your idea, or ask a question...",
+    "emailLabel": "Email (optional)",
+    "emailPlaceholder": "you@example.com",
+    "submit": "Send",
+    "submitting": "Sending...",
+    "success": "Thanks!",
+    "successMessage": "We read every message and will follow up if needed.",
+    "error": "Failed to send. Please try again.",
+    "errorRequired": "Please write a message"
   },
   "result": {
     "header": "GAME OVER · VS AI",
@@ -135,7 +151,10 @@
     "aiEasy": "Easy",
     "aiMedium": "Normal",
     "aiHard": "Hard",
-    "noGames": "No games yet"
+    "noGames": "No games yet",
+    "appearance": "Appearance",
+    "appearanceDesc": "Avatar, board & skins",
+    "appearanceCta": "Edit"
   },
   "history": {
     "title": "History",
@@ -257,26 +276,6 @@
     "dailyRewardTitle": "🎁 Your daily reward is ready!",
     "dailyRewardBody": "Claim your +15 XP and jump into a match."
   },
-  "feedback": {
-    "title": "Feedback & Support",
-    "subtitle": "Help us make Flipia better",
-    "category": {
-      "bug": "Bug",
-      "feature": "Feature",
-      "question": "Question",
-      "other": "Other"
-    },
-    "messageLabel": "Your message",
-    "messagePlaceholder": "Describe the bug, your idea, or ask a question...",
-    "emailLabel": "Email (optional)",
-    "emailPlaceholder": "you@example.com",
-    "submit": "Send",
-    "submitting": "Sending...",
-    "success": "Thanks!",
-    "successMessage": "We read every message and will follow up if needed.",
-    "error": "Failed to send. Please try again.",
-    "errorRequired": "Please write a message"
-  },
   "offline": {
     "title": "No Internet Connection",
     "message": "This feature requires an internet connection. Please connect to Wi-Fi or mobile data and try again.",
@@ -346,5 +345,132 @@
       "ctaLost": "Get my revenge",
       "ctaDraw": "Prove I'm better"
     }
+  },
+  "shop": {
+    "title": "Shop",
+    "premium": {
+      "eyebrow": "The best of Flipia",
+      "title": "Go Premium",
+      "subtitle": "No ads, +10% XP and 2 exclusive skins. One payment, lifetime.",
+      "cta": "Unlock"
+    },
+    "sectionPacks": "Starter Packs",
+    "sectionPacksBadge": "Popular",
+    "packAngel": {
+      "title": "Angel Pack",
+      "count": "Avatar + Board",
+      "description": "Exclusive Angel 👼 avatar and Heaven board"
+    },
+    "packDemon": {
+      "title": "Demon Pack",
+      "count": "Avatar + Board",
+      "description": "Exclusive Demon 😈 avatar and Inferno board",
+      "badge": "HOT"
+    },
+    "ctaShort": "Buy",
+    "owned": "Owned",
+    "ownedPremium": "✓ Premium owned",
+    "restore": "Restore purchases",
+    "restoring": "Restoring…",
+    "restoreTitle": "Restored",
+    "restoreOk": "Your purchases have been restored.",
+    "restoreFailed": "Restore failed.",
+    "purchaseFailed": "Purchase did not complete.",
+    "soonTitle": "Coming soon",
+    "soonBody": "Purchases will be enabled when V1 ships."
+  },
+  "packs": {
+    "premium": {
+      "title": "Premium",
+      "tagline": "Everything unlocked, lifetime",
+      "features": {
+        "noAds": {
+          "title": "No ads",
+          "description": "Play without interruption"
+        },
+        "xpBoost": {
+          "title": "+10% XP",
+          "description": "Permanent boost on every game"
+        },
+        "avatar": {
+          "title": "Crown Avatar 👑",
+          "description": "Premium-exclusive avatar"
+        },
+        "table": {
+          "title": "Royal Board",
+          "description": "Exclusive gold game board"
+        }
+      }
+    },
+    "angel": {
+      "title": "Angel Pack",
+      "tagline": "The luminous starter pack",
+      "features": {
+        "avatar": {
+          "title": "Angel Avatar 👼",
+          "description": "Exclusive Angel avatar"
+        },
+        "table": {
+          "title": "Heaven Board",
+          "description": "Celestial exclusive board"
+        }
+      }
+    },
+    "demon": {
+      "title": "Demon Pack",
+      "tagline": "The dark starter pack",
+      "features": {
+        "avatar": {
+          "title": "Demon Avatar 😈",
+          "description": "Exclusive Demon avatar"
+        },
+        "table": {
+          "title": "Inferno Board",
+          "description": "Fiery exclusive board"
+        }
+      }
+    }
+  },
+  "pack": {
+    "includes": "WHAT YOU GET"
+  },
+  "common": {
+    "error": "Error"
+  },
+  "apparence": {
+    "title": "Appearance",
+    "currentAvatar": "Your current avatar",
+    "collection": "Collection",
+    "collectionCount": "{{unlocked}}/{{total}} unlocked",
+    "tables": "Boards",
+    "tablesCount": "{{count}} styles",
+    "preview": "Preview",
+    "previewTitle": "Preview",
+    "previewBack": "Back"
+  },
+  "avatars": {
+    "brain": "Brain",
+    "fox": "Fox",
+    "octopus": "Octopus",
+    "owl": "Owl",
+    "panda": "Panda",
+    "lion": "Lion",
+    "tiger": "Tiger",
+    "unicorn": "Unicorn",
+    "wolf": "Wolf",
+    "eagle": "Eagle",
+    "frog": "Frog",
+    "butterfly": "Butterfly",
+    "bee": "Bee",
+    "shark": "Shark",
+    "whale": "Whale",
+    "flamingo": "Flamingo",
+    "crown": "Crown",
+    "angel": "Angel",
+    "demon": "Demon"
+  },
+  "plateauPreview": {
+    "opponent": "Opponent",
+    "you": "You"
   }
 }

@@ -19,6 +19,7 @@ import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { GRID_CONFIG, type CpuDifficulty } from "../../lib/gameLogic";
 import { showInterstitialThen } from "../../hooks/useInterstitialAd";
+import { usePremium } from "../../hooks/useEntitlements";
 
 const TURN_TIMEOUT = 60;
 
@@ -42,6 +43,7 @@ export default function OnlineGameScreen() {
   const { t } = useTranslation();
   const { colors, isDark } = useTheme();
   const { avatar, userId, nickname } = usePlayerStats();
+  const premium = usePremium();
   const { room } = useRoom(roomCode);
 
   const {
@@ -169,9 +171,9 @@ export default function OnlineGameScreen() {
             ...(isBotMode && { matchmaking: "1" }),
           },
         });
-      });
+      }, { skip: premium });
     }
-  }, [game?.status, room?.status]);
+  }, [game?.status, room?.status, premium]);
 
   // --- Loading ---
   if (!game || !room) {

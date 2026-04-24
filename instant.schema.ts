@@ -6,6 +6,7 @@ const _schema = i.schema({
       userId: i.string().unique().indexed(),
       nickname: i.string().unique().optional(),
       avatar: i.string().optional(),
+      selectedTable: i.string().optional(),
       createdAt: i.number().indexed(),
     }),
     games: i.entity({

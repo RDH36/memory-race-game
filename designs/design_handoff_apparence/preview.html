@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Flipia — Apparence V3 preview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --surface: #FAF1F1;
+    --surface-container: #FFFFFF;
+    --surface-container-low: #F4EAEA;
+    --primary: #3B309E;
+    --primary-container: #534AB7;
+    --primary-container-bg: #F0EDFB;
+    --on-surface: #1A1C17;
+    --on-surface-variant: #474553;
+    --on-surface-muted: #7A7885;
+    --success: #1D9E75;
+    --ghost-border: rgba(26, 28, 23, 0.08);
+    --display: 'Fredoka', system-ui, sans-serif;
+    --body: 'Nunito', system-ui, sans-serif;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    background: #E8E4E8;
+    font-family: var(--body);
+    color: var(--on-surface);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  * { box-sizing: border-box; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="reference/android-frame.jsx"></script>
+<script type="text/babel" src="reference/shop-icons.jsx"></script>
+<script type="text/babel" src="reference/shop-shared.jsx"></script>
+<script type="text/babel" src="reference/apparence-shared.jsx"></script>
+<script type="text/babel" src="reference/apparence-v3.jsx"></script>
+
+<script type="text/babel">
+  const Preview = () => (
+    <AndroidDevice width={412} height={892}>
+      <ApparenceV3 />
+    </AndroidDevice>
+  );
+  ReactDOM.createRoot(document.getElementById('root')).render(<Preview />);
+</script>
+</body>
+</html>

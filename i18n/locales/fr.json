@@ -2,6 +2,8 @@
   "tabs": {
     "home": "Jouer",
     "leaderboard": "Classement",
+    "achievements": "Succès",
+    "shop": "Boutique",
     "settings": "Paramètres",
     "profile": "Profil"
   },
@@ -42,7 +44,6 @@
     "dailyRewardSubtitle": "Réclame tes +{{xp}} XP gratuits",
     "dailyRewardClaim": "Réclamer",
     "dailyRewardClaimed": "Reviens demain !"
-
   },
   "game": {
     "menu": "Menu",
@@ -61,10 +62,24 @@
     "launch": "Lancer"
   },
   "feedback": {
-    "playerMatch": "Bien joué !",
-    "cpuMatch": "CPU +1",
-    "playerMiss": "Raté !",
-    "cpuMiss": "Raté !"
+    "title": "Retour & Support",
+    "subtitle": "Aide-nous à améliorer Flipia",
+    "category": {
+      "bug": "Bug",
+      "feature": "Idée",
+      "question": "Question",
+      "other": "Autre"
+    },
+    "messageLabel": "Ton message",
+    "messagePlaceholder": "Décris le bug, ton idée ou pose ta question...",
+    "emailLabel": "Email (optionnel)",
+    "emailPlaceholder": "toi@exemple.com",
+    "submit": "Envoyer",
+    "submitting": "Envoi...",
+    "success": "Merci !",
+    "successMessage": "On lit chaque message et on revient vers toi si besoin.",
+    "error": "Échec de l'envoi. Réessaye.",
+    "errorRequired": "Écris un message"
   },
   "result": {
     "header": "PARTIE TERMINÉE · VS IA",
@@ -136,7 +151,10 @@
     "aiEasy": "Facile",
     "aiMedium": "Normal",
     "aiHard": "Difficile",
-    "noGames": "Aucune partie"
+    "noGames": "Aucune partie",
+    "appearance": "Apparence",
+    "appearanceDesc": "Avatar, plateau & skins",
+    "appearanceCta": "Modifier"
   },
   "history": {
     "title": "Historique",
@@ -258,26 +276,6 @@
     "dailyRewardTitle": "🎁 Ta récompense quotidienne t'attend !",
     "dailyRewardBody": "Réclame tes +15 XP et lance une partie."
   },
-  "feedback": {
-    "title": "Retour & Support",
-    "subtitle": "Aide-nous à améliorer Flipia",
-    "category": {
-      "bug": "Bug",
-      "feature": "Idée",
-      "question": "Question",
-      "other": "Autre"
-    },
-    "messageLabel": "Ton message",
-    "messagePlaceholder": "Décris le bug, ton idée ou pose ta question...",
-    "emailLabel": "Email (optionnel)",
-    "emailPlaceholder": "toi@exemple.com",
-    "submit": "Envoyer",
-    "submitting": "Envoi...",
-    "success": "Merci !",
-    "successMessage": "On lit chaque message et on revient vers toi si besoin.",
-    "error": "Échec de l'envoi. Réessaye.",
-    "errorRequired": "Écris un message"
-  },
   "offline": {
     "title": "Pas de connexion Internet",
     "message": "Cette fonctionnalité nécessite une connexion Internet. Connecte-toi au Wi-Fi ou aux données mobiles et réessaye.",
@@ -347,5 +345,132 @@
       "ctaLost": "Prendre ma revanche",
       "ctaDraw": "Prouver que je suis meilleur"
     }
+  },
+  "shop": {
+    "title": "Boutique",
+    "premium": {
+      "eyebrow": "Le meilleur de Flipia",
+      "title": "Passe en Premium",
+      "subtitle": "Plus de pub, +10% XP et 2 skins exclusifs. Un seul paiement, à vie.",
+      "cta": "Débloquer"
+    },
+    "sectionPacks": "Starter Packs",
+    "sectionPacksBadge": "Populaires",
+    "packAngel": {
+      "title": "Pack Ange",
+      "count": "Avatar + Plateau",
+      "description": "Avatar Ange 👼 et plateau Heaven exclusifs"
+    },
+    "packDemon": {
+      "title": "Pack Démon",
+      "count": "Avatar + Plateau",
+      "description": "Avatar Démon 😈 et plateau Inferno exclusifs",
+      "badge": "HOT"
+    },
+    "ctaShort": "Acheter",
+    "owned": "Possédé",
+    "ownedPremium": "✓ Premium acquis",
+    "restore": "Restaurer mes achats",
+    "restoring": "Restauration…",
+    "restoreTitle": "Restauration",
+    "restoreOk": "Tes achats ont été restaurés.",
+    "restoreFailed": "La restauration a échoué.",
+    "purchaseFailed": "L'achat n'a pas pu aboutir.",
+    "soonTitle": "Bientôt disponible",
+    "soonBody": "Les achats seront activés à la sortie de la V1."
+  },
+  "packs": {
+    "premium": {
+      "title": "Premium",
+      "tagline": "Tout débloqué, à vie",
+      "features": {
+        "noAds": {
+          "title": "Aucune publicité",
+          "description": "Joue sans interruption"
+        },
+        "xpBoost": {
+          "title": "+10% XP",
+          "description": "Boost permanent sur chaque partie"
+        },
+        "avatar": {
+          "title": "Avatar Couronne 👑",
+          "description": "Avatar exclusif Premium"
+        },
+        "table": {
+          "title": "Plateau Royal",
+          "description": "Plateau de jeu doré exclusif"
+        }
+      }
+    },
+    "angel": {
+      "title": "Pack Ange",
+      "tagline": "Le starter pack lumineux",
+      "features": {
+        "avatar": {
+          "title": "Avatar Ange 👼",
+          "description": "Avatar exclusif Ange"
+        },
+        "table": {
+          "title": "Plateau Heaven",
+          "description": "Plateau céleste exclusif"
+        }
+      }
+    },
+    "demon": {
+      "title": "Pack Démon",
+      "tagline": "Le starter pack ténébreux",
+      "features": {
+        "avatar": {
+          "title": "Avatar Démon 😈",
+          "description": "Avatar exclusif Démon"
+        },
+        "table": {
+          "title": "Plateau Inferno",
+          "description": "Plateau ardent exclusif"
+        }
+      }
+    }
+  },
+  "pack": {
+    "includes": "CE QUE TU OBTIENS"
+  },
+  "common": {
+    "error": "Erreur"
+  },
+  "apparence": {
+    "title": "Apparence",
+    "currentAvatar": "Ton avatar actuel",
+    "collection": "Collection",
+    "collectionCount": "{{unlocked}}/{{total}} débloqués",
+    "tables": "Plateaux",
+    "tablesCount": "{{count}} styles",
+    "preview": "Aperçu",
+    "previewTitle": "Aperçu",
+    "previewBack": "Retour"
+  },
+  "avatars": {
+    "brain": "Cerveau",
+    "fox": "Renard",
+    "octopus": "Pieuvre",
+    "owl": "Hibou",
+    "panda": "Panda",
+    "lion": "Lion",
+    "tiger": "Tigre",
+    "unicorn": "Licorne",
+    "wolf": "Loup",
+    "eagle": "Aigle",
+    "frog": "Grenouille",
+    "butterfly": "Papillon",
+    "bee": "Abeille",
+    "shark": "Requin",
+    "whale": "Baleine",
+    "flamingo": "Flamant",
+    "crown": "Couronne",
+    "angel": "Ange",
+    "demon": "Démon"
+  },
+  "plateauPreview": {
+    "opponent": "Adversaire",
+    "you": "Toi"
   }
 }

@@ -4,6 +4,7 @@ import {
   RewardedAdEventType,
   AdEventType,
 } from "react-native-google-mobile-ads";
+import { usePremium } from "./useEntitlements";
 
 const TEST_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
 
@@ -11,7 +12,10 @@ const AD_UNIT_ID = __DEV__
   ? TEST_AD_UNIT_ID
   : process.env.EXPO_PUBLIC_ADMOB_REWARDED_ID ?? TEST_AD_UNIT_ID;
 
+const NOOP = () => {};
+
 export function useRewardedAd(onRewardEarned: () => void) {
+  const premium = usePremium();
   const [isLoaded, setIsLoaded] = useState(false);
   const [isShowing, setIsShowing] = useState(false);
   const rewardedRef = useRef<RewardedAd | null>(null);
@@ -51,8 +55,9 @@ export function useRewardedAd(onRewardEarned: () => void) {
   }, []);
 
   useEffect(() => {
+    if (premium) return;
     loadAd();
-  }, [loadAd]);
+  }, [loadAd, premium]);
 
   const showAd = useCallback(() => {
     if (rewardedRef.current && isLoaded) {
@@ -60,6 +65,10 @@ export function useRewardedAd(onRewardEarned: () => void) {
       rewardedRef.current.show();
     }
   }, [isLoaded]);
+
+  if (premium) {
+    return { isLoaded: false, isShowing: false, showAd: NOOP };
+  }
 
   return { isLoaded, isShowing, showAd };
 }

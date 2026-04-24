@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 import { db } from "@/lib/instant";
 import { id, tx } from "@instantdb/react-native";
 import { useProfile } from "@/lib/identity";
+import { usePremium } from "@/hooks/useEntitlements";
 
 interface PlayerStats {
   gamesPlayed: number;
@@ -17,10 +18,8 @@ const XP_REWARDS: Record<string, { win: number; loss: number }> = {
   hard: { win: 40, loss: 5 },
 };
 
-export const AVATARS = [
-  "🧠", "🦊", "🐙", "🦉", "🐼", "🦁", "🐯", "🦄",
-  "🐺", "🦅", "🐸", "🦋", "🐝", "🦈", "🐳", "🦩",
-];
+// AVATARS lives in lib/skins.ts (re-exported here for back-compat)
+export { AVATARS } from "@/lib/skins";
 
 function computeLevel(xp: number) {
   let level = 1;
@@ -50,6 +49,7 @@ interface StatsContext {
   stats: PlayerStats;
   avatar: string;
   nickname: string;
+  selectedTable: string;
   profileId: string | null;
   userId: string | undefined;
   level: number;
@@ -70,14 +70,16 @@ const Ctx = createContext<StatsContext | null>(null);
 
 export function PlayerStatsProvider({ children }: { children: React.ReactNode }) {
   const [lastXpGain, setLastXpGain] = useState(0);
+  const premium = usePremium();
 
   const { user } = db.useAuth();
   const userId = user?.id;
 
-  // Profile from InstantDB (nickname + avatar)
+  // Profile from InstantDB (nickname + avatar + selectedTable)
   const { profile } = useProfile(userId);
   const avatar = profile?.avatar ?? "🧠";
   const nickname = profile?.nickname ?? "";
+  const selectedTable = profile?.selectedTable ?? "classic";
   const profileId = profile?.id ?? null;
 
   // Leaderboard from InstantDB (stats)
@@ -120,7 +122,8 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
 
     const rewards = XP_REWARDS[difficulty] ?? XP_REWARDS.medium;
     const baseXp = won ? rewards.win : rewards.loss;
-    const xp = Math.round(baseXp * (options?.xpBoost ?? 1));
+    const premiumBoost = premium ? 1.1 : 1;
+    const xp = Math.round(baseXp * (options?.xpBoost ?? 1) * premiumBoost);
     setLastXpGain(xp);
 
     const newStreak = won ? stats.currentStreak + 1 : 0;
@@ -164,7 +167,7 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
     }
 
     db.transact(ops);
-  }, [userId, stats, leaderboardId, profileId]);
+  }, [userId, stats, leaderboardId, profileId, premium]);
 
   const levelInfo = useMemo(() => computeLevel(stats.points), [stats.points]);
 
@@ -174,13 +177,13 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
 
   const value = useMemo(
     () => ({
-      stats, avatar, nickname, profileId, userId, winRate, lastXpGain, recordGame, addBonusXp,
+      stats, avatar, nickname, selectedTable, profileId, userId, winRate, lastXpGain, recordGame, addBonusXp,
       level: levelInfo.level,
       levelProgress: levelInfo.progress,
       xpForNextLevel: levelInfo.xpForNext,
       xpInLevel: levelInfo.xpInLevel,
     }),
-    [stats, avatar, nickname, profileId, userId, winRate, lastXpGain, recordGame, addBonusXp, levelInfo],
+    [stats, avatar, nickname, selectedTable, profileId, userId, winRate, lastXpGain, recordGame, addBonusXp, levelInfo],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -14,6 +14,7 @@ import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { GRID_CONFIG, type CpuDifficulty } from "../../lib/gameLogic";
 import { showInterstitialThen } from "../../hooks/useInterstitialAd";
+import { usePremium } from "../../hooks/useEntitlements";
 
 const CPU_PROFILES: Record<string, { name: string; avatar: string }> = {
   easy: { name: "BabyBot", avatar: "🐣" },
@@ -27,6 +28,7 @@ export default function GameScreen() {
   const { t } = useTranslation();
   const { colors, isDark } = useTheme();
   const { avatar } = usePlayerStats();
+  const premium = usePremium();
   const { game, lastMatchResult, handleCardPress, handleTornado, handleTornadoComplete } =
     useLocalGame(difficulty as CpuDifficulty);
 
@@ -61,9 +63,9 @@ export default function GameScreen() {
             xpBoost,
           },
         });
-      });
+      }, { skip: premium });
     }
-  }, [game.status]);
+  }, [game.status, premium]);
 
   const confirmQuit = () => {
     if (game.status !== "playing") {
