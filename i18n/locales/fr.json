@@ -352,7 +352,7 @@
       "eyebrow": "Le meilleur de Flipia",
       "title": "Passe en Premium",
       "subtitle": "Plus de pub, +10% XP et 2 skins exclusifs. Un seul paiement, à vie.",
-      "cta": "Débloquer"
+      "cta": "Aperçu"
     },
     "sectionPacks": "Starter Packs",
     "sectionPacksBadge": "Populaires",
@@ -367,7 +367,7 @@
       "description": "Avatar Démon 😈 et plateau Inferno exclusifs",
       "badge": "HOT"
     },
-    "ctaShort": "Acheter",
+    "ctaShort": "Aperçu",
     "owned": "Possédé",
     "ownedPremium": "✓ Premium acquis",
     "restore": "Restaurer mes achats",
@@ -442,7 +442,18 @@
     "trustLifetime": "À vie",
     "trustNoSubscription": "Sans abonnement",
     "trustRestore": "Restaurable",
-    "bottomTagline": "Achat unique · À vie · Sans abonnement"
+    "bottomTagline": "Achat unique · À vie · Sans abonnement",
+    "eyebrow": "APERÇU DU PACK",
+    "previewCaption": "PLATEAU EN JEU",
+    "contents": "DANS CE PACK",
+    "avatarChip": "AVATAR EXCLUSIF",
+    "tableChip": "PLATEAU EXCLUSIF",
+    "unlock": "Débloquer",
+    "owned": "✓ Tu possèdes déjà ce pack",
+    "buying": "Achat en cours…",
+    "soon": "Bientôt disponible",
+    "restoring": "Restauration…",
+    "restoreCta": "Restaurer mes achats"
   },
   "common": {
     "error": "Erreur"

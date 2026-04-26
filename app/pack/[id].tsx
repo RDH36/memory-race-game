@@ -6,26 +6,25 @@ import { useLocalSearchParams, useRouter, Redirect } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { Gradient } from "../../components/ui/Gradient";
 import { PACKS } from "../../lib/packs";
 import {
   AVATAR_SKINS,
   TABLE_SKINS,
-  ROYAL_THEME, INFERNO_THEME, HEAVEN_THEME,
   type PackId,
+  type CardSkin,
 } from "../../lib/skins";
 import { purchaseProduct, restorePurchases, useRevenueCat } from "../../lib/revenuecat";
 import { useEntitlements } from "../../hooks/useEntitlements";
-import { TableMiniPreview } from "../../components/appearance/TableMiniPreview";
-import { Crown } from "../../components/ui/icons/Crown";
-import { RoyalSealIcon } from "../../components/game/royal/RoyalSealIcon";
-import { CelticCross } from "../../components/game/heaven/CelticCross";
-import { HeavenHalo } from "../../components/game/heaven/HeavenHalo";
-import { GoeticSigil } from "../../components/game/inferno/GoeticSigil";
-import { DemonHorn } from "../../components/game/inferno/DemonHorn";
+import { PlateauPreview } from "../../components/preview/PlateauPreview";
 
-const HERO_HEIGHT = 380;
+const SKIN_BY_PACK: Record<PackId, CardSkin> = {
+  premium: "royal",
+  angel: "heaven",
+  demon: "inferno",
+};
 
 const TABLE_BY_PACK: Record<PackId, string> = {
   premium: "premium",
@@ -33,7 +32,7 @@ const TABLE_BY_PACK: Record<PackId, string> = {
   demon: "demon",
 };
 
-export default function PackDetailScreen() {
+export default function PackPreviewScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t } = useTranslation();
@@ -46,12 +45,10 @@ export default function PackDetailScreen() {
   if (!id || !(id in PACKS)) return <Redirect href="/(tabs)/shop" />;
 
   const pack = PACKS[id as PackId];
+  const skin = SKIN_BY_PACK[pack.id];
   const tableSkin = TABLE_SKINS.find((tb) => tb.id === TABLE_BY_PACK[pack.id]);
-  const cardSkin =
-    pack.id === "premium" ? "royal" : pack.id === "demon" ? "inferno" : "heaven";
-  // Real in-game avatar this pack unlocks (used as corner ornaments)
-  const cornerAvatar = AVATAR_SKINS.find((a) => a.emoji === pack.emoji);
-  const cornerHue = cornerAvatar?.hue ?? 48;
+  const avatar = AVATAR_SKINS.find((a) => a.emoji === pack.emoji);
+  const avatarHue = avatar?.hue ?? 48;
 
   const owned =
     (pack.id === "premium" && ents.premium) ||
@@ -66,7 +63,10 @@ export default function PackDetailScreen() {
 
   const handleBuy = async () => {
     if (!purchasable) {
-      Alert.alert("Bientôt disponible", "Les achats seront activés à la sortie de la V1.");
+      Alert.alert(
+        t("shop.soonTitle", "Bientôt disponible"),
+        t("shop.soonBody", "Les achats seront activés à la sortie de la V1."),
+      );
       return;
     }
     try {
@@ -75,7 +75,8 @@ export default function PackDetailScreen() {
       await purchaseProduct(pack.productId);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (e: any) {
-      if (!e?.userCancelled) Alert.alert("Erreur", e?.message ?? "L'achat n'a pas pu aboutir.");
+      if (!e?.userCancelled)
+        Alert.alert(t("common.error", "Erreur"), e?.message ?? t("shop.purchaseFailed", "L'achat n'a pas pu aboutir."));
     } finally {
       setBusy(null);
     }
@@ -85,16 +86,19 @@ export default function PackDetailScreen() {
     try {
       setBusy("restore");
       await restorePurchases();
-      Alert.alert("Restauration", "Tes achats ont été restaurés.");
+      Alert.alert(
+        t("shop.restoreTitle", "Restauration"),
+        t("shop.restoreOk", "Tes achats ont été restaurés."),
+      );
     } catch (e: any) {
-      Alert.alert("Erreur", e?.message ?? "La restauration a échoué.");
+      Alert.alert(t("common.error", "Erreur"), e?.message ?? t("shop.restoreFailed", "La restauration a échoué."));
     } finally {
       setBusy(null);
     }
   };
 
-  const ctaBg = owned ? colors.success : pack.cta;
-  const ctaTextColor = owned ? "#FFFFFF" : pack.ctaText;
+  const ctaBg = owned ? "#3DDC97" : pack.cta;
+  const ctaText = owned ? "#08210F" : pack.ctaText;
 
   return (
     <View style={{ flex: 1, backgroundColor: pack.gradient[0] }}>
@@ -104,223 +108,292 @@ export default function PackDetailScreen() {
         contentContainerStyle={{ paddingBottom: 220 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero (scrolls with content) */}
-        <View style={{ height: HERO_HEIGHT, position: "relative" }}>
-          <Gradient colors={pack.gradient} angle={pack.gradientAngle} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}>
-            <View pointerEvents="none" style={{ position: "absolute", top: -60, right: -60, width: 240, height: 240, borderRadius: 120, backgroundColor: pack.glow, opacity: 0.22 }} />
-            <View pointerEvents="none" style={{ position: "absolute", bottom: 60, left: -50, width: 180, height: 180, borderRadius: 90, backgroundColor: "#FFFFFF", opacity: 0.07 }} />
-          </Gradient>
-
-          {/* Hero content */}
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingTop: insets.top + 30 }}>
-            <View style={{ position: "relative", width: 170, height: 170, alignItems: "center", justifyContent: "center" }}>
-              <CornerOrnaments packId={pack.id} />
-              <View
-                style={{
-                  width: 138, height: 138, borderRadius: 38,
-                  backgroundColor: "rgba(255,255,255,0.16)",
-                  alignItems: "center", justifyContent: "center",
-                  shadowColor: pack.glow, shadowOpacity: 0.6, shadowRadius: 50, shadowOffset: { width: 0, height: 0 },
-                }}
-              >
-                <HeroSigil packId={pack.id} />
-              </View>
-            </View>
-
-            <Text style={{ marginTop: 14, fontSize: 32, fontFamily: "Fredoka_700Bold", color: pack.heroText, letterSpacing: 0.3 }}>
-              {t(`packs.${pack.id}.title`)}
-            </Text>
-            <Text style={{ marginTop: 6, fontSize: 13, fontFamily: "Nunito_600SemiBold", color: pack.heroText, opacity: 0.9, textAlign: "center", paddingHorizontal: 32, lineHeight: 18 }}>
-              {t(`packs.${pack.id}.pitch`, t(`packs.${pack.id}.tagline`))}
-            </Text>
-
-            <View
-              style={{
-                marginTop: 14,
-                backgroundColor: pack.cta,
-                paddingHorizontal: 14, paddingVertical: 6,
-                borderRadius: 999,
-                flexDirection: "row", alignItems: "center", gap: 6,
-                shadowColor: pack.glow, shadowOpacity: 0.5, shadowRadius: 12,
-              }}
-            >
-              <Ionicons name="infinite" size={13} color={pack.ctaText} />
-              <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 11, color: pack.ctaText, letterSpacing: 0.8 }}>
-                {t("pack.lifetimeBadge", "À VIE · UN PAIEMENT")}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* White content card */}
-        <View
-          style={{
-            backgroundColor: colors.surface,
-            borderTopLeftRadius: 32, borderTopRightRadius: 32,
-            paddingHorizontal: 22, paddingTop: 28,
-            marginTop: -32, // overlap hero a bit
-          }}
-        >
-          {/* "Ton butin" — vertical stack reveal */}
-          {tableSkin && (
-            <View style={{ marginBottom: 24 }}>
-              <Text style={{ fontSize: 11, fontFamily: "Nunito_700Bold", color: colors.onSurfaceMuted, letterSpacing: 1.5, marginBottom: 12 }}>
-                {t("pack.yourLoot", "TON BUTIN")}
-              </Text>
-
-              {/* Avatar reveal card */}
-              <View
-                style={{
-                  backgroundColor: colors.surfaceContainer,
-                  borderRadius: 20,
-                  paddingVertical: 22, paddingHorizontal: 16,
-                  alignItems: "center",
-                  marginBottom: 12,
-                }}
-              >
-                <Text style={{ fontSize: 10, fontFamily: "Nunito_700Bold", color: colors.onSurfaceMuted, letterSpacing: 1.2, marginBottom: 14 }}>
-                  AVATAR EXCLUSIF
-                </Text>
-                <View
-                  style={{
-                    width: 116, height: 116, borderRadius: 58,
-                    backgroundColor: `hsl(${cornerHue}, 60%, 88%)`,
-                    alignItems: "center", justifyContent: "center",
-                    borderWidth: 3,
-                    borderColor: pack.cta,
-                    shadowColor: pack.glow, shadowOpacity: 0.4, shadowRadius: 20,
-                  }}
-                >
-                  <Text style={{ fontSize: 64, lineHeight: 78 }}>{pack.emoji}</Text>
-                </View>
-                <Text style={{ marginTop: 12, fontSize: 17, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
-                  {avatarLabel(pack.id, t)}
-                </Text>
-              </View>
-
-              {/* Plateau reveal card */}
-              <View
-                style={{
-                  backgroundColor: colors.surfaceContainer,
-                  borderRadius: 20,
-                  paddingVertical: 22, paddingHorizontal: 16,
-                  alignItems: "center",
-                }}
-              >
-                <Text style={{ fontSize: 10, fontFamily: "Nunito_700Bold", color: colors.onSurfaceMuted, letterSpacing: 1.2, marginBottom: 14 }}>
-                  PLATEAU EXCLUSIF
-                </Text>
-                <View
-                  style={{
-                    width: "100%",
-                    borderRadius: 16,
-                    overflow: "hidden",
-                    borderWidth: 3,
-                    borderColor: pack.cta,
-                    shadowColor: pack.glow, shadowOpacity: 0.4, shadowRadius: 20,
-                  }}
-                >
-                  <TableMiniPreview
-                    frame={tableSkin.preview.frame}
-                    back={tableSkin.preview.back}
-                    face={tableSkin.preview.face}
-                    skin={cardSkin}
-                  />
-                </View>
-                <Text style={{ marginTop: 12, fontSize: 17, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
-                  {tableSkin.name}
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {pack.id === "premium" && (
-            <View style={{ marginBottom: 24 }}>
-              <Text style={{ fontSize: 11, fontFamily: "Nunito_700Bold", color: colors.onSurfaceMuted, letterSpacing: 1.5, marginBottom: 12 }}>
-                {t("pack.includes", "INCLUS AUSSI")}
-              </Text>
-              <View style={{ gap: 10 }}>
-                <PerkRow icon="🚫" title={t(`packs.premium.features.noAds.title`)} desc={t(`packs.premium.features.noAds.description`)} colors={colors} />
-                <PerkRow icon="⚡" title={t(`packs.premium.features.xpBoost.title`)} desc={t(`packs.premium.features.xpBoost.description`)} colors={colors} />
-              </View>
-            </View>
-          )}
-
+        {/* Atmospheric backbone — scrolls with content (covers hero zone) */}
+        <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, right: 0, height: 640 }}>
+          <Gradient
+            colors={[pack.gradient[0], pack.gradient[1]]}
+            angle={pack.gradientAngle}
+            style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+          />
           <View
             style={{
-              flexDirection: "row",
-              justifyContent: "space-around",
-              backgroundColor: colors.surfaceContainerLow,
-              borderRadius: 14,
-              paddingVertical: 14, paddingHorizontal: 8,
+              position: "absolute", top: -100, left: 0, right: 0,
+              alignItems: "center",
             }}
           >
-            <TrustItem icon="infinite" label={t("pack.trustLifetime", "À vie")} colors={colors} />
-            <TrustItem icon="card-outline" label={t("pack.trustNoSubscription", "Sans abonnement")} colors={colors} />
-            <TrustItem icon="refresh" label={t("pack.trustRestore", "Restaurable")} colors={colors} />
+            <View
+              style={{
+                width: 360, height: 360, borderRadius: 180,
+                backgroundColor: pack.glow, opacity: 0.18,
+              }}
+            />
           </View>
         </View>
-      </ScrollView>
 
-      {/* Floating close button */}
-      <SafeAreaView edges={["top"]} pointerEvents="box-none" style={{ position: "absolute", top: 0, left: 0, right: 0 }}>
-        <View style={{ flexDirection: "row", paddingHorizontal: 16, paddingTop: 8 }}>
+        {/* Header — back + eyebrow */}
+        <View
+          style={{
+            flexDirection: "row", alignItems: "center",
+            paddingTop: insets.top + 8, paddingHorizontal: 16, paddingBottom: 4,
+          }}
+        >
           <Pressable
             onPress={() => router.back()}
-            style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(0,0,0,0.3)", alignItems: "center", justifyContent: "center" }}
+            hitSlop={10}
+            style={{
+              width: 40, height: 40, borderRadius: 20,
+              backgroundColor: "rgba(255,255,255,0.14)",
+              alignItems: "center", justifyContent: "center",
+            }}
           >
-            <Ionicons name="close" size={22} color="#FFFFFF" />
+            <Ionicons name="chevron-back" size={22} color="#FFFFFF" />
           </Pressable>
+          <View style={{ flex: 1, alignItems: "center" }}>
+            <Text
+              style={{
+                fontFamily: "Nunito_700Bold", fontSize: 10, letterSpacing: 2,
+                color: pack.glow, opacity: 0.95,
+              }}
+            >
+              ● {t("pack.eyebrow", "APERÇU DU PACK")} ●
+            </Text>
+          </View>
+          <View style={{ width: 40 }} />
         </View>
-      </SafeAreaView>
 
-      {/* Sticky bottom CTA */}
+        {/* Title */}
+        <Animated.View entering={FadeIn.duration(300).delay(50)} style={{ alignItems: "center", paddingHorizontal: 28, marginTop: 6 }}>
+          <Text
+            style={{
+              fontFamily: "Fredoka_700Bold", fontSize: 32,
+              color: "#FFFFFF", letterSpacing: 0.4, textAlign: "center", lineHeight: 36,
+            }}
+          >
+            {t(`packs.${pack.id}.title`)}
+          </Text>
+          <Text
+            style={{
+              marginTop: 4, fontSize: 13, fontFamily: "Nunito_600SemiBold",
+              color: "rgba(255,255,255,0.82)", textAlign: "center",
+            }}
+          >
+            {t(`packs.${pack.id}.tagline`)}
+          </Text>
+        </Animated.View>
+
+        {/* Plateau preview hero — uses the same chrome as in-game */}
+        {tableSkin && (
+          <Animated.View
+            entering={FadeIn.duration(400).delay(150)}
+            style={{
+              marginTop: 18,
+              marginHorizontal: 16,
+              height: 420,
+              borderRadius: 24,
+              overflow: "hidden",
+            }}
+          >
+            <PlateauPreview skin={skin} />
+          </Animated.View>
+        )}
+
+        {/* Caption under preview */}
+        <Animated.View entering={FadeIn.duration(300).delay(250)} style={{ alignItems: "center", marginTop: 10 }}>
+          <View
+            style={{
+              flexDirection: "row", alignItems: "center", gap: 6,
+              backgroundColor: "rgba(0,0,0,0.30)",
+              paddingVertical: 5, paddingHorizontal: 12,
+              borderRadius: 999,
+              borderWidth: 1, borderColor: pack.cta + "55",
+            }}
+          >
+            <Ionicons name="eye" size={12} color={pack.glow} />
+            <Text
+              style={{
+                fontFamily: "Nunito_700Bold", fontSize: 10,
+                letterSpacing: 1, color: "#FFFFFF",
+              }}
+            >
+              {t("pack.previewCaption", "PLATEAU EN JEU")} · {tableSkin?.name}
+            </Text>
+          </View>
+        </Animated.View>
+
+        {/* Loot card — what's in the pack */}
+        <Animated.View
+          entering={FadeInDown.duration(400).delay(300)}
+          style={{
+            marginTop: 22,
+            marginHorizontal: 22,
+            backgroundColor: colors.surface,
+            borderRadius: 24,
+            padding: 18,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 11, fontFamily: "Nunito_700Bold",
+              color: colors.onSurfaceMuted, letterSpacing: 1.4, marginBottom: 14,
+            }}
+          >
+            {t("pack.contents", "DANS CE PACK")}
+          </Text>
+
+          {/* Avatar row */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 14, marginBottom: 12 }}>
+            <View
+              style={{
+                width: 64, height: 64, borderRadius: 32,
+                backgroundColor: `hsl(${avatarHue}, 60%, 88%)`,
+                borderWidth: 2.5, borderColor: pack.cta,
+                alignItems: "center", justifyContent: "center",
+              }}
+            >
+              <Text style={{ fontSize: 36, lineHeight: 44 }}>{pack.emoji}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 10, fontFamily: "Nunito_700Bold", letterSpacing: 1, color: colors.onSurfaceMuted }}>
+                {t("pack.avatarChip", "AVATAR EXCLUSIF")}
+              </Text>
+              <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 17, color: colors.onSurface, marginTop: 1 }}>
+                {avatarLabel(pack.id, t)}
+              </Text>
+              <Text style={{ fontSize: 11, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceMuted, marginTop: 1 }}>
+                {t(`packs.${pack.id}.features.avatar.description`, "Avatar exclusif")}
+              </Text>
+            </View>
+          </View>
+
+          {/* Plateau row */}
+          {tableSkin && (
+            <View
+              style={{
+                flexDirection: "row", alignItems: "center", gap: 14,
+                paddingTop: 12, borderTopWidth: 1, borderTopColor: "rgba(0,0,0,0.08)",
+              }}
+            >
+              <View
+                style={{
+                  width: 64, height: 64, borderRadius: 14,
+                  backgroundColor: tableSkin.preview.frame,
+                  borderWidth: 2.5, borderColor: pack.cta,
+                  alignItems: "center", justifyContent: "center",
+                  overflow: "hidden",
+                }}
+              >
+                <View style={{ flexDirection: "row", gap: 3 }}>
+                  <View style={{ width: 12, height: 18, borderRadius: 3, backgroundColor: tableSkin.preview.back }} />
+                  <View style={{ width: 12, height: 18, borderRadius: 3, backgroundColor: tableSkin.preview.face }} />
+                  <View style={{ width: 12, height: 18, borderRadius: 3, backgroundColor: tableSkin.preview.back }} />
+                </View>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 10, fontFamily: "Nunito_700Bold", letterSpacing: 1, color: colors.onSurfaceMuted }}>
+                  {t("pack.tableChip", "PLATEAU EXCLUSIF")}
+                </Text>
+                <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 17, color: colors.onSurface, marginTop: 1 }}>
+                  {tableSkin.name}
+                </Text>
+                <Text style={{ fontSize: 11, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceMuted, marginTop: 1 }}>
+                  {t(`packs.${pack.id}.features.table.description`, "Plateau exclusif")}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Premium-only perks */}
+          {pack.id === "premium" && (
+            <View style={{ marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: "rgba(0,0,0,0.08)", gap: 10 }}>
+              <PerkRow icon="🚫" title={t("packs.premium.features.noAds.title")} desc={t("packs.premium.features.noAds.description")} colors={colors} />
+              <PerkRow icon="⚡" title={t("packs.premium.features.xpBoost.title")} desc={t("packs.premium.features.xpBoost.description")} colors={colors} />
+            </View>
+          )}
+        </Animated.View>
+
+        {/* Trust strip */}
+        <Animated.View
+          entering={FadeInDown.duration(400).delay(400)}
+          style={{
+            marginTop: 14,
+            marginHorizontal: 22,
+            flexDirection: "row", justifyContent: "space-around",
+            paddingVertical: 12, paddingHorizontal: 8,
+            backgroundColor: "rgba(255,255,255,0.08)",
+            borderRadius: 14,
+          }}
+        >
+          <TrustItem icon="infinite" label={t("pack.trustLifetime", "À vie")} />
+          <TrustItem icon="card-outline" label={t("pack.trustNoSubscription", "Sans abonnement")} />
+          <TrustItem icon="refresh" label={t("pack.trustRestore", "Restaurable")} />
+        </Animated.View>
+      </ScrollView>
+
+      {/* Sticky CTA */}
       <View
         style={{
           position: "absolute", left: 0, right: 0, bottom: 0,
           paddingHorizontal: 22, paddingTop: 14,
-          paddingBottom: Math.max(insets.bottom, 16) + 8,
-          backgroundColor: colors.surface,
+          paddingBottom: Math.max(insets.bottom, 12) + 6,
+          backgroundColor: pack.gradient[0],
         }}
       >
         <Pressable
           onPress={owned ? () => router.back() : handleBuy}
           disabled={busy === "buy" || !isReady}
           style={({ pressed }) => ({
-            backgroundColor: ctaBg,
-            paddingVertical: 20, borderRadius: 18,
-            alignItems: "center", justifyContent: "center",
-            transform: [{ scale: pressed ? 0.97 : 1 }],
-            opacity: !isReady ? 0.6 : 1,
-            shadowColor: ctaBg, shadowOpacity: 0.4, shadowRadius: 16, shadowOffset: { width: 0, height: 6 },
-            elevation: 6,
+            opacity: !isReady ? 0.6 : pressed ? 0.85 : 1,
           })}
         >
-          <Text style={{ fontSize: 17, fontFamily: "Nunito_700Bold", color: ctaTextColor, letterSpacing: 0.3 }}>
-            {owned ? "✓ Tu possèdes déjà ce pack" : busy === "buy" ? "Achat en cours…" : purchasable ? `Acheter — ${price}` : `Bientôt disponible`}
-          </Text>
+          <View
+            style={{
+              backgroundColor: ctaBg,
+              paddingVertical: 18,
+              borderRadius: 18,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16, fontFamily: "Nunito_700Bold",
+                color: ctaText, letterSpacing: 0.3,
+              }}
+            >
+              {owned
+                ? t("pack.owned", "✓ Tu possèdes déjà ce pack")
+                : busy === "buy"
+                ? t("pack.buying", "Achat en cours…")
+                : purchasable
+                ? `${t("pack.unlock", "Débloquer")} — ${price}`
+                : t("pack.soon", "Bientôt disponible")}
+            </Text>
+          </View>
         </Pressable>
 
         {!owned && (
-          <Text style={{ marginTop: 10, fontSize: 11, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceMuted, textAlign: "center" }}>
-            {t("pack.bottomTagline", "Achat unique · À vie · Sans abonnement")}
-          </Text>
+          <Pressable
+            onPress={handleRestore}
+            disabled={busy === "restore"}
+            hitSlop={8}
+            style={{ alignSelf: "center", marginTop: 8, padding: 4 }}
+          >
+            <Text
+              style={{
+                fontSize: 11, fontFamily: "Nunito_600SemiBold",
+                color: "rgba(255,255,255,0.6)", textDecorationLine: "underline",
+              }}
+            >
+              {busy === "restore"
+                ? t("pack.restoring", "Restauration…")
+                : t("pack.restoreCta", "Restaurer mes achats")}
+            </Text>
+          </Pressable>
         )}
-
-        <Pressable
-          onPress={handleRestore}
-          disabled={busy === "restore"}
-          style={{ marginTop: 4, alignItems: "center", padding: 6 }}
-        >
-          <Text style={{ fontSize: 12, fontFamily: "Nunito_700Bold", color: colors.primaryContainer }}>
-            {busy === "restore" ? "Restauration…" : "Restaurer mes achats"}
-          </Text>
-        </Pressable>
       </View>
     </View>
   );
 }
-
 
 function avatarLabel(packId: PackId, t: (k: string) => string): string {
   if (packId === "premium") return t("avatars.crown");
@@ -328,68 +401,36 @@ function avatarLabel(packId: PackId, t: (k: string) => string): string {
   return t("avatars.demon");
 }
 
-function HeroSigil({ packId }: { packId: PackId }) {
-  if (packId === "premium") return <RoyalSealIcon size={92} color={ROYAL_THEME.gold} accent={ROYAL_THEME.goldBright} />;
-  if (packId === "angel") return <CelticCross size={92} color={HEAVEN_THEME.gold} accent={HEAVEN_THEME.haloBright} />;
-  return <GoeticSigil size={92} color={INFERNO_THEME.ember} accent={INFERNO_THEME.emberBright} />;
-}
-
-function CornerOrnaments({ packId }: { packId: PackId }) {
-  if (packId === "premium") {
-    return (
-      <>
-        <View pointerEvents="none" style={{ position: "absolute", top: 0, left: 0, transform: [{ rotate: "-18deg" }] }}>
-          <Crown size={34} color={ROYAL_THEME.gold} />
-        </View>
-        <View pointerEvents="none" style={{ position: "absolute", top: 0, right: 0, transform: [{ rotate: "18deg" }] }}>
-          <Crown size={34} color={ROYAL_THEME.gold} />
-        </View>
-      </>
-    );
-  }
-  if (packId === "angel") {
-    return (
-      <>
-        <View pointerEvents="none" style={{ position: "absolute", top: 4, left: 4 }}>
-          <HeavenHalo size={30} />
-        </View>
-        <View pointerEvents="none" style={{ position: "absolute", top: 4, right: 4 }}>
-          <HeavenHalo size={30} />
-        </View>
-      </>
-    );
-  }
-  return (
-    <>
-      <View pointerEvents="none" style={{ position: "absolute", top: -2, left: 4, transform: [{ rotate: "-22deg" }] }}>
-        <DemonHorn size={34} />
-      </View>
-      <View pointerEvents="none" style={{ position: "absolute", top: -2, right: 4, transform: [{ rotate: "22deg" }] }}>
-        <DemonHorn size={34} />
-      </View>
-    </>
-  );
-}
-
 function PerkRow({ icon, title, desc, colors }: { icon: string; title: string; desc: string; colors: any }) {
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: colors.surfaceContainer, borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14 }}>
-      <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.primaryContainerBg, alignItems: "center", justifyContent: "center" }}>
-        <Text style={{ fontSize: 22 }}>{icon}</Text>
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+      <View
+        style={{
+          width: 38, height: 38, borderRadius: 19,
+          backgroundColor: colors.surfaceContainer,
+          alignItems: "center", justifyContent: "center",
+        }}
+      >
+        <Text style={{ fontSize: 18 }}>{icon}</Text>
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 14, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>{title}</Text>
-        <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginTop: 1 }}>{desc}</Text>
+        <Text style={{ fontSize: 13, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>{title}</Text>
+        <Text style={{ fontSize: 11, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceMuted }}>{desc}</Text>
       </View>
     </View>
   );
 }
 
-function TrustItem({ icon, label, colors }: { icon: any; label: string; colors: any }) {
+function TrustItem({ icon, label }: { icon: any; label: string }) {
   return (
-    <View style={{ alignItems: "center", gap: 6 }}>
-      <Ionicons name={icon} size={20} color={colors.onSurfaceVariant} />
-      <Text style={{ fontSize: 10, fontFamily: "Nunito_700Bold", color: colors.onSurfaceVariant, letterSpacing: 0.3 }}>
+    <View style={{ alignItems: "center", gap: 5 }}>
+      <Ionicons name={icon} size={18} color="#FFFFFF" />
+      <Text
+        style={{
+          fontSize: 10, fontFamily: "Nunito_700Bold",
+          color: "rgba(255,255,255,0.85)", letterSpacing: 0.3,
+        }}
+      >
         {label}
       </Text>
     </View>

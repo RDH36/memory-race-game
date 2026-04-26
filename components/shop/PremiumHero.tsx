@@ -27,11 +27,6 @@ export function PremiumHero({
       style={({ pressed }) => ({
         transform: [{ scale: pressed ? 0.99 : 1 }],
         borderRadius: 28,
-        shadowColor: "#3B309E",
-        shadowOpacity: 0.32,
-        shadowRadius: 24,
-        shadowOffset: { width: 0, height: 20 },
-        elevation: 12,
       })}
     >
       <View style={{ borderRadius: 28, overflow: "hidden", minHeight: 340 }}>
@@ -61,10 +56,6 @@ export function PremiumHero({
               style={{
                 marginRight: -10,
                 zIndex: 2,
-                shadowOpacity: 0.35,
-                shadowRadius: 16,
-                shadowOffset: { width: 0, height: 18 },
-                elevation: 8,
               }}
             />
             <MiniCardBack
@@ -153,11 +144,6 @@ export function PremiumHero({
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
-                shadowColor: "#000",
-                shadowOpacity: 0.2,
-                shadowRadius: 9,
-                shadowOffset: { width: 0, height: 8 },
-                elevation: 8,
               }}
             >
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexShrink: 1 }}>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Flipia — Paywall Bottom Sheets</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --surface: #FAF1F1;
+    --surface-container: #FFFFFF;
+    --surface-container-low: #F4EAEA;
+    --primary: #3B309E;
+    --primary-container: #534AB7;
+    --on-surface: #1A1C17;
+    --on-surface-variant: #474553;
+    --on-surface-muted: #7A7885;
+    --display: 'Fredoka', system-ui, sans-serif;
+    --body: 'Nunito', system-ui, sans-serif;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #E8E4E8;
+    font-family: var(--body);
+    color: var(--on-surface);
+    -webkit-font-smoothing: antialiased;
+  }
+  * { box-sizing: border-box; }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<template id="__bundler_thumbnail">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <rect width="100" height="100" fill="#3B309E"/>
+    <rect x="26" y="18" width="48" height="64" rx="10" fill="#FAF1F1"/>
+    <rect x="32" y="50" width="36" height="28" rx="6" fill="#F4DA8A"/>
+    <text x="50" y="70" text-anchor="middle" font-size="14" font-weight="800" fill="#1A0509">9,99€</text>
+  </svg>
+</template>
+
+<!-- React + Babel pinned -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+
+<!-- Board components (Royal / Heaven / Inferno) -->
+<script type="text/babel" src="royal-svg.jsx"></script>
+<script type="text/babel" src="royal-card.jsx"></script>
+<script type="text/babel" src="royal-board.jsx"></script>
+<script type="text/babel" src="heaven-svg.jsx"></script>
+<script type="text/babel" src="heaven-card.jsx"></script>
+<script type="text/babel" src="heaven-board.jsx"></script>
+<script type="text/babel" src="inferno-svg.jsx"></script>
+<script type="text/babel" src="inferno-card.jsx"></script>
+<script type="text/babel" src="inferno-board.jsx"></script>
+
+<!-- Paywall -->
+<script type="text/babel" src="paywall-shared.jsx"></script>
+<script type="text/babel" src="paywall-v1.jsx"></script>
+<script type="text/babel" src="paywall-v2.jsx"></script>
+<script type="text/babel" src="paywall-v3.jsx"></script>
+<script type="text/babel" src="paywall-app.jsx"></script>
+
+</body>
+</html>

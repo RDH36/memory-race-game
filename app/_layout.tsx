@@ -55,7 +55,10 @@ function AppContent() {
         <Stack.Screen name="result/index" />
         <Stack.Screen name="player/[id]" />
         <Stack.Screen name="history" />
-        <Stack.Screen name="pack/[id]" />
+        <Stack.Screen
+          name="pack/[id]"
+          options={{ animation: "fade", animationDuration: 180 }}
+        />
         <Stack.Screen name="appearance" />
         <Stack.Screen name="plateau-preview/[id]" />
       </Stack>

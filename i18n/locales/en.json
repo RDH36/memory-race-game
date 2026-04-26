@@ -352,7 +352,7 @@
       "eyebrow": "The best of Flipia",
       "title": "Go Premium",
       "subtitle": "No ads, +10% XP and 2 exclusive skins. One payment, lifetime.",
-      "cta": "Unlock"
+      "cta": "Preview"
     },
     "sectionPacks": "Starter Packs",
     "sectionPacksBadge": "Popular",
@@ -367,7 +367,7 @@
       "description": "Exclusive Demon 😈 avatar and Inferno board",
       "badge": "HOT"
     },
-    "ctaShort": "Buy",
+    "ctaShort": "Preview",
     "owned": "Owned",
     "ownedPremium": "✓ Premium owned",
     "restore": "Restore purchases",
@@ -442,7 +442,18 @@
     "trustLifetime": "Lifetime",
     "trustNoSubscription": "No subscription",
     "trustRestore": "Restorable",
-    "bottomTagline": "One-time purchase · Lifetime · No subscription"
+    "bottomTagline": "One-time purchase · Lifetime · No subscription",
+    "eyebrow": "PACK PREVIEW",
+    "previewCaption": "BOARD IN-GAME",
+    "contents": "WHAT'S INSIDE",
+    "avatarChip": "EXCLUSIVE AVATAR",
+    "tableChip": "EXCLUSIVE BOARD",
+    "unlock": "Unlock",
+    "owned": "✓ You already own this pack",
+    "buying": "Purchasing…",
+    "soon": "Coming soon",
+    "restoring": "Restoring…",
+    "restoreCta": "Restore my purchases"
   },
   "common": {
     "error": "Error"

@@ -148,7 +148,7 @@ export function PackCard({
             {description}
           </Text>
 
-          {/* CTA — boosted: bigger pad, shadow, separate price chip on right */}
+          {/* CTA — boosted: bigger pad, separate price chip on right */}
           <View
             style={{
               backgroundColor: owned ? colors.success : colors.primaryContainer,
@@ -158,11 +158,6 @@ export function PackCard({
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              shadowColor: owned ? colors.success : colors.primaryContainer,
-              shadowOpacity: 0.32,
-              shadowRadius: 12,
-              shadowOffset: { width: 0, height: 6 },
-              elevation: 6,
             }}
           >
             <View style={{ flexDirection: "row", alignItems: "center", gap: 10, flexShrink: 1 }}>
