@@ -102,9 +102,27 @@ export function useRevenueCat() {
 
 // --- Purchase helpers ---
 
+/**
+ * Purchase a product by its store identifier.
+ * Prefers `purchasePackage` via the current offering (Play Billing v6+ resolves
+ * the base plan / purchase option correctly). Falls back to a raw product
+ * fetch only if the offering doesn't expose this product.
+ */
 export async function purchaseProduct(productId: string) {
+  const offerings = await Purchases.getOfferings();
+  const pkg = offerings.current?.availablePackages.find(
+    (p) => p.product.identifier === productId,
+  );
+  if (pkg) {
+    return Purchases.purchasePackage(pkg);
+  }
+
   const products = await Purchases.getProducts([productId]);
-  if (!products.length) throw new Error(`Product not found: ${productId}`);
+  if (!products.length) {
+    throw new Error(
+      `Product not found: ${productId}. Vérifie qu'il est Active dans Play Console et que l'app est installée depuis le Play Store (Internal Testing).`,
+    );
+  }
   return Purchases.purchaseStoreProduct(products[0]);
 }
 
