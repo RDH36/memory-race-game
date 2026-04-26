@@ -6,6 +6,7 @@ import * as Haptics from "expo-haptics";
 import { useTranslation } from "react-i18next";
 import { usePlayerStats } from "../../lib/playerStats";
 import { useRewardedAd } from "../../hooks/useRewardedAd";
+import { usePremium } from "../../hooks/useEntitlements";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -81,6 +82,7 @@ export default function ResultScreen() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, [addBonusXp]);
   const { isLoaded: rewardedLoaded, showAd: showRewardedAd } = useRewardedAd(onBonusReward);
+  const premium = usePremium();
 
   const { colors, isDark } = useTheme();
 
@@ -212,11 +214,12 @@ export default function ResultScreen() {
             xpInLevel={xpInLevel}
             xpForNextLevel={xpForNextLevel}
             won={effectiveWinner === "p1"}
+            premiumBoosted={premium}
           />
         </Animated.View>
 
-        {/* Rewarded bonus after defeat */}
-        {effectiveWinner === "p2" && !bonusClaimed && (
+        {/* Rewarded bonus after defeat (hidden for premium — they already get +10% XP) */}
+        {effectiveWinner === "p2" && !bonusClaimed && !premium && (
           <Animated.View style={[statsStyle, { marginBottom: 12 }]}>
             <Pressable
               onPress={() => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
-import { useTheme } from "../../lib/ThemeContext";
 import { Gradient } from "../../components/ui/Gradient";
 import { PACKS } from "../../lib/packs";
 import {
@@ -36,11 +35,16 @@ export default function PackPreviewScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t } = useTranslation();
-  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const { offering, isReady } = useRevenueCat();
+  const { offering, isReady, refreshOfferings } = useRevenueCat();
   const ents = useEntitlements();
   const [busy, setBusy] = useState<"buy" | "restore" | null>(null);
+
+  // If the offering didn't load at boot (network flake on first launch),
+  // retry whenever the paywall is opened.
+  useEffect(() => {
+    if (isReady && !offering) refreshOfferings();
+  }, [isReady, offering, refreshOfferings]);
 
   if (!id || !(id in PACKS)) return <Redirect href="/(tabs)/shop" />;
 
@@ -220,95 +224,77 @@ export default function PackPreviewScreen() {
           </View>
         </Animated.View>
 
-        {/* Loot card — what's in the pack */}
+        {/* Avatar reveal — transparent on the atmosphere */}
         <Animated.View
           entering={FadeInDown.duration(400).delay(300)}
           style={{
             marginTop: 22,
             marginHorizontal: 22,
-            backgroundColor: colors.surface,
-            borderRadius: 24,
-            padding: 18,
+            flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 14,
           }}
         >
-          <Text
+          <View
             style={{
-              fontSize: 11, fontFamily: "Nunito_700Bold",
-              color: colors.onSurfaceMuted, letterSpacing: 1.4, marginBottom: 14,
+              width: 64, height: 64, borderRadius: 32,
+              backgroundColor: `hsl(${avatarHue}, 60%, 70%)`,
+              borderWidth: 2, borderColor: pack.cta,
+              alignItems: "center", justifyContent: "center",
             }}
           >
-            {t("pack.contents", "DANS CE PACK")}
-          </Text>
-
-          {/* Avatar row */}
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 14, marginBottom: 12 }}>
-            <View
-              style={{
-                width: 64, height: 64, borderRadius: 32,
-                backgroundColor: `hsl(${avatarHue}, 60%, 88%)`,
-                borderWidth: 2.5, borderColor: pack.cta,
-                alignItems: "center", justifyContent: "center",
-              }}
-            >
-              <Text style={{ fontSize: 36, lineHeight: 44 }}>{pack.emoji}</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 10, fontFamily: "Nunito_700Bold", letterSpacing: 1, color: colors.onSurfaceMuted }}>
-                {t("pack.avatarChip", "AVATAR EXCLUSIF")}
-              </Text>
-              <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 17, color: colors.onSurface, marginTop: 1 }}>
-                {avatarLabel(pack.id, t)}
-              </Text>
-              <Text style={{ fontSize: 11, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceMuted, marginTop: 1 }}>
-                {t(`packs.${pack.id}.features.avatar.description`, "Avatar exclusif")}
-              </Text>
-            </View>
+            <Text style={{ fontSize: 36, lineHeight: 44 }}>{pack.emoji}</Text>
           </View>
-
-          {/* Plateau row */}
-          {tableSkin && (
-            <View
+          <View>
+            <Text
               style={{
-                flexDirection: "row", alignItems: "center", gap: 14,
-                paddingTop: 12, borderTopWidth: 1, borderTopColor: "rgba(0,0,0,0.08)",
+                fontSize: 10, fontFamily: "Nunito_700Bold", letterSpacing: 1.2,
+                color: pack.glow, opacity: 0.95,
               }}
             >
+              + {t("pack.avatarChip", "AVATAR EXCLUSIF")}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Fredoka_700Bold", fontSize: 18, color: "#FFFFFF", marginTop: 2,
+              }}
+            >
+              {avatarLabel(pack.id, t)}
+            </Text>
+          </View>
+        </Animated.View>
+
+        {/* Feature chips — wrapped row */}
+        <Animated.View
+          entering={FadeInDown.duration(400).delay(350)}
+          style={{
+            flexDirection: "row", flexWrap: "wrap", gap: 8,
+            justifyContent: "center",
+            paddingHorizontal: 22, marginTop: 16,
+          }}
+        >
+          {pack.features.map((f, i) => {
+            const icon =
+              f.kind === "perk" ? f.icon
+              : f.kind === "avatar" ? f.emoji
+              : "🎴";
+            const title = t(`packs.${pack.id}.features.${f.i18nKey}.title`);
+            return (
               <View
+                key={i}
                 style={{
-                  width: 64, height: 64, borderRadius: 14,
-                  backgroundColor: tableSkin.preview.frame,
-                  borderWidth: 2.5, borderColor: pack.cta,
-                  alignItems: "center", justifyContent: "center",
-                  overflow: "hidden",
+                  flexDirection: "row", alignItems: "center", gap: 6,
+                  backgroundColor: "rgba(0,0,0,0.32)",
+                  borderColor: pack.cta + "55", borderWidth: 1,
+                  borderRadius: 999,
+                  paddingVertical: 7, paddingHorizontal: 12,
                 }}
               >
-                <View style={{ flexDirection: "row", gap: 3 }}>
-                  <View style={{ width: 12, height: 18, borderRadius: 3, backgroundColor: tableSkin.preview.back }} />
-                  <View style={{ width: 12, height: 18, borderRadius: 3, backgroundColor: tableSkin.preview.face }} />
-                  <View style={{ width: 12, height: 18, borderRadius: 3, backgroundColor: tableSkin.preview.back }} />
-                </View>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 10, fontFamily: "Nunito_700Bold", letterSpacing: 1, color: colors.onSurfaceMuted }}>
-                  {t("pack.tableChip", "PLATEAU EXCLUSIF")}
-                </Text>
-                <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 17, color: colors.onSurface, marginTop: 1 }}>
-                  {tableSkin.name}
-                </Text>
-                <Text style={{ fontSize: 11, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceMuted, marginTop: 1 }}>
-                  {t(`packs.${pack.id}.features.table.description`, "Plateau exclusif")}
+                <Text style={{ fontSize: 13 }}>{icon}</Text>
+                <Text style={{ fontSize: 12, fontFamily: "Nunito_700Bold", color: "#FFFFFF" }}>
+                  {title}
                 </Text>
               </View>
-            </View>
-          )}
-
-          {/* Premium-only perks */}
-          {pack.id === "premium" && (
-            <View style={{ marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: "rgba(0,0,0,0.08)", gap: 10 }}>
-              <PerkRow icon="🚫" title={t("packs.premium.features.noAds.title")} desc={t("packs.premium.features.noAds.description")} colors={colors} />
-              <PerkRow icon="⚡" title={t("packs.premium.features.xpBoost.title")} desc={t("packs.premium.features.xpBoost.description")} colors={colors} />
-            </View>
-          )}
+            );
+          })}
         </Animated.View>
 
         {/* Trust strip */}
@@ -399,26 +385,6 @@ function avatarLabel(packId: PackId, t: (k: string) => string): string {
   if (packId === "premium") return t("avatars.crown");
   if (packId === "angel") return t("avatars.angel");
   return t("avatars.demon");
-}
-
-function PerkRow({ icon, title, desc, colors }: { icon: string; title: string; desc: string; colors: any }) {
-  return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-      <View
-        style={{
-          width: 38, height: 38, borderRadius: 19,
-          backgroundColor: colors.surfaceContainer,
-          alignItems: "center", justifyContent: "center",
-        }}
-      >
-        <Text style={{ fontSize: 18 }}>{icon}</Text>
-      </View>
-      <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 13, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>{title}</Text>
-        <Text style={{ fontSize: 11, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceMuted }}>{desc}</Text>
-      </View>
-    </View>
-  );
 }
 
 function TrustItem({ icon, label }: { icon: any; label: string }) {

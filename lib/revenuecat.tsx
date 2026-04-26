@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import Purchases, {
   CustomerInfo,
@@ -37,13 +37,34 @@ interface RCContext {
   customerInfo: CustomerInfo | null;
   offering: PurchasesOffering | null;
   isReady: boolean;
+  /** Force re-fetch of offerings — call from screens that need products. */
+  refreshOfferings: () => Promise<void>;
 }
 
 const Ctx = createContext<RCContext>({
   customerInfo: null,
   offering: null,
   isReady: false,
+  refreshOfferings: async () => {},
 });
+
+async function fetchOfferingsWithRetry(
+  attempts = 3,
+  baseDelayMs = 800,
+): Promise<PurchasesOffering | null> {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const o = await Purchases.getOfferings();
+      if (o.current) return o.current;
+    } catch (e) {
+      if (__DEV__) console.warn(`[RC] getOfferings attempt ${i + 1} failed:`, e);
+    }
+    if (i < attempts - 1) {
+      await new Promise((r) => setTimeout(r, baseDelayMs * Math.pow(2, i)));
+    }
+  }
+  return null;
+}
 
 export function RevenueCatProvider({ children }: { children: React.ReactNode }) {
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
@@ -52,6 +73,11 @@ export function RevenueCatProvider({ children }: { children: React.ReactNode }) 
 
   const { user } = db.useAuth();
   const userId = user?.id;
+
+  const refreshOfferings = useCallback(async () => {
+    const o = await fetchOfferingsWithRetry();
+    if (o) setOffering(o);
+  }, []);
 
   // Initialize SDK once
   useEffect(() => {
@@ -72,9 +98,9 @@ export function RevenueCatProvider({ children }: { children: React.ReactNode }) 
       .catch(() => {})
       .finally(() => setIsReady(true));
 
-    Purchases.getOfferings()
-      .then((o) => setOffering(o.current))
-      .catch(() => {});
+    fetchOfferingsWithRetry().then((o) => {
+      if (o) setOffering(o);
+    });
 
     return () => {
       Purchases.removeCustomerInfoUpdateListener(setCustomerInfo);
@@ -90,7 +116,7 @@ export function RevenueCatProvider({ children }: { children: React.ReactNode }) 
   }, [isReady, userId]);
 
   return (
-    <Ctx.Provider value={{ customerInfo, offering, isReady }}>
+    <Ctx.Provider value={{ customerInfo, offering, isReady, refreshOfferings }}>
       {children}
     </Ctx.Provider>
   );

@@ -102,7 +102,15 @@
     "newGame": "New",
     "goHome": "Home",
     "watchAdBonus": "+10 XP (ad)",
-    "bonusClaimed": "Bonus claimed!"
+    "bonusClaimed": "Bonus claimed!",
+    "premiumBoost": "+10% Premium"
+  },
+  "mode": {
+    "xpBoostPremium": {
+      "title": "+10% XP · Premium active",
+      "desc": "Permanent bonus applied automatically",
+      "badge": "ACTIVE"
+    }
   },
   "stats": {
     "winRate": "Win rate",

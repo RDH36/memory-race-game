@@ -19,6 +19,8 @@ interface XpRewardBarProps {
   xpInLevel: number;
   xpForNextLevel: number;
   won: boolean;
+  /** When true, show a Premium boost badge ("+10% Premium") next to the XP value. */
+  premiumBoosted?: boolean;
 }
 
 export function XpRewardBar({
@@ -28,6 +30,7 @@ export function XpRewardBar({
   xpInLevel,
   xpForNextLevel,
   won,
+  premiumBoosted,
 }: XpRewardBarProps) {
   const { t } = useTranslation();
   const { colors, isDark } = useTheme();
@@ -67,7 +70,23 @@ export function XpRewardBar({
         <Text style={{ fontSize: 11, fontFamily: "Nunito_700Bold", color: colors.onSurfaceVariant, letterSpacing: 0.5 }}>
           {t("result.xpGained")}
         </Text>
-        <Animated.View style={xpStyle}>
+        <Animated.View style={[xpStyle, { flexDirection: "row", alignItems: "center", gap: 8 }]}>
+          {premiumBoosted && (
+            <View
+              style={{
+                flexDirection: "row", alignItems: "center", gap: 4,
+                backgroundColor: "#F4DA8A20",
+                borderColor: "#F4DA8A", borderWidth: 1,
+                paddingHorizontal: 7, paddingVertical: 3,
+                borderRadius: 999,
+              }}
+            >
+              <Text style={{ fontSize: 11 }}>👑</Text>
+              <Text style={{ fontSize: 10, fontFamily: "Nunito_700Bold", color: "#8B6914", letterSpacing: 0.3 }}>
+                {t("result.premiumBoost", "+10% Premium")}
+              </Text>
+            </View>
+          )}
           <Text style={{ fontSize: 20, fontFamily: "Fredoka_700Bold", color: xpColor }}>
             +{xpGained} XP
           </Text>
