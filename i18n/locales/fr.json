@@ -461,7 +461,9 @@
     "buying": "Achat en cours…",
     "soon": "Bientôt disponible",
     "restoring": "Restauration…",
-    "restoreCta": "Restaurer mes achats"
+    "restoreCta": "Restaurer mes achats",
+    "unavailableTitle": "Pack indisponible",
+    "unavailableBody": "Cet achat n'est pas disponible dans ton pays. Vérifie le pays configuré dans Play Store → Paramètres → Pays et profils, ou réessaye plus tard."
   },
   "common": {
     "error": "Erreur"

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useLocalSearchParams, useRouter, Redirect } from "expo-router";
@@ -18,6 +18,7 @@ import {
 import { purchaseProduct, restorePurchases, useRevenueCat } from "../../lib/revenuecat";
 import { useEntitlements } from "../../hooks/useEntitlements";
 import { PlateauPreview } from "../../components/preview/PlateauPreview";
+import { ConfirmModal } from "../../components/ui/ConfirmModal";
 
 const SKIN_BY_PACK: Record<PackId, CardSkin> = {
   premium: "royal",
@@ -39,6 +40,7 @@ export default function PackPreviewScreen() {
   const { offering, isReady, refreshOfferings } = useRevenueCat();
   const ents = useEntitlements();
   const [busy, setBusy] = useState<"buy" | "restore" | null>(null);
+  const [modal, setModal] = useState<{ icon: string; title: string; message: string } | null>(null);
 
   // If the offering didn't load at boot (network flake on first launch),
   // retry whenever the paywall is opened.
@@ -67,10 +69,15 @@ export default function PackPreviewScreen() {
 
   const handleBuy = async () => {
     if (!purchasable) {
-      Alert.alert(
-        t("shop.soonTitle", "Bientôt disponible"),
-        t("shop.soonBody", "Les achats seront activés à la sortie de la V1."),
-      );
+      // Most common cause: pack not distributed in user's Play Store country.
+      setModal({
+        icon: "🌍",
+        title: t("pack.unavailableTitle", "Pack indisponible"),
+        message: t(
+          "pack.unavailableBody",
+          "Cet achat n'est pas disponible dans ton pays. Vérifie le pays configuré dans Play Store → Paramètres → Pays et profils, ou réessaye plus tard.",
+        ),
+      });
       return;
     }
     try {
@@ -79,8 +86,13 @@ export default function PackPreviewScreen() {
       await purchaseProduct(pack.productId);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (e: any) {
-      if (!e?.userCancelled)
-        Alert.alert(t("common.error", "Erreur"), e?.message ?? t("shop.purchaseFailed", "L'achat n'a pas pu aboutir."));
+      if (!e?.userCancelled) {
+        setModal({
+          icon: "⚠️",
+          title: t("common.error", "Erreur"),
+          message: e?.message ?? t("shop.purchaseFailed", "L'achat n'a pas pu aboutir."),
+        });
+      }
     } finally {
       setBusy(null);
     }
@@ -90,12 +102,17 @@ export default function PackPreviewScreen() {
     try {
       setBusy("restore");
       await restorePurchases();
-      Alert.alert(
-        t("shop.restoreTitle", "Restauration"),
-        t("shop.restoreOk", "Tes achats ont été restaurés."),
-      );
+      setModal({
+        icon: "✅",
+        title: t("shop.restoreTitle", "Restauration"),
+        message: t("shop.restoreOk", "Tes achats ont été restaurés."),
+      });
     } catch (e: any) {
-      Alert.alert(t("common.error", "Erreur"), e?.message ?? t("shop.restoreFailed", "La restauration a échoué."));
+      setModal({
+        icon: "⚠️",
+        title: t("common.error", "Erreur"),
+        message: e?.message ?? t("shop.restoreFailed", "La restauration a échoué."),
+      });
     } finally {
       setBusy(null);
     }
@@ -352,7 +369,7 @@ export default function PackPreviewScreen() {
                 ? t("pack.buying", "Achat en cours…")
                 : purchasable
                 ? `${t("pack.unlock", "Débloquer")} — ${price}`
-                : t("pack.soon", "Bientôt disponible")}
+                : t("pack.unlock", "Débloquer")}
             </Text>
           </View>
         </Pressable>
@@ -377,6 +394,17 @@ export default function PackPreviewScreen() {
           </Pressable>
         )}
       </View>
+
+      <ConfirmModal
+        visible={!!modal}
+        icon={modal?.icon}
+        title={modal?.title ?? ""}
+        message={modal?.message ?? ""}
+        cancelText=""
+        confirmText="OK"
+        onCancel={() => setModal(null)}
+        onConfirm={() => setModal(null)}
+      />
     </View>
   );
 }
