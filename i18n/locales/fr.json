@@ -516,5 +516,35 @@
     "confirm": "Mettre à jour",
     "install": "Installer maintenant",
     "later": "Plus tard"
+  },
+  "achievements": {
+    "title": "Succès",
+    "unlockedCount": "{{unlocked}} / {{total}} débloqués",
+    "comingSoon": {
+      "title": "Plus de succès bientôt",
+      "message": "De nouveaux défis arrivent dans les prochaines mises à jour"
+    },
+    "items": {
+      "first-win":   { "title": "Première victoire", "description": "Gagne ta première partie" },
+      "ten-games":   { "title": "Joueur régulier",   "description": "Joue 10 parties" },
+      "wins-10":     { "title": "Vainqueur",         "description": "Gagne 10 parties" },
+      "games-50":    { "title": "Persévérant",       "description": "Joue 50 parties" },
+      "streak-3":    { "title": "En feu",            "description": "Gagne 3 fois d'affilée" },
+      "wins-50":     { "title": "Conquérant",        "description": "Gagne 50 parties" },
+      "100-games":   { "title": "Centenaire",        "description": "Joue 100 parties" },
+      "level-5":     { "title": "Niveau 5",          "description": "Atteins le niveau 5" },
+      "streak-5":    { "title": "Imbattable",        "description": "Gagne 5 fois d'affilée" },
+      "winrate-50":  { "title": "Stratège",          "description": "50% de victoires (min. 20 parties)" },
+      "500-points":  { "title": "Collectionneur",    "description": "Gagne 500 XP au total" },
+      "games-250":   { "title": "Vétéran",           "description": "Joue 250 parties" },
+      "level-10":    { "title": "Niveau 10",         "description": "Atteins le niveau 10" },
+      "wins-100":    { "title": "Légende",           "description": "Gagne 100 parties" },
+      "streak-10":   { "title": "Inarrêtable",       "description": "Gagne 10 fois d'affilée" },
+      "points-1000": { "title": "Magnat",            "description": "Gagne 1000 XP au total" },
+      "level-15":    { "title": "Expert",            "description": "Atteins le niveau 15" },
+      "level-20":    { "title": "Maître",            "description": "Atteins le niveau 20" },
+      "points-5000": { "title": "Trésorier",         "description": "Gagne 5000 XP au total" },
+      "level-25":    { "title": "Grand maître",      "description": "Atteins le niveau 25" }
+    }
   }
 }

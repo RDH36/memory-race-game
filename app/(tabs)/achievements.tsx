@@ -1,42 +1,42 @@
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 
 interface Achievement {
   id: string;
   emoji: string;
-  title: string;
-  description: string;
   unlocked: boolean;
 }
 
 export default function AchievementsScreen() {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const { stats, level, winRate } = usePlayerStats();
 
   const achievements: Achievement[] = [
-    { id: "first-win", emoji: "🥇", title: "Première victoire", description: "Gagne ta première partie", unlocked: stats.gamesWon >= 1 },
-    { id: "ten-games", emoji: "🎮", title: "Joueur régulier", description: "Joue 10 parties", unlocked: stats.gamesPlayed >= 10 },
-    { id: "wins-10", emoji: "🏆", title: "Vainqueur", description: "Gagne 10 parties", unlocked: stats.gamesWon >= 10 },
-    { id: "games-50", emoji: "🎯", title: "Persévérant", description: "Joue 50 parties", unlocked: stats.gamesPlayed >= 50 },
-    { id: "streak-3", emoji: "🔥", title: "En feu", description: "Gagne 3 fois d'affilée", unlocked: stats.bestStreak >= 3 },
-    { id: "wins-50", emoji: "👑", title: "Conquérant", description: "Gagne 50 parties", unlocked: stats.gamesWon >= 50 },
-    { id: "100-games", emoji: "💯", title: "Centenaire", description: "Joue 100 parties", unlocked: stats.gamesPlayed >= 100 },
-    { id: "level-5", emoji: "⭐", title: "Niveau 5", description: "Atteins le niveau 5", unlocked: level >= 5 },
-    { id: "streak-5", emoji: "⚡", title: "Imbattable", description: "Gagne 5 fois d'affilée", unlocked: stats.bestStreak >= 5 },
-    { id: "winrate-50", emoji: "♟️", title: "Stratège", description: "50% de victoires (min. 20 parties)", unlocked: stats.gamesPlayed >= 20 && winRate >= 0.5 },
-    { id: "500-points", emoji: "💎", title: "Collectionneur", description: "Gagne 500 XP au total", unlocked: stats.points >= 500 },
-    { id: "games-250", emoji: "🎖️", title: "Vétéran", description: "Joue 250 parties", unlocked: stats.gamesPlayed >= 250 },
-    { id: "level-10", emoji: "🌟", title: "Niveau 10", description: "Atteins le niveau 10", unlocked: level >= 10 },
-    { id: "wins-100", emoji: "🏅", title: "Légende", description: "Gagne 100 parties", unlocked: stats.gamesWon >= 100 },
-    { id: "streak-10", emoji: "🚀", title: "Inarrêtable", description: "Gagne 10 fois d'affilée", unlocked: stats.bestStreak >= 10 },
-    { id: "points-1000", emoji: "💰", title: "Magnat", description: "Gagne 1000 XP au total", unlocked: stats.points >= 1000 },
-    { id: "level-15", emoji: "💫", title: "Expert", description: "Atteins le niveau 15", unlocked: level >= 15 },
-    { id: "level-20", emoji: "🧙", title: "Maître", description: "Atteins le niveau 20", unlocked: level >= 20 },
-    { id: "points-5000", emoji: "🏦", title: "Trésorier", description: "Gagne 5000 XP au total", unlocked: stats.points >= 5000 },
-    { id: "level-25", emoji: "👨‍🎓", title: "Grand maître", description: "Atteins le niveau 25", unlocked: level >= 25 },
+    { id: "first-win", emoji: "🥇", unlocked: stats.gamesWon >= 1 },
+    { id: "ten-games", emoji: "🎮", unlocked: stats.gamesPlayed >= 10 },
+    { id: "wins-10", emoji: "🏆", unlocked: stats.gamesWon >= 10 },
+    { id: "games-50", emoji: "🎯", unlocked: stats.gamesPlayed >= 50 },
+    { id: "streak-3", emoji: "🔥", unlocked: stats.bestStreak >= 3 },
+    { id: "wins-50", emoji: "👑", unlocked: stats.gamesWon >= 50 },
+    { id: "100-games", emoji: "💯", unlocked: stats.gamesPlayed >= 100 },
+    { id: "level-5", emoji: "⭐", unlocked: level >= 5 },
+    { id: "streak-5", emoji: "⚡", unlocked: stats.bestStreak >= 5 },
+    { id: "winrate-50", emoji: "♟️", unlocked: stats.gamesPlayed >= 20 && winRate >= 0.5 },
+    { id: "500-points", emoji: "💎", unlocked: stats.points >= 500 },
+    { id: "games-250", emoji: "🎖️", unlocked: stats.gamesPlayed >= 250 },
+    { id: "level-10", emoji: "🌟", unlocked: level >= 10 },
+    { id: "wins-100", emoji: "🏅", unlocked: stats.gamesWon >= 100 },
+    { id: "streak-10", emoji: "🚀", unlocked: stats.bestStreak >= 10 },
+    { id: "points-1000", emoji: "💰", unlocked: stats.points >= 1000 },
+    { id: "level-15", emoji: "💫", unlocked: level >= 15 },
+    { id: "level-20", emoji: "🧙", unlocked: level >= 20 },
+    { id: "points-5000", emoji: "🏦", unlocked: stats.points >= 5000 },
+    { id: "level-25", emoji: "👨‍🎓", unlocked: level >= 25 },
   ];
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
@@ -49,10 +49,10 @@ export default function AchievementsScreen() {
       >
         <View style={{ marginBottom: 20 }}>
           <Text style={{ fontSize: 28, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
-            Succès
+            {t("achievements.title")}
           </Text>
           <Text style={{ fontSize: 13, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginTop: 2 }}>
-            {unlockedCount} / {achievements.length} débloqués
+            {t("achievements.unlockedCount", { unlocked: unlockedCount, total: achievements.length })}
           </Text>
         </View>
 
@@ -79,10 +79,10 @@ export default function AchievementsScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 15, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
-                  {a.title}
+                  {t(`achievements.items.${a.id}.title`)}
                 </Text>
                 <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginTop: 1 }}>
-                  {a.description}
+                  {t(`achievements.items.${a.id}.description`)}
                 </Text>
               </View>
               {a.unlocked ? (
@@ -96,10 +96,10 @@ export default function AchievementsScreen() {
 
         <View style={{ marginTop: 24, padding: 16, borderRadius: 16, backgroundColor: colors.surfaceContainerLow, alignItems: "center" }}>
           <Text style={{ fontSize: 13, fontFamily: "Nunito_700Bold", color: colors.onSurfaceVariant }}>
-            Plus de succès bientôt
+            {t("achievements.comingSoon.title")}
           </Text>
           <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: colors.onSurfaceMuted, marginTop: 4, textAlign: "center" }}>
-            De nouveaux défis arrivent dans les prochaines mises à jour
+            {t("achievements.comingSoon.message")}
           </Text>
         </View>
       </ScrollView>

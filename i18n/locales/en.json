@@ -516,5 +516,35 @@
     "confirm": "Update",
     "install": "Install now",
     "later": "Later"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "unlockedCount": "{{unlocked}} / {{total}} unlocked",
+    "comingSoon": {
+      "title": "More achievements soon",
+      "message": "New challenges are coming in upcoming updates"
+    },
+    "items": {
+      "first-win":   { "title": "First win",       "description": "Win your first game" },
+      "ten-games":   { "title": "Regular player",  "description": "Play 10 games" },
+      "wins-10":     { "title": "Winner",          "description": "Win 10 games" },
+      "games-50":    { "title": "Persistent",      "description": "Play 50 games" },
+      "streak-3":    { "title": "On fire",         "description": "Win 3 in a row" },
+      "wins-50":     { "title": "Conqueror",       "description": "Win 50 games" },
+      "100-games":   { "title": "Centurion",       "description": "Play 100 games" },
+      "level-5":     { "title": "Level 5",         "description": "Reach level 5" },
+      "streak-5":    { "title": "Unbeatable",      "description": "Win 5 in a row" },
+      "winrate-50":  { "title": "Strategist",      "description": "50% win rate (min. 20 games)" },
+      "500-points":  { "title": "Collector",       "description": "Earn 500 XP total" },
+      "games-250":   { "title": "Veteran",         "description": "Play 250 games" },
+      "level-10":    { "title": "Level 10",        "description": "Reach level 10" },
+      "wins-100":    { "title": "Legend",          "description": "Win 100 games" },
+      "streak-10":   { "title": "Unstoppable",     "description": "Win 10 in a row" },
+      "points-1000": { "title": "Magnate",         "description": "Earn 1000 XP total" },
+      "level-15":    { "title": "Expert",          "description": "Reach level 15" },
+      "level-20":    { "title": "Master",          "description": "Reach level 20" },
+      "points-5000": { "title": "Treasurer",       "description": "Earn 5000 XP total" },
+      "level-25":    { "title": "Grand master",    "description": "Reach level 25" }
+    }
   }
 }
