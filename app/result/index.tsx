@@ -71,7 +71,7 @@ export default function ResultScreen() {
   }>();
   const router = useRouter();
   const { t } = useTranslation();
-  const [loading, setLoading] = useState<"replay" | "new" | "home" | null>(null);
+  const [loading, setLoading] = useState<"new" | "home" | null>(null);
   const [bonusClaimed, setBonusClaimed] = useState(false);
   const { avatar, recordGame, addBonusXp, lastXpGain, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
   const recorded = useRef(false);
@@ -278,29 +278,10 @@ export default function ResultScreen() {
 
         {/* Action buttons */}
         <Animated.View style={[buttonsStyle, { flexDirection: "row", gap: 8, width: "100%" }]}>
-          {!isMatchmaking && (
-            <Button
-              icon="🎮"
-              text={t("result.rematch")}
-              loading={loading === "replay"}
-              disabled={loading !== null && loading !== "replay"}
-              style={{ flex: 1 }}
-              onPress={() => {
-                setLoading("replay");
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                cleanupRoom();
-                if (isCasual) {
-                  router.replace("/(tabs)");
-                } else {
-                  router.replace({ pathname: "/game", params: { difficulty } });
-                }
-              }}
-            />
-          )}
           <Button
             icon="🔀"
             text={t("result.newGame")}
-            variant={isMatchmaking ? "primary" : "secondary"}
+            variant="primary"
             loading={loading === "new"}
             disabled={loading !== null && loading !== "new"}
             style={{ flex: 1 }}
@@ -310,8 +291,10 @@ export default function ResultScreen() {
               cleanupRoom();
               if (isMatchmaking) {
                 router.replace("/room/matchmaking");
+              } else if (isCasual) {
+                router.replace("/mode/casual");
               } else {
-                router.replace("/(tabs)");
+                router.replace("/mode/solo");
               }
             }}
           />
