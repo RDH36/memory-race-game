@@ -11,6 +11,7 @@ import { Fredoka_500Medium, Fredoka_600SemiBold, Fredoka_700Bold } from "@expo-g
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold } from "@expo-google-fonts/nunito";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import "../hooks/useInterstitialAd";
+import { UpdateModalHost } from "../components/update";
 import { PlayerStatsProvider } from "../lib/playerStats";
 import { ThemeProvider, useTheme } from "../lib/ThemeContext";
 import { ConnectivityProvider } from "../lib/ConnectivityContext";
@@ -62,6 +63,7 @@ function AppContent() {
         <Stack.Screen name="appearance" />
         <Stack.Screen name="plateau-preview/[id]" />
       </Stack>
+      <UpdateModalHost />
     </>
   );
 }

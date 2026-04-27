@@ -503,5 +503,18 @@
   "plateauPreview": {
     "opponent": "Adversaire",
     "you": "Toi"
+  },
+  "update": {
+    "available": {
+      "title": "Mise à jour disponible",
+      "message": "Une nouvelle version de Flipia est prête. Profite des dernières améliorations !"
+    },
+    "ready": {
+      "title": "Prêt à installer",
+      "message": "La mise à jour est téléchargée. Installe-la maintenant pour redémarrer l'app."
+    },
+    "confirm": "Mettre à jour",
+    "install": "Installer maintenant",
+    "later": "Plus tard"
   }
 }

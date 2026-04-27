@@ -503,5 +503,18 @@
   "plateauPreview": {
     "opponent": "Opponent",
     "you": "You"
+  },
+  "update": {
+    "available": {
+      "title": "Update available",
+      "message": "A new version of Flipia is ready. Get the latest improvements!"
+    },
+    "ready": {
+      "title": "Ready to install",
+      "message": "The update has been downloaded. Install it now to restart the app."
+    },
+    "confirm": "Update",
+    "install": "Install now",
+    "later": "Later"
   }
 }
