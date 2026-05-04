@@ -8,8 +8,10 @@ import Animated, {
   withTiming,
   withDelay,
   Easing,
+  cancelAnimation,
 } from "react-native-reanimated";
 import { INFERNO_THEME } from "../../../lib/skins";
+import { useDeferredAnimation } from "../../../lib/perf";
 
 interface Props {
   density?: "low" | "medium" | "high";
@@ -57,8 +59,10 @@ export function InfernoSparks({ density = "medium" }: Props) {
 function Spark({ spec }: { spec: SparkSpec }) {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(0);
+  const deferred = useDeferredAnimation();
 
   useEffect(() => {
+    if (!deferred) return;
     const half = spec.duration / 2;
     opacity.value = withDelay(
       spec.delay,
@@ -78,7 +82,11 @@ function Spark({ spec }: { spec: SparkSpec }) {
         false,
       ),
     );
-  }, []);
+    return () => {
+      cancelAnimation(opacity);
+      cancelAnimation(translateY);
+    };
+  }, [deferred]);
 
   const style = useAnimatedStyle(() => ({
     opacity: opacity.value,

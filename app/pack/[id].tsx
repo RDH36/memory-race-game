@@ -6,7 +6,7 @@ import { useLocalSearchParams, useRouter, Redirect } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { Gradient } from "../../components/ui/Gradient";
 import { PACKS } from "../../lib/packs";
 import {
@@ -19,6 +19,8 @@ import { purchaseProduct, restorePurchases, useRevenueCat } from "../../lib/reve
 import { useEntitlements } from "../../hooks/useEntitlements";
 import { PlateauPreview } from "../../components/preview/PlateauPreview";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
+import { ShapeAura } from "../../components/appearance/ShapeAura";
+import { useDeferredAnimation } from "../../lib/perf";
 
 const SKIN_BY_PACK: Record<PackId, CardSkin> = {
   premium: "royal",
@@ -41,6 +43,7 @@ export default function PackPreviewScreen() {
   const ents = useEntitlements();
   const [busy, setBusy] = useState<"buy" | "restore" | null>(null);
   const [modal, setModal] = useState<{ icon: string; title: string; message: string } | null>(null);
+  const previewReady = useDeferredAnimation();
 
   // If the offering didn't load at boot (network flake on first launch),
   // retry whenever the paywall is opened.
@@ -85,6 +88,8 @@ export default function PackPreviewScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       await purchaseProduct(pack.productId);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.replace({ pathname: "/pack/unveil", params: { packId: pack.id } });
+      return;
     } catch (e: any) {
       if (!e?.userCancelled) {
         setModal({
@@ -182,8 +187,8 @@ export default function PackPreviewScreen() {
           <View style={{ width: 40 }} />
         </View>
 
-        {/* Title */}
-        <Animated.View entering={FadeIn.duration(300).delay(50)} style={{ alignItems: "center", paddingHorizontal: 28, marginTop: 6 }}>
+        {/* Title — single entry animation; downstream sections keep parent fade only */}
+        <Animated.View entering={FadeIn.duration(300)} style={{ alignItems: "center", paddingHorizontal: 28, marginTop: 6 }}>
           <Text
             style={{
               fontFamily: "Fredoka_700Bold", fontSize: 32,
@@ -202,24 +207,28 @@ export default function PackPreviewScreen() {
           </Text>
         </Animated.View>
 
-        {/* Plateau preview hero — uses the same chrome as in-game */}
+        {/* Plateau preview hero — deferred until nav transition settles */}
         {tableSkin && (
-          <Animated.View
-            entering={FadeIn.duration(400).delay(150)}
+          <View
             style={{
               marginTop: 18,
               marginHorizontal: 16,
               height: 420,
               borderRadius: 24,
               overflow: "hidden",
+              backgroundColor: "rgba(0,0,0,0.18)",
             }}
           >
-            <PlateauPreview skin={skin} />
-          </Animated.View>
+            {previewReady && (
+              <Animated.View entering={FadeIn.duration(280)} style={{ flex: 1 }}>
+                <PlateauPreview skin={skin} />
+              </Animated.View>
+            )}
+          </View>
         )}
 
         {/* Caption under preview */}
-        <Animated.View entering={FadeIn.duration(300).delay(250)} style={{ alignItems: "center", marginTop: 10 }}>
+        <View style={{ alignItems: "center", marginTop: 10 }}>
           <View
             style={{
               flexDirection: "row", alignItems: "center", gap: 6,
@@ -239,11 +248,10 @@ export default function PackPreviewScreen() {
               {t("pack.previewCaption", "PLATEAU EN JEU")} · {tableSkin?.name}
             </Text>
           </View>
-        </Animated.View>
+        </View>
 
         {/* Avatar reveal — transparent on the atmosphere */}
-        <Animated.View
-          entering={FadeInDown.duration(400).delay(300)}
+        <View
           style={{
             marginTop: 22,
             marginHorizontal: 22,
@@ -252,13 +260,23 @@ export default function PackPreviewScreen() {
         >
           <View
             style={{
-              width: 64, height: 64, borderRadius: 32,
-              backgroundColor: `hsl(${avatarHue}, 60%, 70%)`,
-              borderWidth: 2, borderColor: pack.cta,
+              width: 110, height: 110,
               alignItems: "center", justifyContent: "center",
             }}
           >
-            <Text style={{ fontSize: 36, lineHeight: 44 }}>{pack.emoji}</Text>
+            {avatar?.requires && (
+              <ShapeAura entitlement={avatar.requires} size={110} />
+            )}
+            <View
+              style={{
+                width: 64, height: 64, borderRadius: 32,
+                backgroundColor: `hsl(${avatarHue}, 60%, 70%)`,
+                borderWidth: 2, borderColor: pack.cta,
+                alignItems: "center", justifyContent: "center",
+              }}
+            >
+              <Text style={{ fontSize: 36, lineHeight: 44 }}>{pack.emoji}</Text>
+            </View>
           </View>
           <View>
             <Text
@@ -277,11 +295,10 @@ export default function PackPreviewScreen() {
               {avatarLabel(pack.id, t)}
             </Text>
           </View>
-        </Animated.View>
+        </View>
 
         {/* Feature chips — wrapped row */}
-        <Animated.View
-          entering={FadeInDown.duration(400).delay(350)}
+        <View
           style={{
             flexDirection: "row", flexWrap: "wrap", gap: 8,
             justifyContent: "center",
@@ -312,11 +329,10 @@ export default function PackPreviewScreen() {
               </View>
             );
           })}
-        </Animated.View>
+        </View>
 
         {/* Trust strip */}
-        <Animated.View
-          entering={FadeInDown.duration(400).delay(400)}
+        <View
           style={{
             marginTop: 14,
             marginHorizontal: 22,
@@ -329,7 +345,7 @@ export default function PackPreviewScreen() {
           <TrustItem icon="infinite" label={t("pack.trustLifetime", "À vie")} />
           <TrustItem icon="card-outline" label={t("pack.trustNoSubscription", "Sans abonnement")} />
           <TrustItem icon="refresh" label={t("pack.trustRestore", "Restaurable")} />
-        </Animated.View>
+        </View>
       </ScrollView>
 
       {/* Sticky CTA */}

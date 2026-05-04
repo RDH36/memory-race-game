@@ -10,6 +10,7 @@ import {
   updateRoomGameState,
   type RoomData,
 } from "../lib/roomLogic";
+import { playFlip, playMatch } from "../lib/sound";
 
 const FLIP_DELAY = 800;
 const FEEDBACK_DURATION = 900;
@@ -29,6 +30,7 @@ export function useOnlineGame(
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
   const prevSelectedRef = useRef<number[]>([]);
+  const resolvingRef = useRef(false);
 
   const game: LocalGameState | null = useMemo(() => {
     if (!room?.gameState) return null;
@@ -53,6 +55,10 @@ export function useOnlineGame(
     // Only the player whose turn it is resolves the match
     if (!myTurn) return;
 
+    // Idempotency guard: skip if a resolution is already in flight
+    if (resolvingRef.current) return;
+    resolvingRef.current = true;
+
     const [a, b] = game.selected;
     const isMatch = game.cardEmojis[a] === game.cardEmojis[b];
 
@@ -61,6 +67,7 @@ export function useOnlineGame(
 
       if (isMatch) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        playMatch();
         const player = game.currentTurn === 1 ? "p1" : "p2";
         const newMatchedBy = [...game.matchedBy];
         newMatchedBy[a] = game.currentTurn;
@@ -111,6 +118,7 @@ export function useOnlineGame(
           : undefined;
 
       updateRoomGameState(room.id, newState, nextPlayerId, finished);
+      resolvingRef.current = false;
 
       if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
       feedbackTimerRef.current = setTimeout(
@@ -121,6 +129,7 @@ export function useOnlineGame(
 
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      resolvingRef.current = false;
     };
   }, [game?.selected?.length, game?.locked]);
 
@@ -137,39 +146,50 @@ export function useOnlineGame(
     const prev = prevSelectedRef.current;
     if (game.selected.length > prev.length && !myTurn) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      playFlip();
     }
     prevSelectedRef.current = [...game.selected];
   }, [game?.selected]);
 
+  // Refs for stable handleCardPress (avoids memo invalidation in CardItem)
+  const gameRef = useRef(game);
+  const roomRef = useRef(room);
+  const myTurnRef = useRef(myTurn);
+  useEffect(() => {
+    gameRef.current = game;
+    roomRef.current = room;
+    myTurnRef.current = myTurn;
+  });
+
   // --- P1 card press ---
-  const handleCardPress = useCallback(
-    (cardId: number) => {
-      if (!game || !room || !myTurn) return;
-      if (
-        game.locked ||
-        game.tornadoActive ||
-        game.matchedBy[cardId] !== -1 ||
-        game.selected.includes(cardId) ||
-        game.selected.length >= 2 ||
-        game.status !== "playing"
-      )
-        return;
+  const handleCardPress = useCallback((cardId: number) => {
+    const g = gameRef.current;
+    const r = roomRef.current;
+    if (!g || !r || !myTurnRef.current) return;
+    if (
+      g.locked ||
+      g.tornadoActive ||
+      g.matchedBy[cardId] !== -1 ||
+      g.selected.includes(cardId) ||
+      g.selected.length >= 2 ||
+      g.status !== "playing"
+    )
+      return;
 
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    playFlip();
 
-      const newSelected = [...game.selected, cardId];
-      const isSecondCard = newSelected.length === 2;
+    const newSelected = [...g.selected, cardId];
+    const isSecondCard = newSelected.length === 2;
 
-      const newState: LocalGameState = {
-        ...game,
-        selected: newSelected,
-        locked: isSecondCard,
-      };
+    const newState: LocalGameState = {
+      ...g,
+      selected: newSelected,
+      locked: isSecondCard,
+    };
 
-      updateRoomGameState(room.id, newState, room.currentPlayerId!);
-    },
-    [game, room, myTurn],
-  );
+    updateRoomGameState(r.id, newState, r.currentPlayerId!);
+  }, []);
 
   // --- Tornado ---
   const handleTornado = useCallback(() => {

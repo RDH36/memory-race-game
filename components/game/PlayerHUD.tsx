@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 import { useTheme } from '../../lib/ThemeContext';
+import { PremiumDecor } from '../appearance/PremiumDecor';
 
 interface OpponentCardProps {
   name: string;
@@ -121,6 +122,7 @@ export function OpponentCard({
           justifyContent: 'center',
         }}
       >
+        <PremiumDecor emoji={avatar} size={40} borderRadius={12} />
         <Text style={{ fontSize: 22 }}>{avatar}</Text>
       </View>
     </View>

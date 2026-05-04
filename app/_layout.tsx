@@ -17,6 +17,7 @@ import { ThemeProvider, useTheme } from "../lib/ThemeContext";
 import { ConnectivityProvider } from "../lib/ConnectivityContext";
 import { RevenueCatProvider } from "../lib/revenuecat";
 import { setupDailyReminder } from "../lib/notifications";
+import { configureAudioMode } from "../lib/sound";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,7 +35,8 @@ function AppContent() {
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: colors.surface },
-          animation: "slide_from_right",
+          animation: "fade",
+          animationDuration: 180,
         }}
       >
         <Stack.Screen name="index" />
@@ -84,6 +86,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     setupDailyReminder();
+    configureAudioMode();
   }, []);
 
   if (!fontsLoaded) return null;

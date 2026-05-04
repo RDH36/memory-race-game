@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -12,6 +12,7 @@ import { Label } from "../../components/ui/Label";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { MitsitsyCard } from "../../components/promo/MitsitsyCard";
+import { PremiumDecor } from "../../components/appearance/PremiumDecor";
 
 const DAILY_REWARD_KEY = "daily_reward_last_claimed";
 const DAILY_REWARD_XP = 15;
@@ -96,9 +97,23 @@ export default function HomeScreen() {
                 backgroundColor: colors.primaryContainerBg,
                 alignItems: "center",
                 justifyContent: "center",
+                borderWidth: 1.5,
+                borderColor: colors.ghostBorder,
               }}
             >
-              <Text style={{ fontSize: 26 }}>{avatar}</Text>
+              <PremiumDecor emoji={avatar} size={45} borderRadius={14.5} hideOuterGlow animateAura auraInset clipAura />
+              <Text
+                style={{
+                  fontSize: 24,
+                  textAlign: "center",
+                  ...(Platform.OS === "android" && {
+                    includeFontPadding: false,
+                    textAlignVertical: "center",
+                  }),
+                }}
+              >
+                {avatar}
+              </Text>
             </Pressable>
             <View
               style={{

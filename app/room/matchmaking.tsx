@@ -130,8 +130,14 @@ export default function MatchmakingScreen() {
 
   useEffect(() => {
     mountedRef.current = true;
-    searchForMatch();
+    // Stagger initial search 0-2s to break thundering-herd patterns when
+    // many clients hit matchmaking simultaneously.
+    const jitter = Math.floor(Math.random() * 2000);
+    const startTimer = setTimeout(() => {
+      if (mountedRef.current) searchForMatch();
+    }, jitter);
     return () => {
+      clearTimeout(startTimer);
       mountedRef.current = false;
       // Cleanup: if we leave without starting a game, delete the room
       if (roomIdRef.current && !startedRef.current) {
@@ -189,6 +195,15 @@ export default function MatchmakingScreen() {
     if (elapsed < botTimeout || !isHost || !roomId || startedRef.current || matchState !== "searching") return;
 
     const injectBot = async () => {
+      // Re-check the room before claiming startedRef — a real guest may have joined
+      // between our last broadcast and now. Aborting lets the host-watcher effect
+      // pick up the legit guest instead of overwriting them.
+      const { data } = await db.queryOnce({
+        rooms: { $: { where: { id: roomId } } },
+      });
+      const current = data?.rooms?.[0];
+      if (!mountedRef.current || !current || current.guestId) return;
+
       startedRef.current = true;
       const fakeName = randomFakeName();
       const fakeAvatar = randomFakeAvatar();

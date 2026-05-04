@@ -546,5 +546,22 @@
       "points-5000": { "title": "Trésorier",         "description": "Gagne 5000 XP au total" },
       "level-25":    { "title": "Grand maître",      "description": "Atteins le niveau 25" }
     }
+  },
+  "celebration": {
+    "levelUp": {
+      "title": "Niveau {{level}} atteint !",
+      "subtitle": "Tu deviens plus fort. Continue !"
+    },
+    "achievement": {
+      "title": "Succès débloqué !"
+    },
+    "continue": "Continuer"
+  },
+  "unveil": {
+    "eyebrow": "NOUVEAU DÉBLOCAGE",
+    "title": "Avatar débloqué !",
+    "subtitle": "Affiche-le et démarque-toi.",
+    "equip": "Équiper maintenant",
+    "later": "Plus tard"
   }
 }

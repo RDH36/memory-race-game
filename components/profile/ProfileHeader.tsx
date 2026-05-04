@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
@@ -7,6 +7,9 @@ import { Gradient } from "../ui/Gradient";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { useCurrentUser } from "../../lib/identity";
+import { getAvatarSkin } from "../../lib/skins";
+import { getPremiumTheme } from "../../lib/premiumTheme";
+import { PremiumDecor } from "../appearance/PremiumDecor";
 import { GoogleLinkSheet } from "./GoogleLinkSheet";
 
 export function ProfileHeader() {
@@ -20,6 +23,8 @@ export function ProfileHeader() {
 
   const hasEmail = !!user?.email;
   const displayName = nickname || t("profile.guest");
+  const skin = getAvatarSkin(avatar);
+  const isPremium = !!getPremiumTheme(skin?.requires ?? null);
 
   const goToSetup = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -70,20 +75,55 @@ export function ProfileHeader() {
           </Pressable>
         </View>
 
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
           <Pressable
             onPress={goToSetup}
             style={({ pressed }) => ({
-              width: 80,
-              height: 80,
-              borderRadius: 24,
+              width: 72,
+              height: 72,
+              borderRadius: 20,
               backgroundColor: "rgba(255,255,255,0.22)",
-              alignItems: "center",
-              justifyContent: "center",
               transform: [{ scale: pressed ? 0.95 : 1 }],
+              overflow: "visible",
+              ...(!isPremium && {
+                borderWidth: 2.5,
+                borderColor: "rgba(255,255,255,0.55)",
+              }),
             })}
           >
-            <Text style={{ fontSize: 52, lineHeight: 60 }}>{avatar}</Text>
+            <View
+              style={{
+                width: 72,
+                height: 72,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 38,
+                  textAlign: "center",
+                  ...(Platform.OS === "android" && {
+                    includeFontPadding: false,
+                    textAlignVertical: "center",
+                  }),
+                }}
+              >
+                {avatar}
+              </Text>
+            </View>
+            {isPremium && (
+              <PremiumDecor
+                emoji={avatar}
+                size={72}
+                borderRadius={20}
+                hideOuterGlow
+                strokeWidth={2.5}
+                animateAura
+                auraInset
+                clipAura
+              />
+            )}
           </Pressable>
 
           <View style={{ flex: 1, minWidth: 0 }}>

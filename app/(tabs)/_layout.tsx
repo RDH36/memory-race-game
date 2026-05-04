@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -100,30 +101,38 @@ export default function TabsLayout() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
+  const screenOptions = useMemo(
+    () => ({
+      headerShown: false,
+      animation: "shift" as const,
+      freezeOnBlur: true,
+      sceneStyle: { backgroundColor: colors.surface },
+      tabBarActiveTintColor: colors.primaryContainer,
+      tabBarInactiveTintColor: colors.onSurfaceVariant,
+      tabBarButton: (props: any) => <TabBarButton {...props} />,
+      tabBarHideOnKeyboard: true,
+      tabBarStyle: {
+        backgroundColor: colors.surfaceContainer,
+        borderTopWidth: 0,
+        height: 56 + insets.bottom,
+        paddingBottom: insets.bottom,
+      },
+      tabBarLabelStyle: {
+        fontSize: 11,
+        fontFamily: "Nunito_600SemiBold",
+      },
+    }),
+    [
+      colors.surface,
+      colors.primaryContainer,
+      colors.onSurfaceVariant,
+      colors.surfaceContainer,
+      insets.bottom,
+    ],
+  );
+
   return (
-    <Tabs
-      detachInactiveScreens
-      screenOptions={{
-        headerShown: false,
-        animation: "shift",
-        freezeOnBlur: true,
-        sceneStyle: { backgroundColor: colors.surface },
-        tabBarActiveTintColor: colors.primaryContainer,
-        tabBarInactiveTintColor: colors.onSurfaceVariant,
-        tabBarButton: (props) => <TabBarButton {...props} />,
-        tabBarHideOnKeyboard: true,
-        tabBarStyle: {
-          backgroundColor: colors.surfaceContainer,
-          borderTopWidth: 0,
-          height: 56 + insets.bottom,
-          paddingBottom: insets.bottom,
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontFamily: "Nunito_600SemiBold",
-        },
-      }}
-    >
+    <Tabs detachInactiveScreens screenOptions={screenOptions}>
       <Tabs.Screen
         name="leaderboard"
         options={{

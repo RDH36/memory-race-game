@@ -98,6 +98,10 @@ export function useIsAvatarUnlocked(avatarId: string): boolean {
   return isUnlocked(skin?.requires ?? null, ents);
 }
 
+export function getAvatarSkin(avatarId: string): AvatarSkin | undefined {
+  return AVATAR_SKINS.find((s) => s.id === avatarId);
+}
+
 /**
  * Royal plateau theme (V2 Damas Impérial — rouge + or).
  * Used by the in-game and preview royal renderers.

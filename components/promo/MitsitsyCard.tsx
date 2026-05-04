@@ -1,4 +1,5 @@
-import { Image, Linking, Pressable, Text, View } from "react-native";
+import { Linking, Pressable, Text, View } from "react-native";
+import { Image } from "expo-image";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../lib/ThemeContext";
 
@@ -32,6 +33,9 @@ export function MitsitsyCard() {
         <Image
           source={require("../../assets/mitsitsy.png")}
           style={{ width: 48, height: 48, borderRadius: 12 }}
+          contentFit="cover"
+          cachePolicy="memory-disk"
+          transition={120}
         />
         <View style={{ flex: 1 }}>
           <Text

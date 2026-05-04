@@ -4,42 +4,24 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
-
-interface Achievement {
-  id: string;
-  emoji: string;
-  unlocked: boolean;
-}
+import {
+  ACHIEVEMENT_DEFINITIONS,
+  computeUnlockedAchievementIds,
+} from "../../lib/achievements";
 
 export default function AchievementsScreen() {
   const { colors } = useTheme();
   const { t } = useTranslation();
-  const { stats, level, winRate } = usePlayerStats();
+  const { stats, level } = usePlayerStats();
 
-  const achievements: Achievement[] = [
-    { id: "first-win", emoji: "🥇", unlocked: stats.gamesWon >= 1 },
-    { id: "ten-games", emoji: "🎮", unlocked: stats.gamesPlayed >= 10 },
-    { id: "wins-10", emoji: "🏆", unlocked: stats.gamesWon >= 10 },
-    { id: "games-50", emoji: "🎯", unlocked: stats.gamesPlayed >= 50 },
-    { id: "streak-3", emoji: "🔥", unlocked: stats.bestStreak >= 3 },
-    { id: "wins-50", emoji: "👑", unlocked: stats.gamesWon >= 50 },
-    { id: "100-games", emoji: "💯", unlocked: stats.gamesPlayed >= 100 },
-    { id: "level-5", emoji: "⭐", unlocked: level >= 5 },
-    { id: "streak-5", emoji: "⚡", unlocked: stats.bestStreak >= 5 },
-    { id: "winrate-50", emoji: "♟️", unlocked: stats.gamesPlayed >= 20 && winRate >= 0.5 },
-    { id: "500-points", emoji: "💎", unlocked: stats.points >= 500 },
-    { id: "games-250", emoji: "🎖️", unlocked: stats.gamesPlayed >= 250 },
-    { id: "level-10", emoji: "🌟", unlocked: level >= 10 },
-    { id: "wins-100", emoji: "🏅", unlocked: stats.gamesWon >= 100 },
-    { id: "streak-10", emoji: "🚀", unlocked: stats.bestStreak >= 10 },
-    { id: "points-1000", emoji: "💰", unlocked: stats.points >= 1000 },
-    { id: "level-15", emoji: "💫", unlocked: level >= 15 },
-    { id: "level-20", emoji: "🧙", unlocked: level >= 20 },
-    { id: "points-5000", emoji: "🏦", unlocked: stats.points >= 5000 },
-    { id: "level-25", emoji: "👨‍🎓", unlocked: level >= 25 },
-  ];
+  const unlockedSet = new Set(computeUnlockedAchievementIds(stats, level));
+  const achievements = ACHIEVEMENT_DEFINITIONS.map((def) => ({
+    id: def.id,
+    emoji: def.emoji,
+    unlocked: unlockedSet.has(def.id),
+  }));
 
-  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+  const unlockedCount = unlockedSet.size;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }} edges={["top"]}>

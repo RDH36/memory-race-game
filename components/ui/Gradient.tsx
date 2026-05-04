@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { View, ViewStyle, StyleSheet } from "react-native";
-import Svg, { Defs, LinearGradient as SvgLinearGradient, Rect, Stop } from "react-native-svg";
+import { View, ViewStyle } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface GradientProps {
   colors: string[];
@@ -10,33 +10,38 @@ interface GradientProps {
   borderRadius?: number;
 }
 
-function angleToCoords(angle: number) {
+// Convert CSS-style angle (0 = up, 90 = right, 180 = down, 270 = left)
+// into expo-linear-gradient's normalized start/end points.
+function angleToPoints(angle: number) {
   const rad = ((angle - 90) * Math.PI) / 180;
   return {
-    x1: 0.5 - Math.cos(rad) / 2,
-    y1: 0.5 - Math.sin(rad) / 2,
-    x2: 0.5 + Math.cos(rad) / 2,
-    y2: 0.5 + Math.sin(rad) / 2,
+    start: { x: 0.5 - Math.cos(rad) / 2, y: 0.5 - Math.sin(rad) / 2 },
+    end: { x: 0.5 + Math.cos(rad) / 2, y: 0.5 + Math.sin(rad) / 2 },
   };
 }
 
-/** SVG-backed linear gradient — no native module required. */
-export function Gradient({ colors, angle = 135, style, children, borderRadius = 0 }: GradientProps) {
-  const { x1, y1, x2, y2 } = angleToCoords(angle);
-  const id = `grad-${colors.join("-")}-${angle}`;
+/**
+ * Linear gradient backed by expo-linear-gradient (native, GPU-accelerated).
+ * Replaces the previous SVG implementation which ran on the JS thread and
+ * stuttered during navigation slide transitions.
+ */
+export function Gradient({
+  colors,
+  angle = 135,
+  style,
+  children,
+  borderRadius = 0,
+}: GradientProps) {
+  const { start, end } = angleToPoints(angle);
 
   return (
     <View style={[{ overflow: "hidden", borderRadius }, style]}>
-      <Svg style={StyleSheet.absoluteFill}>
-        <Defs>
-          <SvgLinearGradient id={id} x1={x1} y1={y1} x2={x2} y2={y2}>
-            {colors.map((c, i) => (
-              <Stop key={i} offset={`${(i / Math.max(1, colors.length - 1)) * 100}%`} stopColor={c} />
-            ))}
-          </SvgLinearGradient>
-        </Defs>
-        <Rect width="100%" height="100%" fill={`url(#${id})`} />
-      </Svg>
+      <LinearGradient
+        colors={colors as [string, string, ...string[]]}
+        start={start}
+        end={end}
+        style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+      />
       {children}
     </View>
   );

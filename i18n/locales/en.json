@@ -546,5 +546,22 @@
       "points-5000": { "title": "Treasurer",       "description": "Earn 5000 XP total" },
       "level-25":    { "title": "Grand master",    "description": "Reach level 25" }
     }
+  },
+  "celebration": {
+    "levelUp": {
+      "title": "Level {{level}} reached!",
+      "subtitle": "You're getting stronger. Keep going!"
+    },
+    "achievement": {
+      "title": "Achievement unlocked!"
+    },
+    "continue": "Continue"
+  },
+  "unveil": {
+    "eyebrow": "NEW UNLOCK",
+    "title": "Avatar unlocked!",
+    "subtitle": "Make it yours and stand out.",
+    "equip": "Equip now",
+    "later": "Later"
   }
 }

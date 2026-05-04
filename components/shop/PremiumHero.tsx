@@ -4,6 +4,8 @@ import { Gradient } from "../ui/Gradient";
 import { Crown } from "../ui/icons/Crown";
 import { Sparkle } from "../ui/icons/Sparkle";
 import { MiniCardFace, MiniCardBack } from "./MiniCard";
+import { ShapeAura } from "../appearance/ShapeAura";
+import { ENTITLEMENT } from "../../lib/revenuecat";
 
 interface Props {
   eyebrow: string;
@@ -31,7 +33,7 @@ export function PremiumHero({
     >
       <View style={{ borderRadius: 28, overflow: "hidden", minHeight: 340 }}>
         <Gradient colors={GRADIENT} angle={160} borderRadius={28} style={{ flex: 1, minHeight: 340 }}>
-          {/* Cards showcase row — 4 overlapping, rotated */}
+          {/* Cards showcase row — 4 overlapping, rotated. Star aura orbits behind. */}
           <View
             style={{
               flexDirection: "row",
@@ -39,8 +41,11 @@ export function PremiumHero({
               alignItems: "center",
               paddingTop: 24,
               paddingBottom: 4,
+              position: "relative",
             }}
           >
+            {/* Star aura disabled here for perf — 3 packs render simultaneously on shop tab.
+                The PackCard auras provide enough premium feel. */}
             <MiniCardFace
               width={56}
               symbol="✦"

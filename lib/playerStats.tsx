@@ -4,7 +4,7 @@ import { id, tx } from "@instantdb/react-native";
 import { useProfile } from "@/lib/identity";
 import { usePremium } from "@/hooks/useEntitlements";
 
-interface PlayerStats {
+export interface PlayerStats {
   gamesPlayed: number;
   gamesWon: number;
   currentStreak: number;
@@ -89,15 +89,25 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
   const entry = data?.leaderboard?.[0];
   const leaderboardId = entry?.id ?? null;
 
-  const stats: PlayerStats = entry
-    ? {
-        gamesPlayed: entry.gamesPlayed,
-        gamesWon: entry.gamesWon,
-        currentStreak: entry.currentStreak,
-        bestStreak: entry.bestStreak,
-        points: entry.points,
-      }
-    : DEFAULT_STATS;
+  const stats: PlayerStats = useMemo(
+    () =>
+      entry
+        ? {
+            gamesPlayed: entry.gamesPlayed,
+            gamesWon: entry.gamesWon,
+            currentStreak: entry.currentStreak,
+            bestStreak: entry.bestStreak,
+            points: entry.points,
+          }
+        : DEFAULT_STATS,
+    [
+      entry?.gamesPlayed,
+      entry?.gamesWon,
+      entry?.currentStreak,
+      entry?.bestStreak,
+      entry?.points,
+    ],
+  );
 
   const addBonusXp = useCallback((amount: number) => {
     if (!userId) return;

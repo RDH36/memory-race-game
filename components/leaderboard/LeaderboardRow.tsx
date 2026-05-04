@@ -1,4 +1,5 @@
-import { Pressable, Text, View } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
+import { PremiumDecor } from "../appearance/PremiumDecor";
 
 export interface LeaderboardEntry {
   id: string;
@@ -103,11 +104,30 @@ export function LeaderboardRow({
             alignItems: "center",
             justifyContent: "center",
             marginLeft: 8,
-            borderWidth: podium ? 2 : 0,
-            borderColor: podium?.border,
+            borderWidth: podium ? 2 : 1.5,
+            borderColor: podium?.border ?? colors.ghostBorder,
           }}
         >
-          <Text style={{ fontSize: podium ? 22 : 18 }}>{item.avatar}</Text>
+          <PremiumDecor
+            emoji={item.avatar}
+            size={podium ? 40 : 33}
+            borderRadius={podium ? 20 : 16.5}
+            animateAura={isPodium || item.isCurrentUser}
+            auraInset
+            clipAura
+          />
+          <Text
+            style={{
+              fontSize: podium ? 20 : 16,
+              textAlign: "center",
+              ...(Platform.OS === "android" && {
+                includeFontPadding: false,
+                textAlignVertical: "center",
+              }),
+            }}
+          >
+            {item.avatar}
+          </Text>
         </View>
 
         <View style={{ flex: 1, marginLeft: 12 }}>

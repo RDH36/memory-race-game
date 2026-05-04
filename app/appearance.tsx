@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { useTheme } from "../lib/ThemeContext";
 import { usePlayerStats } from "../lib/playerStats";
 import { saveProfile } from "../lib/identity";
@@ -19,6 +19,7 @@ import {
 } from "../lib/skins";
 import { AvatarTile } from "../components/appearance/AvatarTile";
 import { AvatarHalo } from "../components/appearance/AvatarHalo";
+import { PremiumHalo } from "../components/appearance/PremiumHalo";
 import { TableMiniPreview } from "../components/appearance/TableMiniPreview";
 
 const DOT_COUNT = 10;
@@ -92,18 +93,22 @@ export default function AppearanceScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView
+      <Animated.ScrollView
+        entering={FadeIn.duration(280)}
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
         {/* FOCUS PREVIEW */}
-        <Animated.View
-          entering={FadeIn.duration(300).delay(50)}
+        <View
           style={{ position: "relative", paddingTop: 10, paddingBottom: 22, marginBottom: 8, alignItems: "center" }}
         >
-          {/* Halo */}
+          {/* Halo — themed + animated for ALL paid avatars (locked or not), hue-based for free */}
           <View style={{ position: "absolute", top: 20, alignItems: "center", justifyContent: "center", width: 220, height: 220 }}>
-            <AvatarHalo hue={currentAvatar.hue} neutral={currentAvatar.neutral} size={220} />
+            {currentAvatar.requires ? (
+              <PremiumHalo entitlement={currentAvatar.requires} size={220} animate />
+            ) : (
+              <AvatarHalo hue={currentAvatar.hue} neutral={currentAvatar.neutral} size={220} />
+            )}
           </View>
 
           <View style={{ position: "relative" }}>
@@ -142,10 +147,10 @@ export default function AppearanceScreen() {
               );
             })}
           </View>
-        </Animated.View>
+        </View>
 
         {/* COLLECTION header */}
-        <Animated.View entering={FadeInDown.duration(400).delay(150)}>
+        <View>
           <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
             <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: colors.onSurface }}>
               {t("apparence.collection", "Collection")}
@@ -189,10 +194,10 @@ export default function AppearanceScreen() {
               );
             })}
           </View>
-        </Animated.View>
+        </View>
 
         {/* TABLES header */}
-        <Animated.View entering={FadeInDown.duration(400).delay(250)}>
+        <View>
           <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
             <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: colors.onSurface }}>
               {t("apparence.tables", "Tables")}
@@ -275,8 +280,8 @@ export default function AppearanceScreen() {
               );
             })}
           </View>
-        </Animated.View>
-      </ScrollView>
+        </View>
+      </Animated.ScrollView>
     </SafeAreaView>
   );
 }

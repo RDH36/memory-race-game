@@ -1,4 +1,13 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import NetInfo from "@react-native-community/netinfo";
 import { useTranslation } from "react-i18next";
 import { ConfirmModal } from "../components/ui/ConfirmModal";
@@ -15,18 +24,48 @@ const ConnectivityContext = createContext<ConnectivityContextValue>({
   showOfflineModal: () => {},
 });
 
-export function ConnectivityProvider({ children }: { children: ReactNode }) {
+// Modal lives in a sibling subtree so toggling its visibility doesn't re-render
+// the provider's value (which would cascade to every consumer).
+function OfflineModalHost({
+  modalVisible,
+  setModalVisible,
+}: {
+  modalVisible: boolean;
+  setModalVisible: (v: boolean) => void;
+}) {
   const { t } = useTranslation();
+  return (
+    <ConfirmModal
+      visible={modalVisible}
+      icon="📡"
+      title={t("offline.title")}
+      message={t("offline.message")}
+      cancelText=""
+      confirmText={t("offline.ok")}
+      onCancel={() => setModalVisible(false)}
+      onConfirm={() => setModalVisible(false)}
+    />
+  );
+}
+
+export function ConnectivityProvider({ children }: { children: ReactNode }) {
   const [isOnline, setIsOnline] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const isOnlineRef = useRef(isOnline);
+
+  useEffect(() => {
+    isOnlineRef.current = isOnline;
+  });
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
-      const connected = state.isConnected !== false && state.isInternetReachable !== false;
+      const connected =
+        state.isConnected !== false && state.isInternetReachable !== false;
       setIsOnline(connected);
     });
     NetInfo.fetch().then((state) => {
-      const connected = state.isConnected !== false && state.isInternetReachable !== false;
+      const connected =
+        state.isConnected !== false && state.isInternetReachable !== false;
       setIsOnline(connected);
     });
     return () => unsubscribe();
@@ -34,26 +73,24 @@ export function ConnectivityProvider({ children }: { children: ReactNode }) {
 
   const showOfflineModal = useCallback(() => setModalVisible(true), []);
 
-  const requireOnline = useCallback(
-    (action: () => void) => {
-      if (isOnline) action();
-      else setModalVisible(true);
-    },
-    [isOnline]
+  // Reads isOnline through ref so the callback identity stays stable —
+  // requireOnline doesn't change between renders.
+  const requireOnline = useCallback((action: () => void) => {
+    if (isOnlineRef.current) action();
+    else setModalVisible(true);
+  }, []);
+
+  const value = useMemo(
+    () => ({ isOnline, requireOnline, showOfflineModal }),
+    [isOnline, requireOnline, showOfflineModal],
   );
 
   return (
-    <ConnectivityContext.Provider value={{ isOnline, requireOnline, showOfflineModal }}>
+    <ConnectivityContext.Provider value={value}>
       {children}
-      <ConfirmModal
-        visible={modalVisible}
-        icon="📡"
-        title={t("offline.title")}
-        message={t("offline.message")}
-        cancelText=""
-        confirmText={t("offline.ok")}
-        onCancel={() => setModalVisible(false)}
-        onConfirm={() => setModalVisible(false)}
+      <OfflineModalHost
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
       />
     </ConnectivityContext.Provider>
   );

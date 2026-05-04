@@ -7,7 +7,9 @@ import Animated, {
   withDelay,
   withRepeat,
   Easing,
+  cancelAnimation,
 } from "react-native-reanimated";
+import { useDeferredAnimation } from "../../lib/perf";
 
 const CONFETTI_EMOJIS = ["🎊", "⭐", "✨", "🎉", "💫", "🌟"];
 const CONFETTI_COUNT = 8;
@@ -17,8 +19,10 @@ function ConfettiParticle({ index }: { index: number }) {
   const translateX = useSharedValue(0);
   const opacity = useSharedValue(0);
   const rotation = useSharedValue(0);
+  const deferred = useDeferredAnimation();
 
   useEffect(() => {
+    if (!deferred) return;
     const delay = 200 + index * 80;
     const xOffset = (index % 2 === 0 ? -1 : 1) * (30 + Math.random() * 60);
 
@@ -43,7 +47,14 @@ function ConfettiParticle({ index }: { index: number }) {
     );
 
     opacity.value = withDelay(delay + 800, withTiming(0, { duration: 400 }));
-  }, []);
+
+    return () => {
+      cancelAnimation(translateX);
+      cancelAnimation(translateY);
+      cancelAnimation(opacity);
+      cancelAnimation(rotation);
+    };
+  }, [deferred]);
 
   const style = useAnimatedStyle(() => ({
     position: "absolute" as const,

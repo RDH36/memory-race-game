@@ -8,6 +8,7 @@ import {
   isGameFinished,
 } from "../lib/gameLogic";
 import { CpuMemory, cpuDecide, updateMemory } from "../lib/cpuLogic";
+import { playFlip, playMatch } from "../lib/sound";
 
 const FLIP_DELAY = 800;
 const CPU_DELAY = 600;
@@ -48,6 +49,7 @@ export function useLocalGame(difficulty: CpuDifficulty) {
           return g;
 
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        playFlip();
 
         const newSelected = [...g.selected, cardId];
 
@@ -78,6 +80,7 @@ export function useLocalGame(difficulty: CpuDifficulty) {
     timeoutRef.current = setTimeout(() => {
       if (isMatch) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        playMatch();
         const player = game.currentTurn === 1 ? "p1" : "p2";
         const newMatchedBy = [...game.matchedBy];
         newMatchedBy[a] = game.currentTurn;
@@ -164,6 +167,7 @@ export function useLocalGame(difficulty: CpuDifficulty) {
 
       // Flip first card
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      playFlip();
       setGame((g) => ({ ...g, selected: [first] }));
 
       // Update our own memory for card we just flipped
@@ -180,6 +184,7 @@ export function useLocalGame(difficulty: CpuDifficulty) {
       // Flip second card after delay
       setTimeout(() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        playFlip();
         setGame((g) => {
           cpuMemoryRef.current = updateMemory(
             cpuMemoryRef.current,

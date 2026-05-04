@@ -5,6 +5,8 @@ import { useTheme } from "../../lib/ThemeContext";
 import { Angel } from "../ui/icons/Angel";
 import { Demon } from "../ui/icons/Demon";
 import { MiniCardFace } from "./MiniCard";
+import { ShapeAura } from "../appearance/ShapeAura";
+import { ENTITLEMENT } from "../../lib/revenuecat";
 
 export type PackIconKind = "angel" | "demon";
 
@@ -36,6 +38,8 @@ export function PackCard({
 }: Props) {
   const { colors } = useTheme();
   const Icon = iconType === "angel" ? Angel : Demon;
+  const entitlement = iconType === "angel" ? ENTITLEMENT.PACK_ANGEL : ENTITLEMENT.PACK_DEMON;
+  const auraSize = 96;
 
   return (
     <Pressable
@@ -67,7 +71,17 @@ export function PackCard({
             angle={135}
             style={{ position: "absolute", inset: 0 }}
           />
-          <Icon size={64} color="#FFFFFF" />
+          <View
+            style={{
+              width: auraSize,
+              height: auraSize,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ShapeAura entitlement={entitlement} size={auraSize} animate={false} />
+            <Icon size={64} color="#FFFFFF" />
+          </View>
 
           {/* Mini cards cluster — absolute right */}
           <View

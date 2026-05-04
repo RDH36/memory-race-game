@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 import Purchases, {
   CustomerInfo,
@@ -115,8 +115,13 @@ export function RevenueCatProvider({ children }: { children: React.ReactNode }) 
       .catch(() => {});
   }, [isReady, userId]);
 
+  const value = useMemo(
+    () => ({ customerInfo, offering, isReady, refreshOfferings }),
+    [customerInfo, offering, isReady, refreshOfferings],
+  );
+
   return (
-    <Ctx.Provider value={{ customerInfo, offering, isReady, refreshOfferings }}>
+    <Ctx.Provider value={value}>
       {children}
     </Ctx.Provider>
   );

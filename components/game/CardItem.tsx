@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useTheme } from '../../lib/ThemeContext';
 import Animated, {
@@ -30,7 +30,7 @@ interface CardItemProps {
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
-export function CardItem({
+function CardItemImpl({
   cardId,
   emoji,
   isFaceUp,
@@ -295,3 +295,17 @@ export function CardItem({
     </Pressable>
   );
 }
+
+export const CardItem = memo(CardItemImpl, (prev, next) => {
+  return (
+    prev.cardId === next.cardId &&
+    prev.emoji === next.emoji &&
+    prev.isFaceUp === next.isFaceUp &&
+    prev.matchedBy === next.matchedBy &&
+    prev.isJustMatched === next.isJustMatched &&
+    prev.isJustMismatched === next.isJustMismatched &&
+    prev.disabled === next.disabled &&
+    prev.skin === next.skin &&
+    prev.onPress === next.onPress
+  );
+});

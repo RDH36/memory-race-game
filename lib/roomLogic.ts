@@ -172,6 +172,8 @@ function randomDifficulty(): CpuDifficulty {
   return DIFFICULTIES[Math.floor(Math.random() * DIFFICULTIES.length)];
 }
 
+const GHOST_ROOM_TTL_MS = 90_000;
+
 export async function findMatchmakingRoom(
   userId: string,
 ): Promise<RoomData | null> {
@@ -186,9 +188,17 @@ export async function findMatchmakingRoom(
     },
   });
 
+  const cutoff = Date.now() - GHOST_ROOM_TTL_MS;
   const rooms = (data?.rooms ?? []) as RoomData[];
-  // Find a room where we're not the host and no guest yet
-  return rooms.find((r) => r.hostId !== userId && !r.guestId) ?? null;
+  // Skip ghost rooms (host crashed/killed app) and pick deterministically:
+  // oldest first, tie-break on hostId — avoids 100 clients all picking the same row.
+  const candidates = rooms
+    .filter((r) => r.hostId !== userId && !r.guestId && r.createdAt > cutoff)
+    .sort(
+      (a, b) =>
+        a.createdAt - b.createdAt || a.hostId.localeCompare(b.hostId),
+    );
+  return candidates[0] ?? null;
 }
 
 export async function createMatchmakingRoom(

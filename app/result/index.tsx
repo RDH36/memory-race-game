@@ -24,6 +24,16 @@ import { Label } from "../../components/ui/Label";
 import { useTheme } from "../../lib/ThemeContext";
 import { deleteRoom } from "../../lib/roomLogic";
 import { MitsitsyCard } from "../../components/promo/MitsitsyCard";
+import { CelebrationModal } from "../../components/celebration/CelebrationModal";
+import {
+  computeUnlockedAchievementIds,
+  getAchievementEmoji,
+  type AchievementId,
+} from "../../lib/achievements";
+
+type CelebrationItem =
+  | { type: "levelUp"; level: number }
+  | { type: "achievement"; achievementId: AchievementId };
 
 const CPU_PROFILES: Record<string, { name: string; avatar: string }> = {
   easy: { name: "BabyBot", avatar: "🐣" },
@@ -73,8 +83,11 @@ export default function ResultScreen() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState<"new" | "home" | null>(null);
   const [bonusClaimed, setBonusClaimed] = useState(false);
-  const { avatar, recordGame, addBonusXp, lastXpGain, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
+  const { avatar, stats, recordGame, addBonusXp, lastXpGain, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
   const recorded = useRef(false);
+  const initialLevelRef = useRef<number | null>(null);
+  const initialUnlockedRef = useRef<AchievementId[] | null>(null);
+  const [celebrationQueue, setCelebrationQueue] = useState<CelebrationItem[]>([]);
 
   const onBonusReward = useCallback(() => {
     addBonusXp(10);
@@ -125,6 +138,8 @@ export default function ResultScreen() {
   useEffect(() => {
     if (!recorded.current) {
       recorded.current = true;
+      initialLevelRef.current = level;
+      initialUnlockedRef.current = computeUnlockedAchievementIds(stats, level);
       recordGame(effectiveWinner === "p1", difficulty as string, {
         scoreP1: s1,
         scoreP2: s2,
@@ -133,6 +148,31 @@ export default function ResultScreen() {
       }, { xpBoost: xpBoost === "1" ? 1.5 : 1 });
     }
   }, []);
+
+  // Detect level-up and newly unlocked achievements after stats refresh
+  useEffect(() => {
+    if (initialLevelRef.current === null || initialUnlockedRef.current === null) return;
+
+    const currentUnlocked = computeUnlockedAchievementIds(stats, level);
+    const newCelebrations: CelebrationItem[] = [];
+
+    if (level > initialLevelRef.current) {
+      newCelebrations.push({ type: "levelUp", level });
+    }
+
+    const previouslyUnlocked = new Set(initialUnlockedRef.current);
+    for (const id of currentUnlocked) {
+      if (!previouslyUnlocked.has(id)) {
+        newCelebrations.push({ type: "achievement", achievementId: id });
+      }
+    }
+
+    if (newCelebrations.length > 0) {
+      setCelebrationQueue((prev) => [...prev, ...newCelebrations]);
+      initialLevelRef.current = level;
+      initialUnlockedRef.current = currentUnlocked;
+    }
+  }, [stats.points, level]);
 
   // Dynamic stats
   const attempts = parseInt(p1Attempts, 10);
@@ -319,6 +359,23 @@ export default function ResultScreen() {
           <MitsitsyCard />
         </Animated.View>
       </ScrollView>
+
+      {celebrationQueue.length > 0 && (
+        <CelebrationModal
+          visible
+          type={celebrationQueue[0].type}
+          level={celebrationQueue[0].type === "levelUp" ? celebrationQueue[0].level : undefined}
+          achievementId={
+            celebrationQueue[0].type === "achievement" ? celebrationQueue[0].achievementId : undefined
+          }
+          emoji={
+            celebrationQueue[0].type === "achievement"
+              ? getAchievementEmoji(celebrationQueue[0].achievementId)
+              : undefined
+          }
+          onContinue={() => setCelebrationQueue((q) => q.slice(1))}
+        />
+      )}
     </SafeAreaView>
   );
 }

@@ -8,8 +8,10 @@ import Animated, {
   withTiming,
   withDelay,
   Easing,
+  cancelAnimation,
 } from "react-native-reanimated";
 import { ROYAL_THEME } from "../../../lib/skins";
+import { useDeferredAnimation } from "../../../lib/perf";
 
 interface Props {
   density?: "low" | "medium" | "high";
@@ -58,8 +60,10 @@ export function RoyalSparkles({ density = "medium", color = ROYAL_THEME.goldBrig
 
 function Sparkle({ spec, color }: { spec: SparkleSpec; color: string }) {
   const opacity = useSharedValue(0);
+  const deferred = useDeferredAnimation();
 
   useEffect(() => {
+    if (!deferred) return;
     const half = spec.duration / 2;
     opacity.value = withDelay(
       spec.delay,
@@ -71,7 +75,10 @@ function Sparkle({ spec, color }: { spec: SparkleSpec; color: string }) {
         -1,
       ),
     );
-  }, []);
+    return () => {
+      cancelAnimation(opacity);
+    };
+  }, [deferred]);
 
   const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
 

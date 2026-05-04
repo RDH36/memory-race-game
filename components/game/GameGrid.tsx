@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { LayoutChangeEvent, View } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -30,7 +30,7 @@ interface GameGridProps {
   skin?: CardSkin;
 }
 
-function AnimatedCardSlot({
+const AnimatedCardSlot = memo(function AnimatedCardSlot({
   index,
   tornadoActive,
   cols,
@@ -103,7 +103,7 @@ function AnimatedCardSlot({
       {children}
     </Animated.View>
   );
-}
+});
 
 export function GameGrid({
   positions,
@@ -121,7 +121,10 @@ export function GameGrid({
   const [cardSize, setCardSize] = useState(0);
   const totalCards = positions.length;
   const rows = Math.ceil(totalCards / cols);
-  const gridIndices = Array.from({ length: totalCards }, (_, i) => i);
+  const gridIndices = useMemo(
+    () => Array.from({ length: totalCards }, (_, i) => i),
+    [totalCards],
+  );
 
   const onLayout = useCallback(
     (e: LayoutChangeEvent) => {

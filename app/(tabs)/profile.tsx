@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -9,18 +8,18 @@ import { useTheme } from "../../lib/ThemeContext";
 import { ProfileHeader } from "../../components/profile/ProfileHeader";
 import { ProfileStats, type StatsTab } from "../../components/profile/ProfileStats";
 import { RecentMatches } from "../../components/profile/RecentMatches";
-import { Card } from "../../components/ui/Card";
 import { APP_VERSION } from "../../lib/constants";
+import { useDeferredAnimation } from "../../lib/perf";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<StatsTab>("global");
+  const matchesReady = useDeferredAnimation();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }} edges={["top"]}>
-     <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40, flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
@@ -127,7 +126,7 @@ export default function ProfileScreen() {
           onChangeTab={setActiveTab}
         />
 
-        <RecentMatches tab={activeTab} />
+        {matchesReady && <RecentMatches tab={activeTab} />}
 
         <View style={{ flex: 1 }} />
 
@@ -135,7 +134,6 @@ export default function ProfileScreen() {
           Flipia v{APP_VERSION}
         </Text>
       </ScrollView>
-     </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

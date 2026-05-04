@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "lint": "expo lint"
   },
   "dependencies": {
     "@expo-google-fonts/fredoka": "^0.4.1",
@@ -17,10 +18,13 @@
     "@react-native-google-signin/google-signin": "^16.1.2",
     "@supabase/supabase-js": "^2.104.0",
     "expo": "~55.0.8",
+    "expo-audio": "^55.0.14",
     "expo-clipboard": "^55.0.9",
     "expo-dev-client": "55.0.19",
     "expo-font": "^55.0.4",
     "expo-haptics": "^55.0.9",
+    "expo-image": "^55.0.9",
+    "expo-linear-gradient": "^55.0.13",
     "expo-localization": "^55.0.9",
     "expo-notifications": "^55.0.20",
     "expo-router": "^55.0.7",
@@ -45,6 +49,8 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "eslint": "^9.39.4",
+    "eslint-config-expo": "~55.0.0",
     "instant-cli": "^0.22.171",
     "tailwindcss": "^3.4.19",
     "typescript": "~5.9.2"
