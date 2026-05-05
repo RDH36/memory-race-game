@@ -40,7 +40,8 @@ export async function fetchAppStoreVersion(
     if (data.resultCount === 0 || !data.results[0]) return null;
     const { version, trackViewUrl } = data.results[0];
     return { version, trackViewUrl };
-  } catch {
+  } catch (e) {
+    if (__DEV__) console.warn("[update] fetchAppStoreVersion failed", e);
     return null;
   }
 }

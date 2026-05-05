@@ -255,7 +255,8 @@
       "full": "Cette room est déjà pleine",
       "started": "Cette partie a déjà commencé",
       "versionOld": "Mets à jour Flipia pour rejoindre cette room",
-      "versionNew": "L'autre joueur doit mettre à jour Flipia"
+      "versionNew": "L'autre joueur doit mettre à jour Flipia",
+      "joinFailed": "Connexion impossible. Réessaye."
     }
   },
   "promo": {

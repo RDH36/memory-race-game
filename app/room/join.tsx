@@ -17,6 +17,7 @@ const ERROR_ICONS: Record<string, string> = {
   started: "⏳",
   versionOld: "⬆️",
   versionNew: "⬇️",
+  joinFailed: "📡",
 };
 
 export default function JoinRoomScreen() {

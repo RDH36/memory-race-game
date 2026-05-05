@@ -210,13 +210,19 @@ export default function MatchmakingScreen() {
       const fakeGuestId = id();
 
       // Write fake guest into the room
-      await db.transact(
-        tx.rooms[roomId].update({
-          guestId: fakeGuestId,
-          guestNickname: fakeName,
-          guestAvatar: fakeAvatar,
-        }),
-      );
+      try {
+        await db.transact(
+          tx.rooms[roomId].update({
+            guestId: fakeGuestId,
+            guestNickname: fakeName,
+            guestAvatar: fakeAvatar,
+          }),
+        );
+      } catch (e) {
+        if (__DEV__) console.warn("[matchmaking bot-inject] transact failed", e);
+        startedRef.current = false;
+        return;
+      }
 
       if (!mountedRef.current) return;
 

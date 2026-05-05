@@ -81,13 +81,18 @@ export async function joinRoom(
     return { roomId: "", error: "versionNew" };
   }
 
-  await db.transact(
-    tx.rooms[room.id].update({
-      guestId,
-      guestNickname,
-      guestAvatar,
-    }),
-  );
+  try {
+    await db.transact(
+      tx.rooms[room.id].update({
+        guestId,
+        guestNickname,
+        guestAvatar,
+      }),
+    );
+  } catch (e) {
+    if (__DEV__) console.warn("[joinRoom] transact failed", e);
+    return { roomId: "", error: "joinFailed" };
+  }
 
   return { roomId: room.id };
 }
@@ -248,13 +253,18 @@ export async function joinMatchmakingRoom(
     return { roomId: "", error: "versionNew" };
   }
 
-  await db.transact(
-    tx.rooms[room.id].update({
-      guestId,
-      guestNickname,
-      guestAvatar,
-    }),
-  );
+  try {
+    await db.transact(
+      tx.rooms[room.id].update({
+        guestId,
+        guestNickname,
+        guestAvatar,
+      }),
+    );
+  } catch (e) {
+    if (__DEV__) console.warn("[joinMatchmakingRoom] transact failed", e);
+    return { roomId: "", error: "joinFailed" };
+  }
 
   return { roomId: room.id };
 }
