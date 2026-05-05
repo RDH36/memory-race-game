@@ -77,3 +77,70 @@ export async function markDismissedToday(): Promise<void> {
     // best-effort, silent
   }
 }
+
+export type UpdateCheckResult =
+  | { kind: "available"; storeVersion: string; storeUrl: string }
+  | { kind: "upToDate"; currentVersion: string }
+  | { kind: "error" }
+  | { kind: "unsupported" };
+
+function getBundleId(): string | null {
+  const cfg = Constants.expoConfig;
+  if (Platform.OS === "ios") return cfg?.ios?.bundleIdentifier ?? null;
+  return cfg?.android?.package ?? null;
+}
+
+/**
+ * Manual update check — bypasses the daily-dismissal throttle and the __DEV__
+ * kill-switch. Used by the "Check for updates" button in settings.
+ */
+export async function checkForUpdate(): Promise<UpdateCheckResult> {
+  const bundleId = getBundleId();
+  if (!bundleId) return { kind: "unsupported" };
+  const currentVersion = getCurrentAppVersion();
+
+  if (Platform.OS === "ios") {
+    const info = await fetchAppStoreVersion(bundleId);
+    if (!info) return { kind: "error" };
+    const cmp = compareVersions(info.version, currentVersion);
+    if (cmp > 0) {
+      return {
+        kind: "available",
+        storeVersion: info.version,
+        storeUrl: info.trackViewUrl,
+      };
+    }
+    return { kind: "upToDate", currentVersion };
+  }
+
+  if (Platform.OS === "android") {
+    let lib: any = null;
+    try {
+      lib = require("sp-react-native-in-app-updates");
+    } catch (e) {
+      if (__DEV__) console.warn("[update] sp-react-native-in-app-updates not available", e);
+    }
+    if (!lib?.default) {
+      // No Play Store check possible — fall back to itunes-style logic doesn't apply.
+      // Return unsupported so the UI can offer "Open Play Store" as a manual fallback.
+      return { kind: "unsupported" };
+    }
+    try {
+      const inst = new lib.default(false);
+      const res = await inst.checkNeedsUpdate({ curVersion: currentVersion });
+      if (res?.shouldUpdate) {
+        return {
+          kind: "available",
+          storeVersion: res.storeVersion ?? "?",
+          storeUrl: getStoreUrl(bundleId),
+        };
+      }
+      return { kind: "upToDate", currentVersion };
+    } catch (e) {
+      if (__DEV__) console.warn("[update] manual android check failed", e);
+      return { kind: "error" };
+    }
+  }
+
+  return { kind: "unsupported" };
+}

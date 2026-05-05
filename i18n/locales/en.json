@@ -279,7 +279,23 @@
     "terms": "Terms & Conditions",
     "feedback": "Feedback & Support",
     "feedbackDesc": "Report a bug or suggest an improvement",
-    "developedBy": "Developed by"
+    "developedBy": "Developed by",
+    "update": {
+      "section": "Updates",
+      "sectionDesc": "Current version: {{version}}",
+      "checkButton": "Check for updates",
+      "checking": "Checking…",
+      "availableTitle": "Update available",
+      "availableBody": "A new version ({{version}}) is available. You can update Flipia now.",
+      "updateCta": "Update",
+      "later": "Later",
+      "upToDateTitle": "App is up to date",
+      "upToDateBody": "You're already on the latest version ({{version}}).",
+      "errorTitle": "Couldn't check",
+      "errorBody": "We couldn't reach the store. Check your connection and try again.",
+      "unsupportedTitle": "Check unavailable",
+      "unsupportedBody": "This build can't auto-check. Please check the store directly."
+    }
   },
   "notifications": {
     "dailyRewardTitle": "🎁 Your daily reward is ready!",

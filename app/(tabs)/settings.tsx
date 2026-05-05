@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
+import { CheckUpdateRow } from "../../components/settings/CheckUpdateRow";
 import { FeedbackSupport } from "../../components/settings/FeedbackSupport";
 import { LanguageSelector } from "../../components/settings/LanguageSelector";
 import { LegalLinks } from "../../components/settings/LegalLinks";
@@ -55,6 +56,8 @@ export default function SettingsScreen() {
         <View style={{ marginTop: 24 }} />
 
         <LegalLinks />
+
+        <CheckUpdateRow />
 
         <Pressable
           onPress={() => Linking.openURL(DEVELOPER_URL)}
