@@ -16,7 +16,14 @@ const rules = {
       view: "true",
       create: "auth.id != null",
       delete: "auth.id == data.hostId",
-      update: "auth.id == data.hostId || auth.id == data.guestId",
+      // Three OR-clauses cover every legitimate writer:
+      //  1. data.hostId == auth.id          → host updating their own room
+      //  2. data.guestId == auth.id         → guest updating after they joined
+      //  3. newData.guestId == auth.id      → guest joining for the first time
+      //     (data.guestId is null at this point, so clause 2 fails — clause 3
+      //     accepts the write only if the joiner sets themselves, not someone else)
+      update:
+        "auth.id == data.hostId || auth.id == data.guestId || auth.id == newData.guestId",
     },
   },
   profiles: {

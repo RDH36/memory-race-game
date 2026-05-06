@@ -91,7 +91,11 @@ export default function MatchmakingScreen() {
       if (!mountedRef.current) return;
 
       if (result.error) {
-        // Room was taken, create our own
+        // Common cases: "full" (room got taken between query and write), "joinFailed"
+        // (perms or network), versionOld/versionNew (incompatible client). In all
+        // cases, fall back to creating our own room — the retry loop will pick up
+        // a compatible host on the next cycle.
+        console.warn("[matchmaking] join existing room failed:", result.error);
         await createOwnRoom();
         return;
       }
@@ -182,6 +186,8 @@ export default function MatchmakingScreen() {
         setIsHost(false);
         setMatchState("found");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } else {
+        console.warn("[matchmaking] retry-join failed:", result.error);
       }
     }, 4000);
 

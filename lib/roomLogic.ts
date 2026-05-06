@@ -195,10 +195,18 @@ export async function findMatchmakingRoom(
 
   const cutoff = Date.now() - GHOST_ROOM_TTL_MS;
   const rooms = (data?.rooms ?? []) as RoomData[];
-  // Skip ghost rooms (host crashed/killed app) and pick deterministically:
-  // oldest first, tie-break on hostId — avoids 100 clients all picking the same row.
+  // Skip ghost rooms (host crashed/killed app), incompatible app versions
+  // (would fail joinMatchmakingRoom with versionOld/versionNew and silently
+  // fall back to bot mode), and pick deterministically: oldest first,
+  // tie-break on hostId.
   const candidates = rooms
-    .filter((r) => r.hostId !== userId && !r.guestId && r.createdAt > cutoff)
+    .filter(
+      (r) =>
+        r.hostId !== userId &&
+        !r.guestId &&
+        r.createdAt > cutoff &&
+        (!r.appVersion || r.appVersion === APP_VERSION),
+    )
     .sort(
       (a, b) =>
         a.createdAt - b.createdAt || a.hostId.localeCompare(b.hostId),
