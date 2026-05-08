@@ -61,6 +61,17 @@ export default function OnlineGameScreen() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const forfeitTriggeredRef = useRef(false);
   const [showQuitModal, setShowQuitModal] = useState(false);
+  // Defer LoadingCard mount so a fast InstantDB query doesn't flash the
+  // generic loading screen on top of the skin board for ~100-300 ms.
+  const [loadingVisible, setLoadingVisible] = useState(false);
+  useEffect(() => {
+    if (game && room) {
+      setLoadingVisible(false);
+      return;
+    }
+    const timer = setTimeout(() => setLoadingVisible(true), 250);
+    return () => clearTimeout(timer);
+  }, [game, room]);
 
   const opponentName = isHost ? room?.guestNickname ?? "Guest" : room?.hostNickname ?? "Host";
   const opponentAvatar = isHost ? room?.guestAvatar ?? "🧠" : room?.hostAvatar ?? "🧠";
@@ -181,7 +192,7 @@ export default function OnlineGameScreen() {
   if (!game || !room) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
-        <LoadingCard />
+        {loadingVisible && <LoadingCard />}
       </SafeAreaView>
     );
   }

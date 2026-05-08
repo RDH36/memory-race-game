@@ -12,8 +12,13 @@ import {
 } from "../lib/roomLogic";
 import { playFlip, playMatch } from "../lib/sound";
 
-const FLIP_DELAY = 800;
-const FEEDBACK_DURATION = 900;
+// Online resolves cards slower than local: the observer needs broadcast time
+// (150-300 ms typical) PLUS render time for premium skins (SVG-heavy boards
+// add another 100-300 ms) before the flipped cards are visually face-up. At
+// 800 ms the resolution would close cards before the opponent had even seen
+// them on slower devices. 1300 ms keeps a comfortable visibility window.
+const FLIP_DELAY = 1300;
+const FEEDBACK_DURATION = 1400;
 
 export type MatchResult = {
   type: "match" | "mismatch";
