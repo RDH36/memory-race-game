@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
-import { InteractionManager } from "react-native";
 
 /**
- * Returns true once nav transitions / pending interactions have settled.
- * Use to gate withRepeat/infinite Reanimated loops so they don't compete with
- * a slide-in animation for UI thread time.
+ * Returns true after a short delay on mount. Use to gate withRepeat/infinite
+ * Reanimated loops so they don't fire during the initial mount/transition.
+ *
+ * NOTE: previously used InteractionManager.runAfterInteractions, but in online
+ * games each broadcast counts as an interaction — runAfterInteractions then
+ * resolved precisely when broadcasts arrived, mounting the skin's particles
+ * (Sparks/Particles) right when the opponent's flip animation needed to start,
+ * delaying its visual start by 100-300 ms. A simple setTimeout is stable
+ * regardless of UI activity.
  */
-export function useDeferredAnimation(): boolean {
+export function useDeferredAnimation(delayMs = 200): boolean {
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    const handle = InteractionManager.runAfterInteractions(() => {
-      setReady(true);
-    });
-    return () => handle.cancel();
-  }, []);
+    const timer = setTimeout(() => setReady(true), delayMs);
+    return () => clearTimeout(timer);
+  }, [delayMs]);
   return ready;
 }
