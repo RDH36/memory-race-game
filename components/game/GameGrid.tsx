@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LayoutChangeEvent, View } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -30,7 +30,7 @@ interface GameGridProps {
   skin?: CardSkin;
 }
 
-function AnimatedCardSlotImpl({
+function AnimatedCardSlot({
   index,
   tornadoActive,
   cols,
@@ -104,17 +104,6 @@ function AnimatedCardSlotImpl({
     </Animated.View>
   );
 }
-
-// Custom comparator: ignore `children` (it's a fresh ReactElement every parent
-// render which broke the default shallow compare and forced re-render of all
-// 30 slots on every broadcast). The inner CardItem has its own memo, so
-// ignoring children here is safe and slashes commit cost during opponent flips.
-const AnimatedCardSlot = memo(AnimatedCardSlotImpl, (prev, next) =>
-  prev.index === next.index &&
-  prev.tornadoActive === next.tornadoActive &&
-  prev.cols === next.cols &&
-  prev.cardSize === next.cardSize,
-);
 
 export function GameGrid({
   positions,
