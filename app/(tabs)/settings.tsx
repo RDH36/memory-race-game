@@ -7,6 +7,7 @@ import { CheckUpdateRow } from "../../components/settings/CheckUpdateRow";
 import { FeedbackSupport } from "../../components/settings/FeedbackSupport";
 import { LanguageSelector } from "../../components/settings/LanguageSelector";
 import { LegalLinks } from "../../components/settings/LegalLinks";
+import { RateApp } from "../../components/settings/RateApp";
 import { ThemeSelector } from "../../components/settings/ThemeSelector";
 import { useTheme } from "../../lib/ThemeContext";
 
@@ -54,6 +55,8 @@ export default function SettingsScreen() {
         <FeedbackSupport />
 
         <View style={{ marginTop: 24 }} />
+
+        <RateApp />
 
         <LegalLinks />
 

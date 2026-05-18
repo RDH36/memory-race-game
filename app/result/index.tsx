@@ -23,6 +23,7 @@ import { Button } from "../../components/ui/Button";
 import { Label } from "../../components/ui/Label";
 import { useTheme } from "../../lib/ThemeContext";
 import { deleteRoom } from "../../lib/roomLogic";
+import { maybeRequestReview } from "../../lib/storeReview";
 import { MitsitsyCard } from "../../components/promo/MitsitsyCard";
 import { CelebrationModal } from "../../components/celebration/CelebrationModal";
 import {
@@ -205,6 +206,19 @@ export default function ResultScreen() {
     opacityStats.value = withDelay(1000, withTiming(1, { duration: 400 }));
     opacityButtons.value = withDelay(1200, withTiming(1, { duration: 400 }));
   }, []);
+
+  // In-app review prompt after a win (waits for animations + stats update)
+  const reviewTriggered = useRef(false);
+  const statsRef = useRef(stats);
+  statsRef.current = stats;
+  useEffect(() => {
+    if (effectiveWinner !== "p1" || reviewTriggered.current) return;
+    reviewTriggered.current = true;
+    const tid = setTimeout(() => {
+      maybeRequestReview({ won: true, gamesWon: statsRef.current.gamesWon });
+    }, 1700);
+    return () => clearTimeout(tid);
+  }, [effectiveWinner]);
 
   const headerStyle = useAnimatedStyle(() => ({ opacity: opacityHeader.value }));
   const titleStyle = useAnimatedStyle(() => ({ opacity: opacityTitle.value, transform: [{ scale: scaleTitle.value }] }));
