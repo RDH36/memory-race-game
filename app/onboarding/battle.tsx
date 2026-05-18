@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
+import { playFlip, playMatch } from "../../lib/sound";
 import { CardItem } from "../../components/game/CardItem";
 import { OpponentCard, ProgressDots, formatTime } from "../../components/game/PlayerHUD";
 import { usePlayerStats } from "../../lib/playerStats";
@@ -76,6 +77,7 @@ export default function BattleScreen() {
   const resolve = useCallback((a: number, b: number, player: 1 | 2) => {
     if (EMOJIS[a] === EMOJIS[b]) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      playMatch();
       const next = [...matchedByRef.current];
       next[a] = player;
       next[b] = player;
@@ -116,6 +118,7 @@ export default function BattleScreen() {
   const handleCardPress = useCallback((cardId: number) => {
     if (lockedRef.current || turn !== 1 || matchedByRef.current[cardId] !== -1 || selected.includes(cardId)) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    playFlip();
     const nextSelected = [...selected, cardId];
     setSelected(nextSelected);
     if (nextSelected.length === 2) {

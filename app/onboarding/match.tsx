@@ -15,6 +15,7 @@ import Animated, {
   interpolate,
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
+import { playFlip, playMatch } from "../../lib/sound";
 
 const EMOJIS = ["🐶", "🦊", "🐶", "🦊"];
 const GRID_ORDER = [0, 1, 2, 3]; // 2x2
@@ -125,6 +126,7 @@ export default function MatchScreen() {
       if (lockRef.current || faceUp.has(index) || matched.has(index)) return;
 
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      playFlip();
       const nextFaceUp = new Set(faceUp);
       nextFaceUp.add(index);
       setFaceUp(nextFaceUp);
@@ -139,6 +141,7 @@ export default function MatchScreen() {
         if (EMOJIS[a] === EMOJIS[b]) {
           // Match!
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          playMatch();
           const nextMatched = new Set(matched);
           nextMatched.add(a);
           nextMatched.add(b);

@@ -15,6 +15,7 @@ import Animated, {
   interpolate,
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
+import { playFlip, playMatch } from "../../lib/sound";
 
 const EMOJI = "🐶";
 const AnimatedView = Animated.createAnimatedComponent(View);
@@ -114,6 +115,7 @@ export default function FlipScreen() {
     if (step === "matched") return;
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    playFlip();
     const next = [...flipped];
     next[index] = true;
     setFlipped(next);
@@ -123,6 +125,7 @@ export default function FlipScreen() {
     } else if (step === "tap2") {
       setStep("matched");
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      playMatch();
       setTimeout(() => {
         router.push("/onboarding/match");
       }, 1200);

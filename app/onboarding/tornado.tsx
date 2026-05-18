@@ -14,6 +14,7 @@ import Animated, {
   interpolate,
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
+import { playFlip, playMatch } from "../../lib/sound";
 import { TornadoOverlay } from "../../components/game/TornadoOverlay";
 import { ActionBar } from "../../components/game/ActionBar";
 
@@ -137,6 +138,7 @@ export default function TornadoScreen() {
     // Shuffle cards during the overlay animation
     setTimeout(() => {
       setShuffling(true);
+      playFlip();
       setEmojis(SHUFFLED_EMOJIS);
       setTimeout(() => setShuffling(false), 400);
     }, 2000);
@@ -146,6 +148,7 @@ export default function TornadoScreen() {
     setShowOverlay(false);
     setPhase("done");
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    playMatch();
   };
 
   const handleContinue = () => {
