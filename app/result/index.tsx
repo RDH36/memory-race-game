@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, Pressable } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as Haptics from "expo-haptics";
 import { useTranslation } from "react-i18next";
+import { haptics } from "@/lib/haptics";
 import { usePlayerStats } from "../../lib/playerStats";
 import { useRewardedAd } from "../../hooks/useRewardedAd";
 import { usePremium } from "../../hooks/useEntitlements";
@@ -19,8 +19,7 @@ import { ConfettiParticles } from "../../components/result/ConfettiParticles";
 import { ScoreCard } from "../../components/result/ScoreCard";
 import { StatItem } from "../../components/result/StatItem";
 import { XpRewardBar } from "../../components/result/XpRewardBar";
-import { Button } from "../../components/ui/Button";
-import { Label } from "../../components/ui/Label";
+import { Btn3D, Mascot } from "@/components/ui/arcade";
 import { useTheme } from "../../lib/ThemeContext";
 import { deleteRoom } from "../../lib/roomLogic";
 import { maybeRequestReview } from "../../lib/storeReview";
@@ -93,12 +92,12 @@ export default function ResultScreen() {
   const onBonusReward = useCallback(() => {
     addBonusXp(10);
     setBonusClaimed(true);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    haptics.coin();
   }, [addBonusXp]);
   const { isLoaded: rewardedLoaded, showAd: showRewardedAd } = useRewardedAd(onBonusReward);
   const premium = usePremium();
 
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   const isCasual = mode === "casual";
   const isMatchmaking = matchmaking === "1";
@@ -134,6 +133,7 @@ export default function ResultScreen() {
     ? (iWonForfeit ? t("result.forfeitWin") : t("result.forfeitLoss"))
     : effectiveWinner === "draw" ? t("result.drawHighlight") : effectiveWinner === "p1" ? t("result.youWonHighlight") : t("result.youLostHighlight");
   const resultColor = effectiveWinner === "p1" ? colors.success : effectiveWinner === "p2" ? colors.error : colors.primaryContainer;
+  const mascotEmoji = effectiveWinner === "p1" ? "🦊" : effectiveWinner === "p2" ? "😿" : "🤝";
 
   // Record game result once
   useEffect(() => {
@@ -194,9 +194,11 @@ export default function ResultScreen() {
 
   useEffect(() => {
     if (effectiveWinner === "p1") {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptics.win();
     } else if (effectiveWinner === "p2") {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      haptics.lose();
+    } else {
+      haptics.draw();
     }
     opacityHeader.value = withTiming(1, { duration: 300 });
     opacityTitle.value = withDelay(200, withTiming(1, { duration: 400 }));
@@ -235,15 +237,18 @@ export default function ResultScreen() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header label */}
-        <Animated.View style={headerStyle}>
-          <Label text={isCasual ? t("result.headerCasual") : t("result.header")} style={{ marginBottom: 8 }} />
+        {/* Mascot + outcome title */}
+        <Animated.View style={[headerStyle, { alignItems: "center", marginTop: 8 }]}>
+          <Mascot emoji={mascotEmoji} size={80} />
         </Animated.View>
-
-        {/* Title */}
-        <Animated.View style={[titleStyle, { marginBottom: 24 }]}>
-          <Text style={{ fontSize: 32, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
-            {resultTitle} <Text style={{ color: resultColor }}>{resultHighlight}</Text>
+        <Animated.View style={[titleStyle, { alignItems: "center", marginBottom: 24 }]}>
+          <Text style={{ fontSize: 38, fontFamily: "Fredoka_700Bold", color: resultColor, textAlign: "center" }}>
+            {resultHighlight || resultTitle}
+          </Text>
+          <Text
+            style={{ fontSize: 13, fontFamily: "Fredoka_700Bold", color: colors.onSurfaceMuted, marginTop: 4 }}
+          >
+            {isCasual ? t("result.headerCasual") : t("result.header")}
           </Text>
         </Animated.View>
 
@@ -256,6 +261,7 @@ export default function ResultScreen() {
             p2Avatar={displayOpponentAvatar}
             p2Name={displayOpponentName}
             p2Score={s2}
+            winner={effectiveWinner}
           />
         </Animated.View>
 
@@ -284,17 +290,16 @@ export default function ResultScreen() {
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 8,
-                backgroundColor: "#D4820A" + "18",
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: "#D4820A" + "40",
-                paddingVertical: 12,
+                backgroundColor: colors.hues.gold[2],
+                borderRadius: 16,
+                paddingVertical: 14,
                 paddingHorizontal: 16,
                 opacity: rewardedLoaded ? 1 : 0.5,
+                boxShadow: `0 3px 0 ${colors.panelLip}`,
               }}
             >
               <Text style={{ fontSize: 18 }}>🎬</Text>
-              <Text style={{ fontSize: 14, fontFamily: "Fredoka_700Bold", color: "#D4820A" }}>
+              <Text style={{ fontSize: 14, fontFamily: "Fredoka_700Bold", color: colors.warning }}>
                 {t("result.watchAdBonus")}
               </Text>
             </Pressable>
@@ -331,41 +336,48 @@ export default function ResultScreen() {
         </Animated.View>
 
         {/* Action buttons */}
-        <Animated.View style={[buttonsStyle, { flexDirection: "row", gap: 8, width: "100%" }]}>
-          <Button
-            icon="🔀"
-            text={t("result.newGame")}
-            variant="primary"
-            loading={loading === "new"}
-            disabled={loading !== null && loading !== "new"}
-            style={{ flex: 1 }}
-            onPress={() => {
-              setLoading("new");
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              cleanupRoom();
-              if (isMatchmaking) {
-                router.replace("/room/matchmaking");
-              } else if (isCasual) {
-                router.replace("/mode/casual");
-              } else {
-                router.replace("/mode/solo");
-              }
-            }}
-          />
-          <Button
-            icon="🏠"
-            text={t("result.goHome")}
-            variant="ghost"
-            loading={loading === "home"}
-            disabled={loading !== null && loading !== "home"}
-            style={{ flex: 1 }}
-            onPress={() => {
-              setLoading("home");
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              cleanupRoom();
-              router.replace("/(tabs)");
-            }}
-          />
+        <Animated.View style={[buttonsStyle, { flexDirection: "row", gap: 11, width: "100%" }]}>
+          <View style={{ flex: 1 }}>
+            <Btn3D
+              color="violet"
+              size="lg"
+              full
+              haptic="press"
+              label={t("result.newGame")}
+              loading={loading === "new"}
+              disabled={loading !== null && loading !== "new"}
+              onPress={() => {
+                setLoading("new");
+                cleanupRoom();
+                if (isMatchmaking) {
+                  router.replace("/room/matchmaking");
+                } else if (isCasual) {
+                  router.replace("/mode/casual");
+                } else {
+                  router.replace("/mode/solo");
+                }
+              }}
+            >
+              <Text style={{ fontSize: 16 }}>🔀</Text>
+            </Btn3D>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Btn3D
+              color="white"
+              size="lg"
+              full
+              label={t("result.goHome")}
+              loading={loading === "home"}
+              disabled={loading !== null && loading !== "home"}
+              onPress={() => {
+                setLoading("home");
+                cleanupRoom();
+                router.replace("/(tabs)");
+              }}
+            >
+              <Text style={{ fontSize: 16 }}>🏠</Text>
+            </Btn3D>
+          </View>
         </Animated.View>
 
         {/* Cross-promo Mitsitsy */}

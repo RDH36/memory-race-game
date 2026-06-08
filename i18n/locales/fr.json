@@ -43,10 +43,89 @@
     "dailyReward": "Récompense quotidienne",
     "dailyRewardSubtitle": "Réclame tes +{{xp}} XP gratuits",
     "dailyRewardClaim": "Réclamer",
-    "dailyRewardClaimed": "Reviens demain !"
+    "dailyRewardClaimed": "Reviens demain !",
+    "heroBubble": "Prêt pour un duel ?",
+    "heroBubbles": [
+      "Rusé comme un renard ?",
+      "Un câlin, puis on joue ?",
+      "Montre tes crocs !",
+      "Rugis et retourne les cartes !",
+      "Saute sur les paires !",
+      "Huit bras pour jouer vite !",
+      "Sage comme un hibou ?",
+      "Réveille-toi, on joue !",
+      "Petit malin, trouve les paires !",
+      "Un peu de magie ?",
+      "La meute t'attend !",
+      "Mémoire d'ours, prêt ?"
+    ],
+    "heroTagline": "TROUVE LES PAIRES • BATS TON RIVAL",
+    "playCta": "JOUER",
+    "quickModes": "Modes rapides",
+    "duel": "Duel",
+    "duelDesc": "Crée un salon",
+    "soloShort": "Solo",
+    "soloShortDesc": "vs IA",
+    "quickShort": "Rapide",
+    "quickShortDesc": "En ligne",
+    "rankedShort": "Classé",
+    "rankedShortDesc": "Bientôt",
+    "statGames": "Parties",
+    "statWins": "Victoires",
+    "statStreak": "Série",
+    "leaderboardTitle": "Classement",
+    "leaderboardSub": "Vois ton rang cette semaine"
   },
   "game": {
     "menu": "Menu",
+    "turnBadge": "JOUE",
+    "personas": {
+      "cute": {
+        "match": ["Yay ! Bravo !", "Trop bien joué !", "Hihi, gagné !"],
+        "miss": ["C'est pas grave !", "Tu y es presque !", "Courage, continue !"],
+        "encourage": ["Tu peux le faire !", "Allez allez !", "Je crois en toi !"]
+      },
+      "sly": {
+        "match": ["Hé hé, vu ?", "Trop facile…", "Dans la poche."],
+        "miss": ["Mmh, presque.", "La prochaine !", "Bien tenté."],
+        "encourage": ["Concentre-toi…", "Trouve la faille !", "Vise bien."]
+      },
+      "fierce": {
+        "match": ["RAAH ! Ouais !", "Puissance !", "On les écrase !"],
+        "miss": ["Grr, recommence !", "Pas grave, FONCE !", "Reste fort !"],
+        "encourage": ["Domine le jeu !", "Montre ta force !", "À l'attaque !"]
+      },
+      "robot": {
+        "match": ["Paire validée.", "Calcul exact.", "Efficacité 100%."],
+        "miss": ["Erreur. Recalibrage.", "Donnée incorrecte.", "Réessaie."],
+        "encourage": ["Analyse en cours…", "Optimise tes choix.", "Probabilité élevée."]
+      },
+      "zen": {
+        "match": ["Joli coup.", "Bien vu.", "L'esprit clair gagne."],
+        "miss": ["Respire, recommence.", "Tout vient à point.", "Pas de panique."],
+        "encourage": ["Reste calme.", "Observe bien.", "Confiance."]
+      },
+      "crown": {
+        "match": ["Magnifique.", "Comme il se doit.", "La couronne brille."],
+        "miss": ["Un roi se relève.", "Noblesse oblige.", "Patience royale."],
+        "encourage": ["Règne sur le plateau.", "Avec panache !", "Montre ta grandeur."]
+      },
+      "angel": {
+        "match": ["Divin !", "Béni soit ce coup.", "Lumineux !"],
+        "miss": ["Garde la foi.", "Tout ira bien.", "Reste serein."],
+        "encourage": ["La lumière te guide.", "Aie confiance.", "Élève ton jeu."]
+      },
+      "demon": {
+        "match": ["Mouhaha !", "Brûle de victoire !", "Infernal !"],
+        "miss": ["Grrr… maudit !", "Les flammes attendront.", "Encore une âme…"],
+        "encourage": ["Sème le chaos !", "Domine par le feu !", "Sois impitoyable."]
+      },
+      "default": {
+        "match": ["Bravo !", "Trouvé !", "Bien joué !"],
+        "miss": ["Oups…", "Presque !", "Continue !"],
+        "encourage": ["À toi !", "Concentre-toi !", "Trouve une paire !"]
+      }
+    },
     "ia": "IA",
     "pairs": "PAIRES",
     "you": "Toi",

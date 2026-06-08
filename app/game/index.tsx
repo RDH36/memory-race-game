@@ -1,11 +1,14 @@
-import { BackHandler, Pressable, Text, View } from "react-native";
+import { BackHandler, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocalGame } from "../../hooks/useLocalGame";
 import { GameGrid } from "../../components/game/GameGrid";
-import { OpponentCard, ProgressDots, formatTime } from "../../components/game/PlayerHUD";
+import { formatTime } from "../../components/game/PlayerHUD";
+import { BattleHUD } from "../../components/game/arcade/BattleHUD";
+import { useGameChatter } from "../../components/game/arcade/useGameChatter";
+import { IconBtn } from "@/components/ui/arcade";
 import { ActionBar } from "../../components/game/ActionBar";
 import { TornadoOverlay } from "../../components/game/TornadoOverlay";
 import { MatchFeedback } from "../../components/game/MatchFeedback";
@@ -27,7 +30,7 @@ export default function GameScreen() {
   const { difficulty = "medium", xpBoost = "0" } = useLocalSearchParams<{ difficulty?: string; xpBoost?: string }>();
   const router = useRouter();
   const { t } = useTranslation();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const { avatar, selectedTable } = usePlayerStats();
   const premium = usePremium();
   const skin = getCardSkin(selectedTable);
@@ -103,60 +106,45 @@ export default function GameScreen() {
 
   const gridConfig = GRID_CONFIG[(difficulty as CpuDifficulty) ?? 'medium'];
   const totalPairs = gridConfig.totalCards / 2;
-  const cpuLevel = t(`home.difficulty.${difficulty}`);
+  const chatter = useGameChatter({
+    lastMatchResult,
+    currentTurn: game.currentTurn as 1 | 2,
+    status: game.status,
+    playerAvatar: avatar,
+    opponentAvatar: cpu.avatar,
+  });
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
       <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 4, paddingBottom: 8 }}>
-        {/* Header — back button */}
+        {/* Top bar — back */}
         <View style={{ marginBottom: 10 }}>
-          <Pressable
-            onPress={confirmQuit}
-            hitSlop={16}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              alignSelf: "flex-start",
-              paddingVertical: 6,
-              paddingHorizontal: 10,
-              borderRadius: 10,
-              backgroundColor: colors.surfaceContainer,
-            }}
-          >
-            <Text style={{ fontSize: 18, color: colors.onSurfaceVariant, marginRight: 4 }}>←</Text>
-            <Text style={{ fontSize: 14, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceVariant }}>
-              {t("game.menu")}
-            </Text>
-          </Pressable>
+          <IconBtn color="white" onPress={confirmQuit}>
+            ✕
+          </IconBtn>
         </View>
 
-        {/* Opponent card — IA */}
-        <OpponentCard
-          name={cpu.name}
-          subtitle={`🤖 ${t("game.ia")} · ${cpuLevel}`}
-          avatar={cpu.avatar}
-          pairsMatched={game.scores.p2}
+        {/* Battle HUD — you vs IA + score + bubbles + turn timer */}
+        <BattleHUD
+          player={{
+            avatar,
+            name: t("game.you"),
+            score: game.scores.p1,
+            active: game.currentTurn === 1,
+          }}
+          opponent={{
+            avatar: cpu.avatar,
+            name: cpu.name,
+            score: game.scores.p2,
+            active: game.currentTurn === 2,
+          }}
+          matched={game.scores.p1 + game.scores.p2}
           totalPairs={totalPairs}
-          isActive={game.currentTurn === 2}
-          timerSeconds={game.currentTurn === 2 ? turnTimer : 0}
+          chatter={chatter}
+          timer={{ text: formatTime(turnTimer) }}
         />
 
-        {/* Score */}
-        <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "center", marginVertical: 8 }}>
-          <Text style={{ fontSize: 11, fontFamily: "Nunito_700Bold", color: colors.onSurfaceVariant, letterSpacing: 1, marginRight: 8 }}>
-            {t("game.pairs")}
-          </Text>
-          <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.p1 }}>
-            {game.scores.p1}
-          </Text>
-          <Text style={{ fontSize: 14, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginHorizontal: 6 }}>—</Text>
-          <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.p2 }}>
-            {game.scores.p2}
-          </Text>
-          <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginLeft: 4 }}>
-            / {totalPairs}
-          </Text>
-        </View>
+        <View style={{ height: 12 }} />
 
         {/* Grid */}
         <View style={{ flex: 1 }}>
@@ -178,48 +166,6 @@ export default function GameScreen() {
 
         {/* Tornado card */}
         <ActionBar canUseTornado={canUseTornado} tornadoUsed={game.tornadoUsed.p1} onTornado={handleTornado} />
-
-        {/* Player bar */}
-        <View style={{ flexDirection: "row", alignItems: "center", marginTop: 10, gap: 10 }}>
-          <View
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              backgroundColor: colors.primaryContainerBg,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text style={{ fontSize: 18 }}>{avatar}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 14, fontFamily: "Fredoka_600SemiBold", color: colors.onSurface }}>{t("game.you")}</Text>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-              <Text style={{ fontSize: 11, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant }}>{t("game.player")}</Text>
-              {!game.tornadoUsed.p1 && <Text style={{ fontSize: 11 }}>🌪️</Text>}
-            </View>
-          </View>
-          <ProgressDots filled={game.scores.p1} total={totalPairs} />
-          <View
-            style={{
-              backgroundColor: game.currentTurn === 1 ? colors.primaryContainerBg : isDark ? '#2A2A2A' : '#F5F2F2',
-              paddingHorizontal: 10,
-              paddingVertical: 6,
-              borderRadius: 10,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 14,
-                fontFamily: "Fredoka_600SemiBold",
-                color: game.currentTurn === 1 ? colors.primaryContainer : colors.onSurfaceVariant,
-              }}
-            >
-              {formatTime(game.currentTurn === 1 ? turnTimer : 0)}
-            </Text>
-          </View>
-        </View>
       </View>
 
       {game.tornadoActive && (

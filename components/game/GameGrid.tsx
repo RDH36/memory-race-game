@@ -118,23 +118,33 @@ export function GameGrid({
   cols = 4,
   skin = 'classic',
 }: GameGridProps) {
-  const [cardSize, setCardSize] = useState(0);
+  const [dims, setDims] = useState<{ w: number; h: number } | null>(null);
   const totalCards = positions.length;
-  const rows = Math.ceil(totalCards / cols);
   const gridIndices = useMemo(
     () => Array.from({ length: totalCards }, (_, i) => i),
     [totalCards],
   );
 
-  const onLayout = useCallback(
-    (e: LayoutChangeEvent) => {
-      const { width, height } = e.nativeEvent.layout;
-      const maxW = (width - (cols - 1) * GAP) / cols;
-      const maxH = (height - (rows - 1) * GAP) / rows;
-      setCardSize(Math.floor(Math.min(maxW, maxH)));
-    },
-    [cols, rows],
-  );
+  const onLayout = useCallback((e: LayoutChangeEvent) => {
+    const { width, height } = e.nativeEvent.layout;
+    setDims({ w: width, h: height });
+  }, []);
+
+  // Pick the column count (≤ the configured one) that yields the biggest
+  // square card — so few-card boards (6/8 pairs) grow to fill the space
+  // instead of staying narrow at a fixed 4 columns.
+  const { effectiveCols, cardSize } = useMemo(() => {
+    if (!dims) return { effectiveCols: cols, cardSize: 0 };
+    let best = { c: cols, s: 0 };
+    for (let c = 2; c <= cols; c++) {
+      const r = Math.ceil(totalCards / c);
+      const w = (dims.w - (c - 1) * GAP) / c;
+      const h = (dims.h - (r - 1) * GAP) / r;
+      const s = Math.min(w, h);
+      if (s > best.s) best = { c, s };
+    }
+    return { effectiveCols: best.c, cardSize: Math.floor(best.s) };
+  }, [dims, cols, totalCards]);
 
   const grid = (
     <View
@@ -148,7 +158,7 @@ export function GameGrid({
             flexWrap: 'wrap',
             gap: GAP,
             justifyContent: 'center',
-            width: cols * cardSize + (cols - 1) * GAP,
+            width: effectiveCols * cardSize + (effectiveCols - 1) * GAP,
           }}
         >
           {gridIndices.map((gridIdx) => {
@@ -171,7 +181,7 @@ export function GameGrid({
                 key={gridIdx}
                 index={gridIdx}
                 tornadoActive={tornadoActive}
-                cols={cols}
+                cols={effectiveCols}
                 cardSize={cardSize}
               >
                 <CardItem

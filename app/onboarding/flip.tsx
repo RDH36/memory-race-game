@@ -71,14 +71,15 @@ function TutorialCard({
               width: "100%",
               height: "100%",
               backfaceVisibility: "hidden",
-              backgroundColor: colors.p1Bg,
-              borderRadius: 12,
+              backgroundColor: colors.hues.violet[0],
+              borderRadius: 18,
               justifyContent: "center",
               alignItems: "center",
+              boxShadow: `0 4px 0 ${colors.hues.violet[1]}, 0 12px 22px -12px ${colors.panelShadow}`,
             },
           ]}
         >
-          <Text style={{ fontSize: 28, fontFamily: "Fredoka_700Bold", color: colors.p1 }}>?</Text>
+          <Text style={{ fontSize: 28, fontFamily: "Fredoka_700Bold", color: "#fff" }}>?</Text>
         </AnimatedView>
         <AnimatedView
           style={[
@@ -89,11 +90,12 @@ function TutorialCard({
               height: "100%",
               backfaceVisibility: "hidden",
               backgroundColor: colors.surfaceContainer,
-              borderRadius: 12,
+              borderRadius: 18,
               justifyContent: "center",
               alignItems: "center",
               borderWidth: 2,
               borderColor: colors.p1 + "33",
+              boxShadow: `0 4px 0 ${colors.panelLip}, 0 12px 22px -12px ${colors.panelShadow}`,
             },
           ]}
         >

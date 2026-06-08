@@ -1,15 +1,15 @@
-import { BackHandler, Pressable, Text, View } from "react-native";
+import { BackHandler, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import Animated, { FadeInDown } from "react-native-reanimated";
-import * as Haptics from "expo-haptics";
 import { useOnlineGame } from "../../hooks/useOnlineGame";
 import { useBotPlayer } from "../../hooks/useBotPlayer";
-import { useRoom, forfeitRoom, deleteRoom } from "../../lib/roomLogic";
+import { useRoom, forfeitRoom } from "../../lib/roomLogic";
 import { GameGrid } from "../../components/game/GameGrid";
-import { OpponentCard, ProgressDots } from "../../components/game/PlayerHUD";
+import { BattleHUD } from "../../components/game/arcade/BattleHUD";
+import { useGameChatter } from "../../components/game/arcade/useGameChatter";
+import { IconBtn } from "@/components/ui/arcade";
 import { ActionBar } from "../../components/game/ActionBar";
 import { TornadoOverlay } from "../../components/game/TornadoOverlay";
 import { MatchFeedback } from "../../components/game/MatchFeedback";
@@ -24,15 +24,6 @@ import { getCardSkin } from "../../lib/skins";
 
 const TURN_TIMEOUT = 60;
 
-function Tooltip({ text }: { text: string }) {
-  const { colors } = useTheme();
-  return (
-    <Animated.View entering={FadeInDown.duration(250)} style={{ backgroundColor: colors.primaryContainer, borderRadius: 18, paddingHorizontal: 24, paddingVertical: 14, alignSelf: "stretch", marginHorizontal: 4 }}>
-      <Text style={{ color: "#FFF", fontFamily: "Fredoka_700Bold", fontSize: 18, textAlign: "center" }}>{text}</Text>
-    </Animated.View>
-  );
-}
-
 export default function OnlineGameScreen() {
   const { roomCode, difficulty = "medium", botMode: botModeParam } = useLocalSearchParams<{
     roomCode: string;
@@ -42,7 +33,7 @@ export default function OnlineGameScreen() {
   const isBotMode = botModeParam === "1";
   const router = useRouter();
   const { t } = useTranslation();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const { avatar, userId, nickname, selectedTable } = usePlayerStats();
   const premium = usePremium();
   const skin = getCardSkin(selectedTable);
@@ -188,6 +179,15 @@ export default function OnlineGameScreen() {
     }
   }, [game?.status, room?.status, premium]);
 
+  const chatter = useGameChatter({
+    lastMatchResult,
+    currentTurn: (game?.currentTurn ?? 1) as 1 | 2,
+    status: game?.status ?? "loading",
+    meIsPlayer: isHost ? 1 : 2,
+    playerAvatar: avatar,
+    opponentAvatar,
+  });
+
   // --- Loading ---
   if (!game || !room) {
     return (
@@ -203,53 +203,29 @@ export default function OnlineGameScreen() {
   const opponentScore = isHost ? game.scores.p2 : game.scores.p1;
   const tornadoKey = isHost ? "p1" : "p2";
   const canUseTornado = myTurn && !game.tornadoUsed[tornadoKey] && !game.locked && !game.tornadoActive && game.status === "playing";
-
-  const turnLabel = myTurn
-    ? `${t("room.yourTurn")} · ⏱️ ${turnTimer}s`
-    : `${t("room.turnOf")} ${opponentName} · ⏱️ ${turnTimer}s`;
+  const timeLow = turnTimer <= 10;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
       <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 4, paddingBottom: 8 }}>
-        {/* Back button */}
+        {/* Top bar — back */}
         <View style={{ marginBottom: 10 }}>
-          <Pressable onPress={confirmQuit} hitSlop={16}
-            style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-start", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 10, backgroundColor: colors.surfaceContainer }}
-          >
-            <Text style={{ fontSize: 18, color: colors.onSurfaceVariant, marginRight: 4 }}>←</Text>
-            <Text style={{ fontSize: 14, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceVariant }}>{t("game.menu")}</Text>
-          </Pressable>
+          <IconBtn color="white" onPress={confirmQuit}>
+            ✕
+          </IconBtn>
         </View>
 
-        {/* Opponent card */}
-        <OpponentCard
-          name={opponentName}
-          subtitle={`👤 ${t("room.friend")}`}
-          avatar={opponentAvatar}
-          pairsMatched={opponentScore}
+        {/* Battle HUD — you vs opponent + score + bubbles + 60s turn timer */}
+        <BattleHUD
+          player={{ avatar, name: myName, score: myScore, active: myTurn }}
+          opponent={{ avatar: opponentAvatar, name: opponentName, score: opponentScore, active: !myTurn }}
+          matched={myScore + opponentScore}
           totalPairs={totalPairs}
-          isActive={!myTurn}
-          timerSeconds={0}
-          hideTimer
+          chatter={chatter}
+          timer={{ text: `${turnTimer}s`, low: timeLow }}
         />
 
-        {/* Score */}
-        <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "center", marginVertical: 8 }}>
-          <Text style={{ fontSize: 11, fontFamily: "Nunito_700Bold", color: colors.onSurfaceVariant, letterSpacing: 1, marginRight: 8 }}>
-            {t("game.pairs")}
-          </Text>
-          <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.p1 }}>{myScore}</Text>
-          <Text style={{ fontSize: 14, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginHorizontal: 6 }}>—</Text>
-          <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.p2 }}>{opponentScore}</Text>
-          <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginLeft: 4 }}>/ {totalPairs}</Text>
-        </View>
-
-        {/* Turn tooltip with timer */}
-        <View style={{ minHeight: 44, marginBottom: 4 }}>
-          {game.status === "playing" && (
-            <Tooltip key={`turn-${game.currentTurn}-${turnTimer <= 10 ? "red" : "ok"}`} text={turnLabel} />
-          )}
-        </View>
+        <View style={{ height: 12 }} />
 
         {/* Grid */}
         <View style={{ flex: 1 }}>
@@ -271,21 +247,6 @@ export default function OnlineGameScreen() {
 
         {/* Tornado */}
         <ActionBar canUseTornado={canUseTornado} tornadoUsed={game.tornadoUsed[tornadoKey]} onTornado={handleTornado} />
-
-        {/* Player bar */}
-        <View style={{ flexDirection: "row", alignItems: "center", marginTop: 10, gap: 10 }}>
-          <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: colors.primaryContainerBg, alignItems: "center", justifyContent: "center" }}>
-            <Text style={{ fontSize: 18 }}>{avatar}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 14, fontFamily: "Fredoka_600SemiBold", color: colors.onSurface }}>{t("game.you")}</Text>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-              <Text style={{ fontSize: 11, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant }}>{t("game.player")}</Text>
-              {!game.tornadoUsed[tornadoKey] && <Text style={{ fontSize: 11 }}>🌪️</Text>}
-            </View>
-          </View>
-          <ProgressDots filled={myScore} total={totalPairs} />
-        </View>
       </View>
 
       {game.tornadoActive && <TornadoOverlay onComplete={handleTornadoComplete} />}

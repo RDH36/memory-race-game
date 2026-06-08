@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
@@ -17,6 +17,7 @@ import { useTheme } from "../../lib/ThemeContext";
 import { playFlip, playMatch } from "../../lib/sound";
 import { TornadoOverlay } from "../../components/game/TornadoOverlay";
 import { ActionBar } from "../../components/game/ActionBar";
+import { Btn3D } from "@/components/ui/arcade";
 
 const INITIAL_EMOJIS = ["🐱", "🦁", "🐸", "🐱", "🦁", "🐸"];
 const SHUFFLED_EMOJIS = ["🦁", "🐸", "🐱", "🐸", "🐱", "🦁"];
@@ -79,13 +80,14 @@ function GridCard({
               height: "100%",
               backfaceVisibility: "hidden",
               backgroundColor: colors.p1Bg,
-              borderRadius: 10,
+              borderRadius: 16,
               justifyContent: "center",
               alignItems: "center",
+              boxShadow: `0 4px 0 ${colors.panelLip}, 0 12px 22px -12px ${colors.panelShadow}`,
             },
           ]}
         >
-          <Text style={{ fontSize: 20, fontFamily: "Fredoka_700Bold", color: colors.p1 }}>?</Text>
+          <Text style={{ fontSize: 22, fontFamily: "Fredoka_700Bold", color: colors.p1 }}>?</Text>
         </AnimatedView>
         <AnimatedView
           style={[
@@ -96,9 +98,10 @@ function GridCard({
               height: "100%",
               backfaceVisibility: "hidden",
               backgroundColor: colors.surfaceContainer,
-              borderRadius: 10,
+              borderRadius: 16,
               justifyContent: "center",
               alignItems: "center",
+              boxShadow: `0 4px 0 ${colors.panelLip}, 0 12px 22px -12px ${colors.panelShadow}`,
             },
           ]}
         >
@@ -152,7 +155,6 @@ export default function TornadoScreen() {
   };
 
   const handleContinue = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push("/onboarding/ready");
   };
 
@@ -248,19 +250,16 @@ export default function TornadoScreen() {
         {/* ActionBar (real game component) or CTA */}
         <Animated.View entering={FadeInDown.delay(600).duration(400)} style={{ paddingBottom: 24 }}>
           {phase === "done" ? (
-            <Pressable
+            <Btn3D
+              color="violet"
+              size="lg"
+              full
+              haptic="press"
+              label={t("onboarding.tornado.cta")}
               onPress={handleContinue}
-              style={{
-                backgroundColor: colors.primaryContainer,
-                borderRadius: 16,
-                paddingVertical: 16,
-                alignItems: "center",
-              }}
             >
-              <Text style={{ fontSize: 16, fontFamily: "Fredoka_600SemiBold", color: "#FFFFFF" }}>
-                {t("onboarding.tornado.cta")} →
-              </Text>
-            </Pressable>
+              <Text style={{ fontSize: 18, color: "#fff" }}>→</Text>
+            </Btn3D>
           ) : (
             <ActionBar
               canUseTornado={phase === "ready"}

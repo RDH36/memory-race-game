@@ -16,6 +16,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { playFlip, playMatch } from "../../lib/sound";
+import { Btn3D } from "@/components/ui/arcade";
 
 const EMOJIS = ["🐶", "🦊", "🐶", "🦊"];
 const GRID_ORDER = [0, 1, 2, 3]; // 2x2
@@ -77,14 +78,15 @@ function MiniCard({
               width: "100%",
               height: "100%",
               backfaceVisibility: "hidden",
-              backgroundColor: colors.p1Bg,
-              borderRadius: 12,
+              backgroundColor: colors.hues.violet[0],
+              borderRadius: 16,
               justifyContent: "center",
               alignItems: "center",
+              boxShadow: `0 4px 0 ${colors.hues.violet[1]}`,
             },
           ]}
         >
-          <Text style={{ fontSize: 24, fontFamily: "Fredoka_700Bold", color: colors.p1 }}>?</Text>
+          <Text style={{ fontSize: 28, fontFamily: "Fredoka_700Bold", color: "#FFFFFF" }}>?</Text>
         </AnimatedView>
         <AnimatedView
           style={[
@@ -95,11 +97,14 @@ function MiniCard({
               height: "100%",
               backfaceVisibility: "hidden",
               backgroundColor: isMatched ? colors.successBg : colors.surfaceContainer,
-              borderRadius: 12,
+              borderRadius: 16,
               justifyContent: "center",
               alignItems: "center",
               borderWidth: isMatched ? 2 : 0,
               borderColor: isMatched ? colors.success + "55" : "transparent",
+              boxShadow: isMatched
+                ? `0 4px 0 ${colors.success}55`
+                : `0 4px 0 ${colors.panelLip}, 0 12px 22px -12px ${colors.panelShadow}`,
             },
           ]}
         >
@@ -169,7 +174,6 @@ export default function MatchScreen() {
   );
 
   const handleContinue = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push("/onboarding/tornado");
   };
 
@@ -255,25 +259,16 @@ export default function MatchScreen() {
         {/* CTA */}
         {allDone && (
           <Animated.View entering={FadeInDown.duration(500)} style={{ paddingBottom: 24 }}>
-            <Pressable
+            <Btn3D
+              color="violet"
+              size="lg"
+              full
+              haptic="press"
+              label={t("onboarding.match.cta")}
               onPress={handleContinue}
-              style={{
-                backgroundColor: colors.primaryContainer,
-                borderRadius: 16,
-                paddingVertical: 16,
-                alignItems: "center",
-              }}
             >
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontFamily: "Fredoka_600SemiBold",
-                  color: "#FFFFFF",
-                }}
-              >
-                {t("onboarding.match.cta")} →
-              </Text>
-            </Pressable>
+              <Text style={{ fontSize: 18, color: "#fff" }}>→</Text>
+            </Btn3D>
           </Animated.View>
         )}
       </View>

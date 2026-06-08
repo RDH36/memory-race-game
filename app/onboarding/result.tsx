@@ -1,27 +1,23 @@
 import { useEffect } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
-import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Animated, {
   FadeInDown,
   FadeIn,
   useSharedValue,
   useAnimatedStyle,
-  withRepeat,
-  withSequence,
   withSpring,
-  withTiming,
   withDelay,
-  Easing,
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { ConfettiParticles } from "../../components/result/ConfettiParticles";
+import { Btn3D, Mascot } from "@/components/ui/arcade";
 
-function BounceEmoji({ emoji, result }: { emoji: string; result: string }) {
+function BounceMascot({ emoji, result }: { emoji: string; result: string }) {
   const scale = useSharedValue(0);
 
   useEffect(() => {
@@ -38,69 +34,10 @@ function BounceEmoji({ emoji, result }: { emoji: string; result: string }) {
   return (
     <View style={{ alignItems: "center" }}>
       {result === "won" && <ConfettiParticles />}
-      <Animated.Text style={[style, { fontSize: 72 }]}>{emoji}</Animated.Text>
+      <Animated.View style={style}>
+        <Mascot emoji={emoji} size={84} />
+      </Animated.View>
     </View>
-  );
-}
-
-function PulsingCta({
-  label,
-  onPress,
-  bgColor,
-}: {
-  label: string;
-  onPress: () => void;
-  bgColor: string;
-}) {
-  const pulseScale = useSharedValue(1);
-
-  useEffect(() => {
-    pulseScale.value = withDelay(
-      1200,
-      withRepeat(
-        withSequence(
-          withTiming(1.04, { duration: 800, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 800, easing: Easing.inOut(Easing.ease) }),
-        ),
-        -1,
-        true,
-      ),
-    );
-  }, []);
-
-  const style = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseScale.value }],
-  }));
-
-  return (
-    <Animated.View
-      entering={FadeInDown.delay(1200).duration(500)}
-      style={{ paddingBottom: 24 }}
-    >
-      <Pressable onPress={onPress}>
-        <Animated.View
-          style={[
-            style,
-            {
-              backgroundColor: bgColor,
-              borderRadius: 16,
-              paddingVertical: 18,
-              alignItems: "center",
-            },
-          ]}
-        >
-          <Text
-            style={{
-              fontSize: 18,
-              fontFamily: "Fredoka_700Bold",
-              color: "#FFFFFF",
-            }}
-          >
-            {label} →
-          </Text>
-        </Animated.View>
-      </Pressable>
-    </Animated.View>
   );
 }
 
@@ -126,7 +63,6 @@ export default function ResultScreen() {
   const emoji = result === "won" ? "🏆" : result === "lost" ? "😤" : "🤝";
 
   const handleCta = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     await AsyncStorage.setItem("onboarding_complete", "true");
     router.replace("/auth");
   };
@@ -142,15 +78,16 @@ export default function ResultScreen() {
             style={{
               marginBottom: 20,
               backgroundColor: result === "won" ? colors.successBg : result === "lost" ? colors.errorBg : colors.primaryContainerBg,
-              borderRadius: 12,
+              borderRadius: 14,
               paddingHorizontal: 20,
               paddingVertical: 14,
+              boxShadow: `0 3px 0 ${colors.panelLip}, 0 8px 18px -8px ${colors.panelShadow}`,
             }}
           >
             <Text
               style={{
                 fontSize: 14,
-                fontFamily: "Nunito_600SemiBold",
+                fontFamily: "Fredoka_600SemiBold",
                 color: result === "won" ? colors.success : result === "lost" ? colors.error : colors.primaryContainer,
                 textAlign: "center",
                 lineHeight: 20,
@@ -160,14 +97,14 @@ export default function ResultScreen() {
             </Text>
           </Animated.View>
 
-          {/* Emoji with bounce + confetti */}
-          <BounceEmoji emoji={emoji} result={result} />
+          {/* Mascot with bounce + confetti */}
+          <BounceMascot emoji={emoji} result={result} />
 
           {/* Title */}
           <Animated.Text
             entering={FadeInDown.delay(400).duration(500)}
             style={{
-              fontSize: 36,
+              fontSize: 38,
               fontFamily: "Fredoka_700Bold",
               color: titleColor,
               textAlign: "center",
@@ -183,33 +120,35 @@ export default function ResultScreen() {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              gap: 20,
+              gap: 24,
               marginTop: 24,
               backgroundColor: colors.surfaceContainer,
-              borderRadius: 16,
+              borderRadius: 20,
               paddingHorizontal: 28,
-              paddingVertical: 16,
+              paddingVertical: 20,
+              boxShadow: `0 4px 0 ${colors.panelLip}, 0 12px 22px -12px ${colors.panelShadow}`,
             }}
           >
             {/* Player */}
             <View style={{ alignItems: "center", flex: 1 }}>
               <View
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  backgroundColor: colors.p1Bg,
+                  width: 56,
+                  height: 56,
+                  borderRadius: 18,
+                  backgroundColor: colors.hues.blue[0],
                   justifyContent: "center",
                   alignItems: "center",
-                  marginBottom: 4,
+                  marginBottom: 8,
+                  boxShadow: `0 4px 0 ${colors.hues.blue[1]}`,
                 }}
               >
-                <Text style={{ fontSize: 20 }}>{avatar}</Text>
+                <Text style={{ fontSize: 28 }}>{avatar}</Text>
               </View>
               <Text
                 style={{
-                  fontSize: 11,
-                  fontFamily: "Nunito_600SemiBold",
+                  fontSize: 12,
+                  fontFamily: "Fredoka_700Bold",
                   color: colors.p1,
                 }}
               >
@@ -217,7 +156,7 @@ export default function ResultScreen() {
               </Text>
               <Text
                 style={{
-                  fontSize: 32,
+                  fontSize: 36,
                   fontFamily: "Fredoka_700Bold",
                   color: colors.p1,
                 }}
@@ -229,33 +168,34 @@ export default function ResultScreen() {
             {/* Separator */}
             <Text
               style={{
-                fontSize: 18,
-                fontFamily: "Fredoka_600SemiBold",
-                color: colors.onSurfaceVariant,
+                fontSize: 15,
+                fontFamily: "Fredoka_700Bold",
+                color: colors.onSurfaceMuted,
               }}
             >
-              —
+              VS
             </Text>
 
             {/* BabyBot */}
             <View style={{ alignItems: "center", flex: 1 }}>
               <View
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  backgroundColor: colors.p2Bg,
+                  width: 56,
+                  height: 56,
+                  borderRadius: 18,
+                  backgroundColor: colors.hues.coral[0],
                   justifyContent: "center",
                   alignItems: "center",
-                  marginBottom: 4,
+                  marginBottom: 8,
+                  boxShadow: `0 4px 0 ${colors.hues.coral[1]}`,
                 }}
               >
-                <Text style={{ fontSize: 20 }}>🐣</Text>
+                <Text style={{ fontSize: 28 }}>🐣</Text>
               </View>
               <Text
                 style={{
-                  fontSize: 11,
-                  fontFamily: "Nunito_600SemiBold",
+                  fontSize: 12,
+                  fontFamily: "Fredoka_700Bold",
                   color: colors.p2,
                 }}
               >
@@ -263,7 +203,7 @@ export default function ResultScreen() {
               </Text>
               <Text
                 style={{
-                  fontSize: 32,
+                  fontSize: 36,
                   fontFamily: "Fredoka_700Bold",
                   color: colors.p2,
                 }}
@@ -278,10 +218,10 @@ export default function ResultScreen() {
             entering={FadeInDown.delay(800).duration(500)}
             style={{
               fontSize: 15,
-              fontFamily: "Nunito_600SemiBold",
+              fontFamily: "Fredoka_600SemiBold",
               color: colors.onSurfaceVariant,
               textAlign: "center",
-              marginTop: 12,
+              marginTop: 16,
             }}
           >
             {t(`onboarding.result.${result}Sub`)}
@@ -289,12 +229,22 @@ export default function ResultScreen() {
 
         </View>
 
-        {/* CTA with pulse */}
-        <PulsingCta
-          label={t(ctaKey)}
-          onPress={handleCta}
-          bgColor={colors.primaryContainer}
-        />
+        {/* CTA */}
+        <Animated.View
+          entering={FadeInDown.delay(1200).duration(500)}
+          style={{ paddingBottom: 24 }}
+        >
+          <Btn3D
+            color="gold"
+            size="lg"
+            full
+            haptic="press"
+            label={t(ctaKey)}
+            onPress={handleCta}
+          >
+            <Text style={{ fontSize: 18 }}>→</Text>
+          </Btn3D>
+        </Animated.View>
       </View>
     </SafeAreaView>
   );

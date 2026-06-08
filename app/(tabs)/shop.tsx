@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
+import { haptics } from "@/lib/haptics";
+import { IconBtn } from "@/components/ui/arcade";
+import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import { Label } from "../../components/ui/Label";
 import { useEntitlements } from "../../hooks/useEntitlements";
 import { useRevenueCat, restorePurchases, PRODUCT_ID } from "../../lib/revenuecat";
@@ -21,6 +23,7 @@ export default function ShopScreen() {
   const { offering, isReady } = useRevenueCat();
   const ents = useEntitlements();
   const [restoring, setRestoring] = useState(false);
+  const [info, setInfo] = useState<{ icon: string; title: string; message: string } | null>(null);
 
   const priceFor = (productId: string, fallback: string) => {
     const pkg = offering?.availablePackages.find((p) => p.product.identifier === productId);
@@ -28,18 +31,26 @@ export default function ShopScreen() {
   };
 
   const goToPaywall = (packId: "premium" | "angel" | "demon") => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.tap();
     router.push(`/pack/${packId}`);
   };
 
   const handleRestore = async () => {
     try {
       setRestoring(true);
-      Haptics.selectionAsync();
+      haptics.select();
       await restorePurchases();
-      Alert.alert(t("shop.restoreTitle", "Restauration"), t("shop.restoreOk", "Tes achats ont été restaurés."));
+      setInfo({
+        icon: "✅",
+        title: t("shop.restoreTitle", "Restauration"),
+        message: t("shop.restoreOk", "Tes achats ont été restaurés."),
+      });
     } catch (e: any) {
-      Alert.alert(t("common.error", "Erreur"), e?.message ?? t("shop.restoreFailed", "La restauration a échoué."));
+      setInfo({
+        icon: "⚠️",
+        title: t("common.error", "Erreur"),
+        message: e?.message ?? t("shop.restoreFailed", "La restauration a échoué."),
+      });
     } finally {
       setRestoring(false);
     }
@@ -49,30 +60,21 @@ export default function ShopScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }} edges={["top"]}>
       {/* Header */}
       <View style={{ flexDirection: "row", alignItems: "center", height: 56, paddingTop: 8, paddingHorizontal: 16, paddingBottom: 4 }}>
-        <Pressable
-          onPress={() => router.back()}
-          style={({ pressed }) => ({
-            width: 40, height: 40, borderRadius: 12,
-            backgroundColor: colors.surfaceContainer,
-            alignItems: "center", justifyContent: "center",
-            transform: [{ scale: pressed ? 0.92 : 1 }],
-          })}
-        >
-          <Ionicons name="chevron-back" size={22} color={colors.onSurface} />
-        </Pressable>
+        <IconBtn color="white" onPress={() => router.back()}>
+          ‹
+        </IconBtn>
         <Text
           style={{
             flex: 1,
             textAlign: "center",
             fontFamily: "Fredoka_700Bold",
-            fontSize: 20,
+            fontSize: 22,
             color: colors.onSurface,
-            letterSpacing: -0.3,
           }}
         >
           {t("shop.title", "Boutique")}
         </Text>
-        <View style={{ width: 40 }} />
+        <View style={{ width: 44 }} />
       </View>
 
       <ScrollView
@@ -172,6 +174,17 @@ export default function ShopScreen() {
           </Text>
         )}
       </ScrollView>
+
+      <ConfirmModal
+        visible={!!info}
+        icon={info?.icon}
+        title={info?.title ?? ""}
+        message={info?.message ?? ""}
+        cancelText=""
+        confirmText="OK"
+        onCancel={() => setInfo(null)}
+        onConfirm={() => setInfo(null)}
+      />
     </SafeAreaView>
   );
 }

@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
+import { Panel, Rise } from "@/components/ui/arcade";
 import {
   ACHIEVEMENT_DEFINITIONS,
   computeUnlockedAchievementIds,
@@ -38,41 +39,42 @@ export default function AchievementsScreen() {
           </Text>
         </View>
 
-        <View style={{ gap: 10 }}>
-          {achievements.map((a) => (
-            <View
-              key={a.id}
-              style={{
-                flexDirection: "row", alignItems: "center", gap: 14,
-                paddingVertical: 14, paddingHorizontal: 16,
-                borderRadius: 16,
-                backgroundColor: colors.surfaceContainer,
-                opacity: a.unlocked ? 1 : 0.5,
-              }}
-            >
-              <View
-                style={{
-                  width: 48, height: 48, borderRadius: 14,
-                  backgroundColor: a.unlocked ? colors.primaryContainerBg : colors.surfaceContainerLow,
-                  alignItems: "center", justifyContent: "center",
-                }}
-              >
-                <Text style={{ fontSize: 26 }}>{a.emoji}</Text>
+        <View style={{ gap: 11 }}>
+          {achievements.map((a, i) => (
+            <Rise key={a.id} delay={i * 45}>
+              <View style={{ opacity: a.unlocked ? 1 : 0.5 }}>
+                <Panel
+                  style={{ flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 14, paddingHorizontal: 16 }}
+                >
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 14,
+                      backgroundColor: a.unlocked ? colors.hues.violet[2] : colors.surfaceContainerLow,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      boxShadow: a.unlocked ? `0 3px 0 ${colors.hues.violet[1]}33` : undefined,
+                    }}
+                  >
+                    <Text style={{ fontSize: 26 }}>{a.emoji}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 15, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
+                      {t(`achievements.items.${a.id}.title`)}
+                    </Text>
+                    <Text style={{ fontSize: 12, fontFamily: "Fredoka_700Bold", color: colors.onSurfaceMuted, marginTop: 1 }}>
+                      {t(`achievements.items.${a.id}.description`)}
+                    </Text>
+                  </View>
+                  {a.unlocked ? (
+                    <Ionicons name="checkmark-circle" size={22} color={colors.success} />
+                  ) : (
+                    <Ionicons name="lock-closed" size={18} color={colors.onSurfaceMuted} />
+                  )}
+                </Panel>
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 15, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
-                  {t(`achievements.items.${a.id}.title`)}
-                </Text>
-                <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginTop: 1 }}>
-                  {t(`achievements.items.${a.id}.description`)}
-                </Text>
-              </View>
-              {a.unlocked ? (
-                <Ionicons name="checkmark-circle" size={22} color={colors.success} />
-              ) : (
-                <Ionicons name="lock-closed" size={18} color={colors.onSurfaceMuted} />
-              )}
-            </View>
+            </Rise>
           ))}
         </View>
 

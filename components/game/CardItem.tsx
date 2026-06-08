@@ -236,28 +236,20 @@ function CardItemImpl({
   }
 
   // --- Classic skin (existing) ---
-  const getBackBg = () => {
-    if (matchedBy === 1) return colors.p1Bg;
-    if (matchedBy === 2) return colors.p2Bg;
-    return colors.p1Bg;
-  };
-  const getGhostBorder = () => {
-    if (matchedBy === 1) return colors.p1 + '33';
-    if (matchedBy === 2) return colors.p2 + '33';
-    return colors.p1 + '33';
-  };
-  const getFrontBg = () => {
-    if (matchedBy === 1) return colors.p1Bg;
-    if (matchedBy === 2) return colors.p2Bg;
-    return colors.surfaceContainer;
-  };
+  // Arcade classic look: violet face-down back, white face with a chunky
+  // colored ring once matched (blue = you, coral = opponent).
+  const [violet, violetD] = colors.hues.violet;
+  const ringHue = matchedBy === 1 ? colors.hues.blue : matchedBy === 2 ? colors.hues.coral : null;
+  const frontShadow = ringHue
+    ? `inset 0 0 0 3px ${ringHue[0]}, 0 4px 0 ${ringHue[1]}`
+    : `0 4px 0 ${colors.panelLip}`;
 
   return (
     <Pressable
       onPress={() => onPress(cardId)}
       disabled={disabled}
       className="aspect-square flex-1"
-      style={{ borderRadius: 8 }}
+      style={{ borderRadius: 14 }}
     >
       <View className="relative w-full h-full">
         <AnimatedView
@@ -265,13 +257,14 @@ function CardItemImpl({
             backAnimatedStyle,
             {
               backfaceVisibility: 'hidden',
-              backgroundColor: getBackBg(),
-              borderRadius: 8,
+              backgroundColor: violet,
+              borderRadius: 14,
+              boxShadow: `0 4px 0 ${violetD}, inset 0 0 0 3px #FFFFFF29`,
             },
           ]}
           className="absolute w-full h-full justify-center items-center"
         >
-          <Text className="text-2xl font-display" style={{ color: colors.p1 }}>
+          <Text className="text-2xl font-display" style={{ color: '#fff' }}>
             ?
           </Text>
         </AnimatedView>
@@ -281,10 +274,9 @@ function CardItemImpl({
             frontAnimatedStyle,
             {
               backfaceVisibility: 'hidden',
-              backgroundColor: getFrontBg(),
-              borderRadius: 8,
-              borderWidth: matchedBy !== -1 ? 1.5 : 0,
-              borderColor: matchedBy !== -1 ? getGhostBorder() : 'transparent',
+              backgroundColor: colors.surfaceContainer,
+              borderRadius: 14,
+              boxShadow: frontShadow,
             },
           ]}
           className="absolute w-full h-full justify-center items-center"

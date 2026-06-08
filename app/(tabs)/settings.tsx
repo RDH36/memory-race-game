@@ -2,7 +2,7 @@ import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Ionicons } from "@expo/vector-icons";
+import { IconBtn } from "@/components/ui/arcade";
 import { CheckUpdateRow } from "../../components/settings/CheckUpdateRow";
 import { FeedbackSupport } from "../../components/settings/FeedbackSupport";
 import { LanguageSelector } from "../../components/settings/LanguageSelector";
@@ -26,19 +26,9 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 24 }}>
-          <Pressable
-            onPress={() => router.back()}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              backgroundColor: colors.surfaceContainer,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Ionicons name="arrow-back" size={20} color={colors.onSurfaceVariant} />
-          </Pressable>
+          <IconBtn color="white" onPress={() => router.back()}>
+            ‹
+          </IconBtn>
           <Text style={{ fontSize: 28, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
             {t("settings.title")}
           </Text>

@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
-import { Platform, Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Haptics from "expo-haptics";
 import { useTranslation } from "react-i18next";
-import Animated, { FadeInDown } from "react-native-reanimated";
-import { Gradient } from "../../components/ui/Gradient";
-import { StatsRow } from "../../components/home/StatsRow";
-import { Label } from "../../components/ui/Label";
-import { useTheme } from "../../lib/ThemeContext";
-import { usePlayerStats } from "../../lib/playerStats";
-import { MitsitsyCard } from "../../components/promo/MitsitsyCard";
-import { PremiumDecor } from "../../components/appearance/PremiumDecor";
+import { useTheme } from "@/lib/ThemeContext";
+import { usePlayerStats } from "@/lib/playerStats";
+import { haptics } from "@/lib/haptics";
+import { MitsitsyCard } from "@/components/promo/MitsitsyCard";
+import { Panel, Pop, Rise, Ribbon, XPBar } from "@/components/ui/arcade";
+import { HomeHeader } from "@/components/home/arcade/HomeHeader";
+import { ArcadeHero } from "@/components/home/arcade/ArcadeHero";
+import { QuickModes } from "@/components/home/arcade/QuickModes";
+import { HomeStats } from "@/components/home/arcade/HomeStats";
 
 const DAILY_REWARD_KEY = "daily_reward_last_claimed";
 const DAILY_REWARD_XP = 15;
@@ -28,11 +27,9 @@ function isSameDay(ts1: number, ts2: number) {
 }
 
 export default function HomeScreen() {
-  const router = useRouter();
   const { t } = useTranslation();
-  const { stats, avatar, level, levelProgress, xpInLevel, xpForNextLevel, addBonusXp } =
-    usePlayerStats();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
+  const { level, levelProgress, xpInLevel, xpForNextLevel, addBonusXp } = usePlayerStats();
   const [dailyClaimed, setDailyClaimed] = useState(true);
 
   useEffect(() => {
@@ -48,484 +45,75 @@ export default function HomeScreen() {
     addBonusXp(DAILY_REWARD_XP);
     setDailyClaimed(true);
     AsyncStorage.setItem(DAILY_REWARD_KEY, Date.now().toString());
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    haptics.coin();
   }, [dailyClaimed, addBonusXp]);
 
-  const xpBarTrack = isDark ? "#2A2532" : "#E8E4E4";
+  const [gold, goldD, goldBg] = colors.hues.gold;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }} edges={["top"]}>
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 120 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header — logo left, avatar + level chip right */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            marginTop: 8,
-            marginBottom: 24,
-          }}
-        >
-          <View style={{ flex: 1 }}>
-            <Label text={t("home.welcome")} style={{ marginBottom: 0 }} />
-            <Text
-              style={{
-                fontSize: 38,
-                fontFamily: "Fredoka_700Bold",
-                color: colors.primaryContainer,
-                lineHeight: 40,
-                marginTop: 4,
-                letterSpacing: -0.76,
-              }}
-            >
-              Flipia
-            </Text>
-          </View>
-          <View style={{ alignItems: "flex-end", gap: 6 }}>
-            <Pressable
-              onPress={() => {
-                Haptics.selectionAsync();
-                router.push("/profile");
-              }}
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 16,
-                backgroundColor: colors.primaryContainerBg,
-                alignItems: "center",
-                justifyContent: "center",
-                borderWidth: 1.5,
-                borderColor: colors.ghostBorder,
-              }}
-            >
-              <PremiumDecor emoji={avatar} size={45} borderRadius={14.5} hideOuterGlow animateAura auraInset clipAura />
-              <Text
-                style={{
-                  fontSize: 24,
-                  textAlign: "center",
-                  ...(Platform.OS === "android" && {
-                    includeFontPadding: false,
-                    textAlignVertical: "center",
-                  }),
-                }}
-              >
-                {avatar}
-              </Text>
-            </Pressable>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 4,
-                backgroundColor: colors.primaryContainerBg,
-                paddingHorizontal: 10,
-                paddingVertical: 3,
-                borderRadius: 999,
-              }}
-            >
-              <Text style={{ fontSize: 10 }}>⚡</Text>
-              <Text
-                style={{
-                  fontSize: 11,
-                  fontFamily: "Nunito_700Bold",
-                  color: colors.primaryContainer,
-                }}
-              >
-                Nv. {level} · {stats.points} XP
-              </Text>
-            </View>
-          </View>
-        </View>
+        <HomeHeader />
 
-        {/* XP bar */}
-        <View style={{ marginBottom: 24 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            <Text
-              style={{
-                fontSize: 11,
-                fontFamily: "Nunito_700Bold",
-                color: colors.onSurface,
-              }}
-            >
-              Nv. {level}
-            </Text>
-            <View
-              style={{
-                flex: 1,
-                height: 5,
-                backgroundColor: xpBarTrack,
-                borderRadius: 999,
-                overflow: "hidden",
-              }}
-            >
-              <View
-                style={{
-                  width: `${Math.max(0, Math.min(100, Math.round(levelProgress * 100)))}%`,
-                  height: 5,
-                  backgroundColor: colors.primaryContainer,
-                  borderRadius: 999,
-                }}
-              />
-            </View>
-            <Text
-              style={{
-                fontSize: 11,
-                fontFamily: "Nunito_700Bold",
-                color: colors.onSurfaceMuted,
-              }}
-            >
-              Nv. {level + 1}
-            </Text>
-          </View>
-          <Text
-            style={{
-              fontSize: 10,
-              fontFamily: "Nunito_400Regular",
-              color: colors.onSurfaceMuted,
-              textAlign: "right",
-              marginTop: 3,
-            }}
-          >
-            {xpInLevel} / {xpForNextLevel} XP
-          </Text>
-        </View>
+        {/* XP strip */}
+        <Rise delay={60}>
+          <Panel style={{ padding: 12, marginBottom: 16 }}>
+            <XPBar
+              level={level}
+              pct={Math.round(levelProgress * 100)}
+              xpIn={xpInLevel}
+              xpFor={xpForNextLevel}
+            />
+          </Panel>
+        </Rise>
 
-        {/* Daily reward banner */}
+        <ArcadeHero />
+
+        {/* Daily reward */}
         {!dailyClaimed && (
-          <Animated.View entering={FadeInDown.duration(400)}>
-            <Pressable
+          <Pop style={{ marginBottom: 16 }}>
+            <Panel
               onPress={claimDailyReward}
-              className={`mb-5 flex-row items-center gap-3 rounded-2xl border px-3.5 py-3.5 active:opacity-85 ${
-                isDark
-                  ? "bg-[#2A1810] border-[#3A2418]"
-                  : "bg-[#FFF4EC] border-[#FCD9BD]"
-              }`}
+              haptic="none"
+              background={goldBg}
+              style={{ flexDirection: "row", alignItems: "center", gap: 12, padding: 12 }}
             >
               <View
-                className={`h-11 w-11 items-center justify-center rounded-xl ${
-                  isDark ? "bg-[#3A2418]" : "bg-white"
-                }`}
+                style={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: 14,
+                  backgroundColor: colors.surfaceContainer,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: `0 3px 0 ${goldD}`,
+                }}
               >
-                <Text className="text-2xl">🎁</Text>
+                <Text style={{ fontSize: 24 }}>🎁</Text>
               </View>
-              <View className="flex-1">
-                <Text
-                  className={`font-display text-[14px] ${
-                    isDark ? "text-[#FB923C]" : "text-[#EA580C]"
-                  }`}
-                >
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 15, color: goldD }}>
                   {t("home.dailyReward")}
                 </Text>
-                <Text
-                  className="mt-0.5 font-body text-[11px]"
-                  style={{ color: colors.onSurfaceMuted }}
-                >
+                <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 11.5, color: gold }}>
                   {t("home.dailyRewardSubtitle", { xp: DAILY_REWARD_XP })}
                 </Text>
               </View>
-              <View className="flex-row items-center gap-2">
-                <Text
-                  className={`font-display text-[16px] ${
-                    isDark ? "text-[#FB923C]" : "text-[#EA580C]"
-                  }`}
-                >
-                  +{DAILY_REWARD_XP}
-                </Text>
-                <View
-                  className={`rounded-full px-3 py-1.5 ${
-                    isDark ? "bg-[#FB923C]" : "bg-[#EA580C]"
-                  }`}
-                >
-                  <Text className="font-display text-[12px] text-white">
-                    {t("home.dailyRewardClaim")}
-                  </Text>
-                </View>
-              </View>
-            </Pressable>
-          </Animated.View>
+              <Ribbon color="gold">{t("home.dailyRewardClaim")}</Ribbon>
+            </Panel>
+          </Pop>
         )}
 
-        {/* HERO MODE — Casual (primary CTA) */}
-        <Animated.View entering={FadeInDown.delay(50).duration(400)} style={{ marginBottom: 14 }}>
-          <Pressable
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push("/mode/casual");
-            }}
-            style={({ pressed }) => ({
-              transform: [{ scale: pressed ? 0.97 : 1 }],
-            })}
-          >
-            <Gradient
-              colors={["#1D9E75", "#17835F"]}
-              angle={135}
-              borderRadius={22}
-              style={{
-                paddingVertical: 22,
-                paddingHorizontal: 20,
-              }}
-            >
-              {/* Decorative floating cards — positioned inside bounds to avoid clipping */}
-              <View
-                pointerEvents="none"
-                style={{
-                  position: "absolute",
-                  right: 6,
-                  top: 8,
-                  width: 52,
-                  height: 70,
-                  borderRadius: 10,
-                  backgroundColor: "rgba(255,255,255,0.12)",
-                  transform: [{ rotate: "14deg" }],
-                }}
-              />
-              <View
-                pointerEvents="none"
-                style={{
-                  position: "absolute",
-                  right: 46,
-                  top: 14,
-                  width: 46,
-                  height: 62,
-                  borderRadius: 10,
-                  backgroundColor: "rgba(255,255,255,0.18)",
-                  transform: [{ rotate: "-6deg" }],
-                }}
-              />
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
-                <View
-                  style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: 18,
-                    backgroundColor: "rgba(255,255,255,0.22)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Text style={{ fontSize: 30 }}>🔥</Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={{
-                      fontSize: 11,
-                      fontFamily: "Nunito_700Bold",
-                      letterSpacing: 1.2,
-                      color: "rgba(255,255,255,0.75)",
-                    }}
-                  >
-                    {t("home.featuredMode")}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 24,
-                      fontFamily: "Fredoka_700Bold",
-                      color: "#FFFFFF",
-                      marginTop: 2,
-                      letterSpacing: -0.3,
-                    }}
-                  >
-                    {t("home.modes.casual")}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontFamily: "Nunito_400Regular",
-                      color: "rgba(255,255,255,0.85)",
-                      marginTop: 3,
-                    }}
-                    numberOfLines={1}
-                  >
-                    {t("home.modes.casualDesc")}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 19,
-                    backgroundColor: "rgba(255,255,255,0.22)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 17,
-                      color: "#FFFFFF",
-                      fontFamily: "Fredoka_700Bold",
-                    }}
-                  >
-                    →
-                  </Text>
-                </View>
-              </View>
-            </Gradient>
-          </Pressable>
-        </Animated.View>
+        <Rise delay={120}>
+          <QuickModes />
+        </Rise>
 
-        {/* Secondary modes — 2 columns */}
-        <View style={{ flexDirection: "row", gap: 12, marginBottom: 32 }}>
-          {/* Solo */}
-          <Animated.View
-            entering={FadeInDown.delay(150).duration(400)}
-            style={{ flex: 1 }}
-          >
-            <Pressable
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                router.push("/mode/solo");
-              }}
-              style={({ pressed }) => ({
-                transform: [{ scale: pressed ? 0.96 : 1 }],
-              })}
-            >
-              <View
-                style={{
-                  backgroundColor: colors.surfaceContainer,
-                  borderRadius: 18,
-                  paddingVertical: 20,
-                  paddingHorizontal: 16,
-                }}
-              >
-                <View
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 12,
-                    backgroundColor: colors.primaryContainerBg,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 10,
-                  }}
-                >
-                  <Text style={{ fontSize: 22 }}>🎮</Text>
-                </View>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    fontFamily: "Fredoka_700Bold",
-                    color: colors.onSurface,
-                  }}
-                >
-                  {t("home.modes.solo")}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 10,
-                    fontFamily: "Nunito_400Regular",
-                    color: colors.onSurfaceMuted,
-                    marginTop: 2,
-                    lineHeight: 13,
-                  }}
-                  numberOfLines={2}
-                >
-                  {t("home.modes.soloDesc")}
-                </Text>
-                <View
-                  style={{
-                    alignSelf: "flex-start",
-                    marginTop: 8,
-                    backgroundColor: colors.primaryContainerBg,
-                    paddingHorizontal: 7,
-                    paddingVertical: 2,
-                    borderRadius: 6,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 9,
-                      fontFamily: "Nunito_700Bold",
-                      letterSpacing: 0.5,
-                      color: colors.primaryContainer,
-                    }}
-                  >
-                    SOLO
-                  </Text>
-                </View>
-              </View>
-            </Pressable>
-          </Animated.View>
-
-          {/* Ranked — disabled */}
-          <Animated.View
-            entering={FadeInDown.delay(250).duration(400)}
-            style={{ flex: 1 }}
-          >
-            <View
-              style={{
-                backgroundColor: colors.surfaceContainer,
-                borderRadius: 18,
-                paddingVertical: 20,
-                paddingHorizontal: 16,
-                opacity: 0.55,
-              }}
-            >
-              <View
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
-                  backgroundColor: colors.p2Bg,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 10,
-                }}
-              >
-                <Text style={{ fontSize: 22 }}>🏆</Text>
-              </View>
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontFamily: "Fredoka_700Bold",
-                  color: colors.onSurface,
-                }}
-              >
-                {t("home.modes.ranked")}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 10,
-                  fontFamily: "Nunito_400Regular",
-                  color: colors.onSurfaceMuted,
-                  marginTop: 2,
-                  lineHeight: 13,
-                }}
-                numberOfLines={2}
-              >
-                {t("home.modes.rankedDesc")}
-              </Text>
-              <View
-                style={{
-                  alignSelf: "flex-start",
-                  marginTop: 8,
-                  backgroundColor: colors.onSurfaceMuted,
-                  paddingHorizontal: 7,
-                  paddingVertical: 2,
-                  borderRadius: 6,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 9,
-                    fontFamily: "Nunito_700Bold",
-                    letterSpacing: 0.5,
-                    color: "#FFFFFF",
-                  }}
-                >
-                  BIENTÔT
-                </Text>
-              </View>
-            </View>
-          </Animated.View>
-        </View>
-
-        {/* My stats */}
-        <Label text={t("home.myStats")} style={{ marginBottom: 10 }} />
-        <StatsRow />
+        <Rise delay={160}>
+          <HomeStats />
+        </Rise>
 
         {/* Cross-promo */}
         <View style={{ marginTop: 24 }}>

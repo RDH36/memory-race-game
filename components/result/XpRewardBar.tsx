@@ -9,7 +9,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
-import { Card } from "../ui/Card";
+import { Panel } from "@/components/ui/arcade";
 import { useTheme } from "../../lib/ThemeContext";
 
 interface XpRewardBarProps {
@@ -52,9 +52,9 @@ export function XpRewardBar({
 
   const barStyle = useAnimatedStyle(() => ({
     width: `${barWidth.value}%`,
-    height: 8,
+    height: 12,
     backgroundColor: won ? colors.success : colors.primaryContainer,
-    borderRadius: 4,
+    borderRadius: 999,
   }));
 
   const xpStyle = useAnimatedStyle(() => ({
@@ -65,7 +65,7 @@ export function XpRewardBar({
   const xpColor = won ? colors.success : colors.primaryContainer;
 
   return (
-    <Card style={{ gap: 12 }}>
+    <Panel style={{ gap: 12, padding: 18 }}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <Text style={{ fontSize: 11, fontFamily: "Nunito_700Bold", color: colors.onSurfaceVariant, letterSpacing: 0.5 }}>
           {t("result.xpGained")}
@@ -102,10 +102,10 @@ export function XpRewardBar({
             {xpInLevel} / {xpForNextLevel} XP → Nv. {level + 1}
           </Text>
         </View>
-        <View style={{ height: 8, backgroundColor: isDark ? "#333" : "#E8E4E4", borderRadius: 4 }}>
+        <View style={{ height: 12, backgroundColor: isDark ? "#2A2348" : "#E7DEF7", borderRadius: 999, overflow: "hidden" }}>
           <Animated.View style={barStyle} />
         </View>
       </View>
-    </Card>
+    </Panel>
   );
 }

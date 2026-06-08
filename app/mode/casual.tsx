@@ -2,13 +2,12 @@ import { useCallback, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import * as Haptics from "expo-haptics";
 import { useTranslation } from "react-i18next";
-import { Label } from "../../components/ui/Label";
-import { ModeBackButton } from "../../components/mode/ModeBackButton";
-import { ModeHero } from "../../components/mode/ModeHero";
-import { ModeStatsStrip } from "../../components/mode/ModeStatsStrip";
-import { ModeOptionCard } from "../../components/mode/ModeOptionCard";
+import type { HueName } from "@/components/ui/theme";
+import { ScreenHeader } from "@/components/ui/arcade";
+import { ChoiceRow } from "@/components/mode/arcade/ChoiceRow";
+import { ModeHeroArcade } from "@/components/mode/arcade/ModeHeroArcade";
+import { ModeStatsArcade } from "@/components/mode/arcade/ModeStatsArcade";
 import { ModeXpBoost } from "../../components/mode/ModeXpBoost";
 import { useTheme } from "../../lib/ThemeContext";
 import { useConnectivity } from "../../lib/ConnectivityContext";
@@ -41,33 +40,32 @@ export default function CasualModeScreen() {
   const winRate = friendsStats?.winRate ?? 0;
   const gamesWon = friendsStats?.gamesWon ?? 0;
 
-  const options: { key: OptionKey; icon: string; title: string; desc: string; color: string }[] = [
+  const options: { key: OptionKey; icon: string; title: string; desc: string; color: HueName }[] = [
     {
       key: "matchmaking",
       icon: "🎲",
       title: t("room.matchmaking"),
       desc: t("room.matchmakingDesc"),
-      color: colors.warning,
+      color: "gold",
     },
     {
       key: "create",
       icon: "🏠",
       title: t("room.createRoom"),
       desc: t("room.createDesc"),
-      color: colors.success,
+      color: "green",
     },
     {
       key: "join",
       icon: "🔗",
       title: t("room.joinRoom"),
       desc: t("room.joinDesc"),
-      color: colors.primaryContainer,
+      color: "violet",
     },
   ];
 
   const handleOptionPress = (key: OptionKey) => {
     requireOnline(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       const shouldBoost = xpBoost && rewardedLoaded;
 
       const navigate = () => {
@@ -95,27 +93,26 @@ export default function CasualModeScreen() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        <ModeBackButton />
+        <ScreenHeader title={t("home.modes.casual")} onBack={() => router.back()} />
 
-        <ModeHero
-          gradientColors={[colors.success, "#17835F"]}
-          icon="🔥"
+        <ModeHeroArcade
+          icon="⚔️"
           title={t("home.modes.casual")}
           subtitle={t("home.modes.casualDesc")}
+          color="coral"
         />
 
-        <ModeStatsStrip stats={stats} />
+        <ModeStatsArcade stats={stats} />
 
-        <Label text={t("home.chooseYourGame")} />
-        <View style={{ gap: 10, marginBottom: 20 }}>
+        <View style={{ gap: 13, marginBottom: 20 }}>
           {options.map((opt, index) => (
-            <ModeOptionCard
+            <ChoiceRow
               key={opt.key}
               icon={opt.icon}
               title={opt.title}
               desc={opt.desc}
               color={opt.color}
-              index={index}
+              delay={120 + index * 70}
               disabled={!isOnline}
               onPress={() => handleOptionPress(opt.key)}
             />

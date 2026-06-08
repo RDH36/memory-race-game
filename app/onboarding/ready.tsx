@@ -1,15 +1,11 @@
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
-import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
-
-const OPPONENTS = [
-  { key: "babyBot", emoji: "🐣", color: "#1D9E75" },
-] as const;
+import { Btn3D, Mascot, Panel } from "@/components/ui/arcade";
 
 export default function ReadyScreen() {
   const router = useRouter();
@@ -17,7 +13,6 @@ export default function ReadyScreen() {
   const { colors } = useTheme();
 
   const handlePlay = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     await AsyncStorage.setItem("onboarding_complete", "true");
     router.push("/onboarding/battle");
   };
@@ -37,20 +32,25 @@ export default function ReadyScreen() {
                 width: i === 4 ? 24 : 8,
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: colors.primaryContainer,
+                backgroundColor: i === 4 ? colors.primaryContainer : colors.primaryContainerBg,
               }}
             />
           ))}
         </Animated.View>
 
-        {/* Title */}
-        <Animated.View entering={FadeInDown.delay(200).duration(500)} style={{ marginTop: 40 }}>
+        {/* Title + mascot */}
+        <Animated.View
+          entering={FadeInDown.delay(200).duration(500)}
+          style={{ marginTop: 28, alignItems: "center" }}
+        >
+          <Mascot emoji="🦊" size={90} />
           <Text
             style={{
               fontSize: 32,
               fontFamily: "Fredoka_700Bold",
-              color: colors.primaryContainer,
+              color: colors.onSurface,
               textAlign: "center",
+              marginTop: 8,
             }}
           >
             {t("onboarding.ready.title")}
@@ -81,7 +81,7 @@ export default function ReadyScreen() {
             style={{
               fontSize: 26,
               fontFamily: "Fredoka_700Bold",
-              color: "#1D9E75",
+              color: colors.hues.green[0],
               marginTop: 12,
             }}
           >
@@ -103,72 +103,54 @@ export default function ReadyScreen() {
             entering={FadeInDown.delay(800).duration(400)}
             style={{ flexDirection: "row", gap: 16, marginTop: 28 }}
           >
-            <View
-              style={{
-                backgroundColor: colors.primaryContainerBg,
-                borderRadius: 12,
-                paddingHorizontal: 16,
-                paddingVertical: 10,
-                alignItems: "center",
-              }}
+            <Panel
+              radius={16}
+              style={{ paddingHorizontal: 16, paddingVertical: 10, alignItems: "center" }}
             >
               <Text style={{ fontSize: 11, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceVariant }}>
                 {t("home.difficulty.easy")}
               </Text>
-              <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.primaryContainer }}>
+              <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
                 🐣
               </Text>
-            </View>
-            <View
-              style={{
-                backgroundColor: colors.primaryContainerBg,
-                borderRadius: 12,
-                paddingHorizontal: 16,
-                paddingVertical: 10,
-                alignItems: "center",
-              }}
+            </Panel>
+            <Panel
+              radius={16}
+              style={{ paddingHorizontal: 16, paddingVertical: 10, alignItems: "center" }}
             >
               <Text style={{ fontSize: 11, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceVariant }}>
                 {t("game.pairs")}
               </Text>
-              <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.primaryContainer }}>
+              <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
                 8
               </Text>
-            </View>
-            <View
-              style={{
-                backgroundColor: colors.primaryContainerBg,
-                borderRadius: 12,
-                paddingHorizontal: 16,
-                paddingVertical: 10,
-                alignItems: "center",
-              }}
+            </Panel>
+            <Panel
+              radius={16}
+              style={{ paddingHorizontal: 16, paddingVertical: 10, alignItems: "center" }}
             >
               <Text style={{ fontSize: 11, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceVariant }}>
                 {t("tornado.default")}
               </Text>
-              <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.primaryContainer }}>
+              <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
                 🌪️
               </Text>
-            </View>
+            </Panel>
           </Animated.View>
         </View>
 
         {/* CTA */}
         <Animated.View entering={FadeInDown.delay(900).duration(500)} style={{ paddingBottom: 24 }}>
-          <Pressable
+          <Btn3D
+            color="gold"
+            size="lg"
+            full
+            haptic="press"
+            label={t("onboarding.ready.cta")}
             onPress={handlePlay}
-            style={{
-              backgroundColor: colors.primaryContainer,
-              borderRadius: 16,
-              paddingVertical: 18,
-              alignItems: "center",
-            }}
           >
-            <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: "#FFFFFF" }}>
-              {t("onboarding.ready.cta")} →
-            </Text>
-          </Pressable>
+            <Text style={{ fontSize: 18 }}>▶</Text>
+          </Btn3D>
         </Animated.View>
       </View>
     </SafeAreaView>

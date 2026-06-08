@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Platform, Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
-import * as Haptics from "expo-haptics";
-import { Gradient } from "../ui/Gradient";
+import { haptics } from "@/lib/haptics";
+import { Btn3D, Panel } from "@/components/ui/arcade";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { useCurrentUser } from "../../lib/identity";
@@ -16,7 +16,7 @@ export function ProfileHeader() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const router = useRouter();
-  const { stats, avatar, nickname, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
+  const { stats, avatar, nickname, level, levelProgress } = usePlayerStats();
   const { user } = useCurrentUser();
 
   const [showGoogle, setShowGoogle] = useState(false);
@@ -27,20 +27,21 @@ export function ProfileHeader() {
   const isPremium = !!getPremiumTheme(skin?.requires ?? null);
 
   const goToSetup = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.tap();
     router.push("/auth/setup");
   };
 
   return (
     <>
-      {/* Gradient hero card */}
-      <Gradient
-        colors={[colors.primary, colors.primaryContainer]}
-        angle={135}
-        borderRadius={24}
+      {/* Solid violet hero card (no gradient) */}
+      <View
         style={{
+          backgroundColor: colors.primary,
+          borderRadius: 24,
           paddingVertical: 26,
           paddingHorizontal: 22,
+          overflow: "hidden",
+          boxShadow: `0 5px 0 ${colors.hues.violet[1]}, 0 18px 30px -14px ${colors.primary}A6`,
         }}
       >
         {/* Decorative circle */}
@@ -175,15 +176,13 @@ export function ProfileHeader() {
             </View>
           </View>
         </View>
-      </Gradient>
+      </View>
 
       {/* Link Google CTA — only when not linked */}
       {!hasEmail && (
-        <View
+        <Panel
           style={{
             marginTop: 12,
-            backgroundColor: colors.surfaceContainer,
-            borderRadius: 14,
             paddingVertical: 12,
             paddingHorizontal: 14,
             flexDirection: "row",
@@ -192,48 +191,40 @@ export function ProfileHeader() {
         >
           <View
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              backgroundColor: colors.primaryContainerBg,
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              backgroundColor: colors.hues.violet[2],
               alignItems: "center",
               justifyContent: "center",
               marginRight: 12,
+              boxShadow: `0 3px 0 ${colors.hues.violet[1]}33`,
             }}
           >
             <Text style={{ fontSize: 18 }}>🔒</Text>
           </View>
           <View style={{ flex: 1, marginRight: 12 }}>
-            <Text style={{ fontSize: 13, fontFamily: "Fredoka_600SemiBold", color: colors.onSurface }}>
+            <Text style={{ fontSize: 14, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
               {t("auth.protectTitle")}
             </Text>
             <Text
               style={{
                 fontSize: 11,
-                fontFamily: "Nunito_400Regular",
-                color: colors.onSurfaceVariant,
+                fontFamily: "Fredoka_700Bold",
+                color: colors.onSurfaceMuted,
                 marginTop: 1,
               }}
             >
               {t("profile.protectSubtitle")}
             </Text>
           </View>
-          <Pressable
+          <Btn3D
+            color="violet"
+            size="sm"
+            label={t("profile.linkShort")}
             onPress={() => setShowGoogle(true)}
-            style={{
-              backgroundColor: colors.primary,
-              paddingHorizontal: 18,
-              paddingVertical: 10,
-              borderRadius: 999,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text style={{ fontSize: 13, fontFamily: "Nunito_700Bold", color: "#FFF" }}>
-              {t("profile.linkShort")}
-            </Text>
-          </Pressable>
-        </View>
+          />
+        </Panel>
       )}
 
       <GoogleLinkSheet visible={showGoogle} onClose={() => setShowGoogle(false)} />

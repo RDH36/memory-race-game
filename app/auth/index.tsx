@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, Keyboard } from "react-native";
+import { View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -8,14 +8,14 @@ import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   FadeIn, FadeInDown,
   useSharedValue, useAnimatedStyle, withTiming, withDelay,
-  withSequence, withSpring, interpolate, runOnJS,
+  withSpring, interpolate, runOnJS,
 } from "react-native-reanimated";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { db } from "@/lib/instant";
 import { useTheme } from "@/lib/ThemeContext";
 import { useConnectivity } from "@/lib/ConnectivityContext";
 import { radii } from "../../components/ui/theme";
-import { Button } from "@/components/ui/Button";
+import { Btn3D } from "@/components/ui/arcade";
 import { GoogleIcon } from "@/components/ui/GoogleIcon";
 
 const SHUFFLE_EMOJIS = ["🦁", "🌸", "⚡", "🎲", "🍕", "🚀"];
@@ -82,16 +82,16 @@ function FlipCard({ finalEmoji, delay, endOnBack = false, direction = 1 }: FlipC
       <Animated.View style={[backStyle, {
         position: "absolute", width: "100%", height: "100%",
         backfaceVisibility: "hidden",
-        backgroundColor: colors.p1Bg,
-        borderRadius: 12, alignItems: "center", justifyContent: "center",
+        backgroundColor: colors.hues.violet[0],
+        borderRadius: 14, alignItems: "center", justifyContent: "center",
       }]}>
-        <Text style={{ fontSize: 40, fontFamily: "Fredoka_700Bold", color: colors.p1 }}>?</Text>
+        <Text style={{ fontSize: 40, fontFamily: "Fredoka_700Bold", color: "#fff" }}>?</Text>
       </Animated.View>
       <Animated.View style={[frontStyle, {
         position: "absolute", width: "100%", height: "100%",
         backfaceVisibility: "hidden",
         backgroundColor: colors.surfaceContainer,
-        borderRadius: 12, alignItems: "center", justifyContent: "center",
+        borderRadius: 14, alignItems: "center", justifyContent: "center",
       }]}>
         <Text style={{ fontSize: 48 }}>{displayEmoji}</Text>
       </Animated.View>
@@ -211,7 +211,6 @@ export default function AuthScreen() {
 
   const handleGuest = async () => {
     setGuestLoading(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await db.auth.signInAsGuest();
       router.replace("/auth/setup");
@@ -269,31 +268,40 @@ export default function AuthScreen() {
             </Animated.View>
           ) : null}
 
-          <Button
-            text={t("auth.continueGoogle")}
-            iconNode={<GoogleIcon size={20} />}
+          <Btn3D
+            color="white"
+            size="lg"
+            full
+            haptic="press"
+            label={t("auth.continueGoogle")}
             onPress={() => requireOnline(handleGoogle)}
             loading={googleLoading}
             disabled={!isOnline}
             style={{ marginTop: 4 }}
-          />
+          >
+            <GoogleIcon size={20} />
+          </Btn3D>
 
           <View style={{ flexDirection: "row", alignItems: "center", gap: 14, marginVertical: 6 }}>
             <View style={{ flex: 1, height: 1, backgroundColor: colors.surfaceContainerHigh }} />
-            <Text style={{ color: colors.onSurfaceVariant, fontSize: 12, fontFamily: "Nunito_600SemiBold" }}>
+            <Text style={{ color: colors.onSurfaceVariant, fontSize: 12, fontFamily: "Fredoka_700Bold" }}>
               {t("auth.or")}
             </Text>
             <View style={{ flex: 1, height: 1, backgroundColor: colors.surfaceContainerHigh }} />
           </View>
 
-          <Button
-            text={t("auth.continueGuest")}
-            icon="👤"
+          <Btn3D
+            color="violet"
+            size="lg"
+            full
+            haptic="press"
+            label={t("auth.continueGuest")}
             onPress={() => requireOnline(handleGuest)}
-            variant="secondary"
             loading={guestLoading}
             disabled={!isOnline}
-          />
+          >
+            <Text style={{ fontSize: 16 }}>👤</Text>
+          </Btn3D>
         </Animated.View>
       </View>
 

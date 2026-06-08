@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Gradient } from "../ui/Gradient";
 import { useTheme } from "../../lib/ThemeContext";
+import type { HueName } from "../../components/ui/theme";
 import { Angel } from "../ui/icons/Angel";
 import { Demon } from "../ui/icons/Demon";
 import { MiniCardFace } from "./MiniCard";
@@ -33,7 +33,7 @@ interface Props {
 }
 
 export function PackCard({
-  iconType, gradient, miniCards, title, count, description,
+  iconType, miniCards, title, count, description,
   badge, ctaLabel, price, ownedLabel, owned, onPress, style,
 }: Props) {
   const { colors } = useTheme();
@@ -41,12 +41,22 @@ export function PackCard({
   const entitlement = iconType === "angel" ? ENTITLEMENT.PACK_ANGEL : ENTITLEMENT.PACK_DEMON;
   const auraSize = 96;
 
+  // Solid header color (no gradient) per pack identity.
+  const headerHue: HueName = iconType === "angel" ? "blue" : "coral";
+  const [headerColor] = colors.hues[headerHue];
+
+  // Chunky CTA hue.
+  const ctaHue: HueName = owned ? "green" : "violet";
+  const [ctaBase, ctaLip] = colors.hues[ctaHue];
+
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => ({
         transform: [{ scale: pressed ? 0.98 : 1 }],
         marginBottom: style?.marginBottom ?? 14,
+        borderRadius: 22,
+        boxShadow: `0 4px 0 ${colors.panelLip}, 0 14px 28px -14px ${colors.panelShadow}`,
       })}
     >
       <View
@@ -56,42 +66,24 @@ export function PackCard({
           overflow: "hidden",
         }}
       >
-        {/* Header gradient zone */}
+        {/* Header — solid color zone */}
         <View
           style={{
             height: 110,
             flexDirection: "row",
             alignItems: "center",
             paddingLeft: 22,
+            backgroundColor: headerColor,
             overflow: "hidden",
           }}
         >
-          <Gradient
-            colors={gradient}
-            angle={135}
-            style={{ position: "absolute", inset: 0 }}
-          />
-          <View
-            style={{
-              width: auraSize,
-              height: auraSize,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <View style={{ width: auraSize, height: auraSize, alignItems: "center", justifyContent: "center" }}>
             <ShapeAura entitlement={entitlement} size={auraSize} animate={false} />
             <Icon size={64} color="#FFFFFF" />
           </View>
 
-          {/* Mini cards cluster — absolute right */}
-          <View
-            style={{
-              position: "absolute",
-              right: 14,
-              top: 22,
-              flexDirection: "row",
-            }}
-          >
+          {/* Mini cards cluster */}
+          <View style={{ position: "absolute", right: 14, top: 22, flexDirection: "row" }}>
             {miniCards.map((c, i) => (
               <MiniCardFace
                 key={i}
@@ -107,7 +99,6 @@ export function PackCard({
 
         {/* Content zone */}
         <View style={{ paddingTop: 16, paddingHorizontal: 18, paddingBottom: 18 }}>
-          {/* Title group */}
           <View style={{ marginBottom: 4 }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
               <Text
@@ -119,32 +110,21 @@ export function PackCard({
               {badge && (
                 <View
                   style={{
-                    backgroundColor: colors.p2Bg,
+                    backgroundColor: colors.hues.coral[0],
                     paddingHorizontal: 8,
                     paddingVertical: 3,
-                    borderRadius: 6,
+                    borderRadius: 8,
+                    boxShadow: `0 2px 0 ${colors.hues.coral[1]}`,
                   }}
                 >
-                  <Text
-                    style={{
-                      fontFamily: "Nunito_700Bold",
-                      fontSize: 9,
-                      letterSpacing: 0.5,
-                      color: colors.p2,
-                    }}
-                  >
+                  <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 9, letterSpacing: 0.5, color: "#fff" }}>
                     {badge}
                   </Text>
                 </View>
               )}
             </View>
             <Text
-              style={{
-                fontFamily: "Nunito_700Bold",
-                fontSize: 11,
-                letterSpacing: 0.3,
-                color: colors.onSurfaceMuted,
-              }}
+              style={{ fontFamily: "Fredoka_700Bold", fontSize: 11, letterSpacing: 0.3, color: colors.onSurfaceMuted }}
             >
               {count}
             </Text>
@@ -152,7 +132,7 @@ export function PackCard({
 
           <Text
             style={{
-              fontFamily: "Nunito_600SemiBold",
+              fontFamily: "Fredoka_700Bold",
               fontSize: 12,
               lineHeight: 16.8,
               color: colors.onSurfaceMuted,
@@ -162,24 +142,35 @@ export function PackCard({
             {description}
           </Text>
 
-          {/* CTA — boosted: bigger pad, separate price chip on right */}
+          {/* Chunky CTA — visual only (outer Pressable handles the tap) */}
           <View
             style={{
-              backgroundColor: owned ? colors.success : colors.primaryContainer,
+              backgroundColor: ctaBase,
               borderRadius: 14,
               paddingVertical: 14,
               paddingHorizontal: 16,
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
+              boxShadow: `0 4px 0 ${ctaLip}`,
+              overflow: "hidden",
             }}
           >
+            {/* gloss */}
+            <View
+              pointerEvents="none"
+              style={{
+                position: "absolute",
+                left: "6%",
+                right: "6%",
+                top: 5,
+                height: "32%",
+                borderRadius: 999,
+                backgroundColor: "#FFFFFF52",
+              }}
+            />
             <View style={{ flexDirection: "row", alignItems: "center", gap: 10, flexShrink: 1 }}>
-              <Ionicons
-                name={owned ? "checkmark-circle" : "bag"}
-                size={18}
-                color="#FFFFFF"
-              />
+              <Ionicons name={owned ? "checkmark-circle" : "bag"} size={18} color="#FFFFFF" />
               <Text
                 numberOfLines={1}
                 style={{ fontFamily: "Fredoka_700Bold", fontSize: 15, color: "#FFFFFF" }}
@@ -190,7 +181,7 @@ export function PackCard({
             {!owned && (
               <View
                 style={{
-                  backgroundColor: "rgba(255,255,255,0.22)",
+                  backgroundColor: "#FFFFFF38",
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   borderRadius: 10,

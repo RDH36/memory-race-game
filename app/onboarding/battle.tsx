@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
@@ -8,8 +8,10 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { playFlip, playMatch } from "../../lib/sound";
 import { CardItem } from "../../components/game/CardItem";
-import { OpponentCard, ProgressDots, formatTime } from "../../components/game/PlayerHUD";
+import { BattleHUD } from "../../components/game/arcade/BattleHUD";
+import { useGameChatter } from "../../components/game/arcade/useGameChatter";
 import { usePlayerStats } from "../../lib/playerStats";
+import type { MatchResult } from "../../hooks/useLocalGame";
 
 // Pre-shuffled 2x4 grid — 4 pairs
 const EMOJIS = ["🐶", "🦊", "🐸", "🐱", "🐱", "🐶", "🐸", "🦊"];
@@ -19,9 +21,22 @@ type TooltipData = { text: string; type: "info" | "success" | "error"; key: numb
 
 function Tooltip({ text, type }: { text: string; type: TooltipData["type"] }) {
   const { colors } = useTheme();
-  const bg = type === "success" ? colors.success : type === "error" ? colors.p2 : colors.primaryContainer;
+  const hue =
+    type === "success" ? colors.hues.green : type === "error" ? colors.hues.coral : colors.hues.violet;
+  const [c, cd] = hue;
   return (
-    <Animated.View entering={FadeInDown.duration(250)} style={{ backgroundColor: bg, borderRadius: 18, paddingHorizontal: 24, paddingVertical: 14, alignSelf: "stretch", marginHorizontal: 4 }}>
+    <Animated.View
+      entering={FadeInDown.duration(250)}
+      style={{
+        backgroundColor: c,
+        borderRadius: 18,
+        paddingHorizontal: 24,
+        paddingVertical: 14,
+        alignSelf: "stretch",
+        marginHorizontal: 4,
+        boxShadow: `0 4px 0 ${cd}`,
+      }}
+    >
       <Text style={{ color: "#FFF", fontFamily: "Fredoka_700Bold", fontSize: 18, textAlign: "center" }}>{text}</Text>
     </Animated.View>
   );
@@ -30,7 +45,7 @@ function Tooltip({ text, type }: { text: string; type: TooltipData["type"] }) {
 export default function BattleScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const { avatar } = usePlayerStats();
 
   const [selected, setSelected] = useState<number[]>([]);
@@ -40,10 +55,9 @@ export default function BattleScreen() {
   const [scoreP2, setScoreP2] = useState(0);
   const [lastMatch, setLastMatch] = useState<{ cards: number[]; type: "match" | "mismatch"; player: 1 | 2 } | null>(null);
   const [tooltip, setTooltip] = useState<TooltipData>({ text: "", type: "info", key: 0 });
-  const [turnTimer, setTurnTimer] = useState(0);
+  const [gridDims, setGridDims] = useState<{ w: number; h: number } | null>(null);
   const lockedRef = useRef(false);
   const keyRef = useRef(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Refs to avoid stale closures in resolve/cpuTurn chains
   const matchedByRef = useRef(matchedBy);
@@ -60,15 +74,7 @@ export default function BattleScreen() {
 
   useEffect(() => { showTooltip(t("onboarding.battle.yourTurn"), "info"); }, []);
 
-  // Turn timer
-  useEffect(() => {
-    setTurnTimer(0);
-    timerRef.current = setInterval(() => setTurnTimer((p) => p + 1), 1000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [turn]);
-
   const goToResult = (p1: number, p2: number) => {
-    if (timerRef.current) clearInterval(timerRef.current);
     setTimeout(() => {
       router.replace({ pathname: "/onboarding/result", params: { p1: String(p1), p2: String(p2) } });
     }, 1200);
@@ -143,41 +149,75 @@ export default function BattleScreen() {
     }, 1000);
   }, [resolve]);
 
+  // Memoize so the reference only changes when `lastMatch` changes — otherwise
+  // a fresh object every render retriggers useGameChatter's effect → infinite loop.
+  const matchResult: MatchResult = useMemo(
+    () =>
+      lastMatch
+        ? { type: lastMatch.type, player: lastMatch.player, cards: [lastMatch.cards[0], lastMatch.cards[1]] }
+        : null,
+    [lastMatch],
+  );
+  const chatter = useGameChatter({
+    lastMatchResult: matchResult,
+    currentTurn: turn,
+    status: "playing",
+    playerAvatar: avatar,
+    opponentAvatar: "🐣",
+  });
+
+  // Few cards (8) → grow them to fill the board instead of a fixed 4 cols.
+  const { gCols, cardSize } = useMemo(() => {
+    if (!gridDims) return { gCols: 4, cardSize: 0 };
+    let best = { cols: 4, size: 0 };
+    for (const c of [2, 4]) {
+      const r = Math.ceil(EMOJIS.length / c);
+      const w = (gridDims.w - (c - 1) * 8) / c;
+      const h = (gridDims.h - (r - 1) * 8) / r;
+      const s = Math.min(w, h);
+      if (s > best.size) best = { cols: c, size: s };
+    }
+    return { gCols: best.cols, cardSize: Math.floor(best.size) };
+  }, [gridDims]);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
       <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 4, paddingBottom: 8 }}>
-        {/* Opponent card — BabyBot */}
-        <OpponentCard
-          name="BabyBot"
-          subtitle={`🤖 ${t("game.ia")} · ${t("home.difficulty.easy")}`}
-          avatar="🐣"
-          pairsMatched={scoreP2}
+        {/* Battle HUD — same as the real game */}
+        <BattleHUD
+          player={{ avatar, name: t("game.you"), score: scoreP1, active: turn === 1 }}
+          opponent={{ avatar: "🐣", name: "BabyBot", score: scoreP2, active: turn === 2 }}
+          matched={scoreP1 + scoreP2}
           totalPairs={TOTAL_PAIRS}
-          isActive={turn === 2}
-          timerSeconds={turn === 2 ? turnTimer : 0}
+          chatter={chatter}
         />
 
-        {/* Score */}
-        <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "center", marginVertical: 8 }}>
-          <Text style={{ fontSize: 11, fontFamily: "Nunito_700Bold", color: colors.onSurfaceVariant, letterSpacing: 1, marginRight: 8 }}>
-            {t("game.pairs")}
-          </Text>
-          <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.p1 }}>{scoreP1}</Text>
-          <Text style={{ fontSize: 14, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginHorizontal: 6 }}>—</Text>
-          <Text style={{ fontSize: 18, fontFamily: "Fredoka_700Bold", color: colors.p2 }}>{scoreP2}</Text>
-          <Text style={{ fontSize: 12, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginLeft: 4 }}>/ {TOTAL_PAIRS}</Text>
-        </View>
+        <View style={{ height: 12 }} />
 
-        {/* Tooltip */}
+        {/* Tooltip (tutorial guidance — unchanged) */}
         <View style={{ minHeight: 44, marginBottom: 4 }}>
           <Tooltip key={tooltip.key} text={tooltip.text} type={tooltip.type} />
         </View>
 
-        {/* Grid 2x4 using real CardItem */}
-        <View style={{ flex: 1, justifyContent: "center" }}>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, justifyContent: "center", paddingHorizontal: 4 }}>
+        {/* Grid using real CardItem — cards grow to fill the board */}
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 4 }}
+          onLayout={(e) => {
+            const { width, height } = e.nativeEvent.layout;
+            setGridDims({ w: width, h: height });
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              gap: 8,
+              justifyContent: "center",
+              width: cardSize > 0 ? gCols * cardSize + (gCols - 1) * 8 : "100%",
+            }}
+          >
             {EMOJIS.map((emoji, idx) => (
-              <View key={idx} style={{ width: "22%", aspectRatio: 1 }}>
+              <View key={idx} style={{ width: cardSize > 0 ? cardSize : "22%", height: cardSize > 0 ? cardSize : undefined, aspectRatio: cardSize > 0 ? undefined : 1 }}>
                 <CardItem
                   cardId={idx}
                   emoji={emoji}
@@ -190,23 +230,6 @@ export default function BattleScreen() {
                 />
               </View>
             ))}
-          </View>
-        </View>
-
-        {/* Player bar */}
-        <View style={{ flexDirection: "row", alignItems: "center", marginTop: 10, gap: 10 }}>
-          <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: colors.primaryContainerBg, alignItems: "center", justifyContent: "center" }}>
-            <Text style={{ fontSize: 18 }}>{avatar}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 14, fontFamily: "Fredoka_600SemiBold", color: colors.onSurface }}>{t("game.you")}</Text>
-            <Text style={{ fontSize: 11, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant }}>{t("game.player")}</Text>
-          </View>
-          <ProgressDots filled={scoreP1} total={TOTAL_PAIRS} />
-          <View style={{ backgroundColor: turn === 1 ? colors.primaryContainerBg : isDark ? "#2A2A2A" : "#F5F2F2", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 }}>
-            <Text style={{ fontSize: 14, fontFamily: "Fredoka_600SemiBold", color: turn === 1 ? colors.primaryContainer : colors.onSurfaceVariant }}>
-              {formatTime(turn === 1 ? turnTimer : 0)}
-            </Text>
           </View>
         </View>
       </View>

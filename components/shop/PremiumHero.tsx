@@ -1,11 +1,8 @@
 import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Gradient } from "../ui/Gradient";
 import { Crown } from "../ui/icons/Crown";
 import { Sparkle } from "../ui/icons/Sparkle";
 import { MiniCardFace, MiniCardBack } from "./MiniCard";
-import { ShapeAura } from "../appearance/ShapeAura";
-import { ENTITLEMENT } from "../../lib/revenuecat";
 
 interface Props {
   eyebrow: string;
@@ -18,8 +15,6 @@ interface Props {
   onPress: () => void;
 }
 
-const GRADIENT = ["#2A2374", "#3B309E", "#534AB7"];
-
 export function PremiumHero({
   eyebrow, title, subtitle, cta, price, owned, ownedLabel, onPress,
 }: Props) {
@@ -29,10 +24,10 @@ export function PremiumHero({
       style={({ pressed }) => ({
         transform: [{ scale: pressed ? 0.99 : 1 }],
         borderRadius: 28,
+        boxShadow: "0 5px 0 #4A2BC0, 0 18px 32px -14px #6C4CF1A6",
       })}
     >
-      <View style={{ borderRadius: 28, overflow: "hidden", minHeight: 340 }}>
-        <Gradient colors={GRADIENT} angle={160} borderRadius={28} style={{ flex: 1, minHeight: 340 }}>
+      <View style={{ borderRadius: 28, overflow: "hidden", minHeight: 340, backgroundColor: "#6C4CF1" }}>
           {/* Cards showcase row — 4 overlapping, rotated. Star aura orbits behind. */}
           <View
             style={{
@@ -179,7 +174,6 @@ export function PremiumHero({
               )}
             </View>
           </View>
-        </Gradient>
       </View>
     </Pressable>
   );

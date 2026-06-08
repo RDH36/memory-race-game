@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Text, View, Pressable } from "react-native";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
@@ -9,7 +9,6 @@ import Animated, {
   useAnimatedStyle,
   withRepeat,
   withTiming,
-  FadeIn,
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
@@ -22,7 +21,7 @@ import {
   useRoomById,
 } from "../../lib/roomLogic";
 import { CountdownOverlay } from "../../components/room/CountdownOverlay";
-import { Button } from "../../components/ui/Button";
+import { Avatar, Btn3D, IconBtn, Pop } from "@/components/ui/arcade";
 import { id, tx } from "@instantdb/react-native";
 import { db } from "../../lib/instant";
 import type { CpuDifficulty } from "../../lib/gameLogic";
@@ -310,42 +309,57 @@ export default function MatchmakingScreen() {
     );
   }
 
+  const [violet, violetD] = colors.hues.violet;
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
       <View style={{ padding: 16 }}>
-        <Pressable
-          onPress={handleCancel}
-          hitSlop={16}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingVertical: 6,
-            paddingHorizontal: 10,
-            borderRadius: 10,
-            backgroundColor: colors.surfaceContainer,
-            alignSelf: "flex-start",
-          }}
-        >
-          <Text style={{ fontSize: 18, color: colors.onSurfaceVariant, marginRight: 4 }}>←</Text>
-          <Text style={{ fontSize: 14, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceVariant }}>
-            {t("game.menu")}
-          </Text>
-        </Pressable>
+        <IconBtn color="white" onPress={handleCancel}>
+          ‹
+        </IconBtn>
       </View>
 
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 24 }}>
         {matchState === "searching" && (
           <>
-            <Text style={{ fontSize: 48, marginBottom: 24 }}>🎲</Text>
+            {/* radar */}
+            <View style={{ width: 150, height: 150, marginBottom: 30, alignItems: "center", justifyContent: "center" }}>
+              {[0, 1, 2].map((i) => (
+                <Animated.View
+                  key={i}
+                  style={[
+                    pulseStyle,
+                    {
+                      position: "absolute",
+                      width: 150,
+                      height: 150,
+                      borderRadius: 999,
+                      borderWidth: 3,
+                      borderColor: violet,
+                      opacity: 0.5 - i * 0.15,
+                      transform: [{ scale: 1 + i * 0.18 }],
+                    },
+                  ]}
+                />
+              ))}
+              <View
+                style={{
+                  width: 96,
+                  height: 96,
+                  borderRadius: 999,
+                  backgroundColor: violet,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: `0 8px 0 ${violetD}`,
+                }}
+              >
+                <Text style={{ fontSize: 48 }}>{avatar}</Text>
+              </View>
+            </View>
             <Animated.Text
               style={[
                 pulseStyle,
-                {
-                  fontSize: 18,
-                  fontFamily: "Fredoka_700Bold",
-                  color: colors.onSurface,
-                  marginBottom: 8,
-                },
+                { fontSize: 22, fontFamily: "Fredoka_700Bold", color: colors.onSurface, marginBottom: 6 },
               ]}
             >
               {t("room.searching")}
@@ -353,54 +367,47 @@ export default function MatchmakingScreen() {
             <Text
               style={{
                 fontSize: 13,
-                fontFamily: "Nunito_400Regular",
-                color: colors.onSurfaceVariant,
+                fontFamily: "Fredoka_700Bold",
+                color: colors.onSurfaceMuted,
                 textAlign: "center",
-                marginBottom: 16,
+                marginBottom: 14,
               }}
             >
               {t("room.searchingDesc")}
             </Text>
             <Text
-              style={{
-                fontSize: 28,
-                fontFamily: "Fredoka_600SemiBold",
-                color: colors.onSurfaceVariant,
-                marginBottom: 40,
-              }}
+              style={{ fontSize: 24, fontFamily: "Fredoka_700Bold", color: colors.onSurfaceVariant, marginBottom: 40 }}
             >
               {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}
             </Text>
+            <Btn3D color="white" size="md" label={t("room.cancel")} onPress={handleCancel} style={{ alignSelf: "center" }} />
           </>
         )}
 
         {matchState === "found" && room && (
-          <Animated.View entering={FadeIn.duration(400)} style={{ alignItems: "center" }}>
-            <Text style={{ fontSize: 48, marginBottom: 24 }}>🎯</Text>
+          <Pop style={{ alignItems: "center" }}>
             <Text
               style={{
-                fontSize: 18,
+                fontSize: 14,
                 fontFamily: "Fredoka_700Bold",
-                color: colors.primaryContainer,
-                marginBottom: 8,
+                letterSpacing: 1.5,
+                color: colors.success,
+                marginBottom: 18,
               }}
             >
               {t("room.found")}
             </Text>
+            <Avatar
+              emoji={isHost ? room.guestAvatar ?? "🧠" : room.hostAvatar}
+              size={120}
+              color="coral"
+            />
             <Text
-              style={{
-                fontSize: 14,
-                fontFamily: "Nunito_600SemiBold",
-                color: colors.onSurfaceVariant,
-              }}
+              style={{ fontSize: 24, fontFamily: "Fredoka_700Bold", color: colors.onSurface, marginTop: 16 }}
             >
-              vs {isHost ? room.guestNickname : room.hostNickname}
+              {isHost ? room.guestNickname : room.hostNickname}
             </Text>
-          </Animated.View>
-        )}
-
-        {matchState === "searching" && (
-          <Button icon="✕" text={t("room.cancel")} variant="ghost" onPress={handleCancel} />
+          </Pop>
         )}
       </View>
     </SafeAreaView>

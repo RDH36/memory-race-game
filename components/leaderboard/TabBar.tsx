@@ -24,11 +24,13 @@ export function TabBar({
     <View
       style={{
         flexDirection: "row",
-        marginHorizontal: 20,
-        marginBottom: 12,
-        backgroundColor: isDark ? "#1E1E1E" : "#F0ECEC",
-        borderRadius: 12,
-        padding: 4,
+        marginHorizontal: 16,
+        marginBottom: 16,
+        backgroundColor: colors.surfaceContainer,
+        borderRadius: 16,
+        padding: 5,
+        gap: 4,
+        boxShadow: `0 3px 0 ${colors.panelLip}, 0 10px 22px -14px ${colors.panelShadow}`,
       }}
     >
       {tabs.map((tab) => {
@@ -39,19 +41,20 @@ export function TabBar({
             onPress={() => !tab.disabled && onChangeTab(tab.key)}
             style={{
               flex: 1,
-              paddingVertical: 8,
-              borderRadius: 10,
+              paddingVertical: 9,
+              borderRadius: 13,
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: isActive ? colors.surface : "transparent",
+              backgroundColor: isActive ? colors.primary : "transparent",
+              boxShadow: isActive ? `0 3px 0 ${colors.hues.violet[1]}` : undefined,
               opacity: tab.disabled ? 0.4 : 1,
             }}
           >
             <Text
               style={{
-                fontSize: 13,
-                fontFamily: isActive ? "Nunito_700Bold" : "Nunito_600SemiBold",
-                color: isActive ? colors.onSurface : colors.onSurfaceVariant,
+                fontSize: 14,
+                fontFamily: "Fredoka_700Bold",
+                color: isActive ? "#fff" : colors.onSurfaceMuted,
               }}
             >
               {tab.label}

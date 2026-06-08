@@ -49,13 +49,23 @@ export function LeaderboardRow({
   const podium = isPodium ? PODIUM_COLORS[rank] : null;
 
   const baseBackground = item.isCurrentUser
-    ? colors.primaryContainerBg
+    ? colors.primary
     : colors.surfaceContainer;
   const background = podium
     ? isDark
       ? podium.bgDark
       : podium.bg
     : baseBackground;
+  const nameColor = podium
+    ? podium.accent
+    : item.isCurrentUser
+      ? "#fff"
+      : colors.onSurface;
+  const valueColor = podium
+    ? podium.accent
+    : item.isCurrentUser
+      ? "#fff"
+      : colors.primary;
 
   return (
     <Pressable onPress={onPress}>
@@ -65,12 +75,13 @@ export function LeaderboardRow({
           alignItems: "center",
           paddingVertical: podium ? 16 : 12,
           paddingHorizontal: 16,
-          marginHorizontal: 20,
-          marginBottom: podium ? 10 : 6,
+          marginHorizontal: 16,
+          marginBottom: podium ? 11 : 7,
           borderRadius: 16,
           backgroundColor: background,
-          borderWidth: podium ? 1.5 : 0,
+          borderWidth: podium ? 2 : 0,
           borderColor: podium?.border,
+          boxShadow: `0 3px 0 ${item.isCurrentUser ? colors.hues.violet[1] : colors.panelLip}, 0 10px 22px -14px ${colors.panelShadow}`,
         }}
       >
         <View style={{ width: podium ? 36 : 32, alignItems: "center" }}>
@@ -81,9 +92,9 @@ export function LeaderboardRow({
           ) : (
             <Text
               style={{
-                fontSize: 14,
-                fontFamily: "Nunito_700Bold",
-                color: colors.onSurfaceVariant,
+                fontSize: 15,
+                fontFamily: "Fredoka_700Bold",
+                color: item.isCurrentUser ? "rgba(255,255,255,0.85)" : colors.onSurfaceMuted,
               }}
             >
               {rank}
@@ -133,15 +144,9 @@ export function LeaderboardRow({
         <View style={{ flex: 1, marginLeft: 12 }}>
           <Text
             style={{
-              fontSize: podium ? 16 : 14,
-              fontFamily: podium || item.isCurrentUser
-                ? "Fredoka_700Bold"
-                : "Nunito_600SemiBold",
-              color: podium
-                ? podium.accent
-                : item.isCurrentUser
-                  ? colors.primaryContainer
-                  : colors.onSurface,
+              fontSize: podium ? 16 : 15,
+              fontFamily: "Fredoka_700Bold",
+              color: nameColor,
             }}
           >
             {item.name}
@@ -149,8 +154,8 @@ export function LeaderboardRow({
           <Text
             style={{
               fontSize: 11,
-              fontFamily: "Nunito_400Regular",
-              color: colors.onSurfaceVariant,
+              fontFamily: "Fredoka_700Bold",
+              color: item.isCurrentUser && !podium ? "rgba(255,255,255,0.8)" : colors.onSurfaceMuted,
               marginTop: 1,
             }}
           >
@@ -162,12 +167,8 @@ export function LeaderboardRow({
         <Text
           style={{
             fontSize: podium ? 15 : 14,
-            fontFamily: "Nunito_700Bold",
-            color: podium
-              ? podium.accent
-              : item.isCurrentUser
-                ? colors.primaryContainer
-                : colors.onSurface,
+            fontFamily: "Fredoka_700Bold",
+            color: valueColor,
           }}
         >
           {`${item.xp.toLocaleString()} ${t("leaderboard.xp")}`}

@@ -4,6 +4,7 @@ import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../lib/ThemeContext";
+import { haptics } from "../../lib/haptics";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   useSharedValue,
@@ -25,6 +26,7 @@ function TabBarButton({
   return (
     <Pressable
       onPress={(e) => {
+        haptics.select();
         scale.value = withSpring(0.85, { damping: 10, stiffness: 400 });
         setTimeout(() => {
           scale.value = withSpring(1, { damping: 8, stiffness: 300 });
@@ -50,9 +52,11 @@ function TabBarButton({
 function PlayButton({
   onPress,
   color,
+  lip,
 }: {
   onPress: () => void;
   color: string;
+  lip: string;
 }) {
   const scale = useSharedValue(1);
   const style = useAnimatedStyle(() => ({
@@ -62,6 +66,7 @@ function PlayButton({
   return (
     <Pressable
       onPress={() => {
+        haptics.press();
         scale.value = withSpring(0.85, { damping: 10, stiffness: 400 });
         setTimeout(() => {
           scale.value = withSpring(1, { damping: 8, stiffness: 300 });
@@ -83,13 +88,27 @@ function PlayButton({
             bottom: 8,
             width: 56,
             height: 56,
-            borderRadius: 28,
+            borderRadius: 20,
             backgroundColor: color,
             alignItems: "center",
             justifyContent: "center",
+            boxShadow: `0 5px 0 ${lip}, 0 12px 20px -6px ${color}99`,
           },
         ]}
       >
+        {/* gloss */}
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            left: 9,
+            right: 9,
+            top: 6,
+            height: 16,
+            borderRadius: 999,
+            backgroundColor: "rgba(255,255,255,0.3)",
+          }}
+        />
         <Ionicons name="game-controller" size={26} color="#FFFFFF" />
       </Animated.View>
     </Pressable>
@@ -159,6 +178,7 @@ export default function TabsLayout() {
             <PlayButton
               onPress={() => props.onPress?.({} as any)}
               color={colors.primaryContainer}
+              lip={colors.hues.violet[1]}
             />
           ),
         }}

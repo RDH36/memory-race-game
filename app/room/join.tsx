@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { Text, View, TextInput, Pressable } from "react-native";
+import { Text, View, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import * as Haptics from "expo-haptics";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
+import { haptics } from "@/lib/haptics";
 import { joinRoom, useRoom } from "../../lib/roomLogic";
 import { CountdownOverlay } from "../../components/room/CountdownOverlay";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
-import { Button } from "../../components/ui/Button";
+import { Btn3D, ScreenHeader } from "@/components/ui/arcade";
 
 const ERROR_ICONS: Record<string, string> = {
   notFound: "🔍",
@@ -23,7 +23,7 @@ const ERROR_ICONS: Record<string, string> = {
 export default function JoinRoomScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const { userId, nickname, avatar } = usePlayerStats();
 
   const [code, setCode] = useState("");
@@ -49,12 +49,12 @@ export default function JoinRoomScreen() {
 
     if (result.error) {
       setErrorKey(result.error);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      haptics.miss();
       setLoading(false);
       return;
     }
 
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    haptics.match();
     setJoinedCode(code.toUpperCase());
     setLoading(false);
   };
@@ -91,7 +91,7 @@ export default function JoinRoomScreen() {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <Text style={{ fontSize: 16, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceVariant }}>
+          <Text style={{ fontSize: 16, fontFamily: "Fredoka_700Bold", color: colors.onSurfaceVariant }}>
             {t("room.waitingHost")}
           </Text>
         </View>
@@ -101,19 +101,20 @@ export default function JoinRoomScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
-      <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 16 }}>
-        <Pressable onPress={() => router.back()} hitSlop={16}
-          style={{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 10, borderRadius: 10, backgroundColor: colors.surfaceContainer, alignSelf: "flex-start", marginBottom: 32 }}
-        >
-          <Text style={{ fontSize: 18, color: colors.onSurfaceVariant, marginRight: 4 }}>←</Text>
-          <Text style={{ fontSize: 14, fontFamily: "Nunito_600SemiBold", color: colors.onSurfaceVariant }}>{t("game.menu")}</Text>
-        </Pressable>
+      <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 12 }}>
+        <ScreenHeader title={t("room.joinRoom")} onBack={() => router.back()} />
 
-        <View style={{ alignItems: "center", marginTop: 40 }}>
-          <Text style={{ fontSize: 24, fontFamily: "Fredoka_700Bold", color: colors.onSurface, marginBottom: 8 }}>
-            {t("room.joinTitle")}
-          </Text>
-          <Text style={{ fontSize: 14, fontFamily: "Nunito_400Regular", color: colors.onSurfaceVariant, marginBottom: 32 }}>
+        <View style={{ alignItems: "center", marginTop: 30 }}>
+          <Text
+            style={{
+              fontSize: 13,
+              fontFamily: "Fredoka_700Bold",
+              color: colors.onSurfaceMuted,
+              letterSpacing: 1,
+              marginBottom: 16,
+              textAlign: "center",
+            }}
+          >
             {t("room.joinSubtitle")}
           </Text>
 
@@ -123,33 +124,36 @@ export default function JoinRoomScreen() {
               setCode(text.toUpperCase().slice(0, 6));
             }}
             placeholder="ABCDEF"
-            placeholderTextColor={colors.onSurfaceVariant}
+            placeholderTextColor={colors.onSurfaceMuted}
             autoCapitalize="characters"
             maxLength={6}
             style={{
-              fontSize: 32,
+              fontSize: 34,
               fontFamily: "Fredoka_700Bold",
-              color: colors.primaryContainer,
+              color: colors.primary,
               textAlign: "center",
-              letterSpacing: 8,
-              backgroundColor: isDark ? "#1E1E1E" : "#F5F2F2",
+              letterSpacing: 10,
+              backgroundColor: colors.surfaceContainer,
               paddingHorizontal: 24,
-              paddingVertical: 16,
-              borderRadius: 16,
+              paddingVertical: 18,
+              borderRadius: 18,
               width: "100%",
-              marginBottom: 12,
+              marginBottom: 20,
+              boxShadow: `0 3px 0 ${colors.panelLip}, 0 10px 22px -12px ${colors.panelShadow}`,
             }}
           />
 
-          <View style={{ width: "100%", marginTop: 8 }}>
-            <Button
-              icon="🎮"
-              text={t("room.join")}
-              loading={loading}
-              disabled={code.length !== 6}
-              onPress={handleJoin}
-            />
-          </View>
+          <Btn3D
+            color="green"
+            size="lg"
+            full
+            label={t("room.join")}
+            loading={loading}
+            disabled={code.length !== 6}
+            onPress={handleJoin}
+          >
+            <Text style={{ fontSize: 18 }}>🎮</Text>
+          </Btn3D>
         </View>
       </View>
 

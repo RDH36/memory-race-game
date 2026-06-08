@@ -10,8 +10,7 @@ import { usePlayerStats } from "../../lib/playerStats";
 import { useUnlockedAvatars, entitlementToPackId } from "../../lib/skins";
 import { saveProfile } from "../../lib/identity";
 import { db } from "../../lib/instant";
-import { radii } from "../../components/ui/theme";
-import { Button } from "../../components/ui/Button";
+import { Avatar, Btn3D } from "@/components/ui/arcade";
 import { LockBadge } from "../../components/ui/LockBadge";
 
 export default function SetupScreen() {
@@ -69,15 +68,9 @@ export default function SetupScreen() {
           {t("setup.subtitle")}
         </Text>
 
-        {/* Selected avatar (large, white circle) */}
+        {/* Selected avatar — chunky arcade frame */}
         <View style={{ alignItems: "center", marginBottom: 24 }}>
-          <View style={{
-            width: 100, height: 100, borderRadius: 50,
-            backgroundColor: "#FFFFFF",
-            alignItems: "center", justifyContent: "center",
-          }}>
-            <Text style={{ fontSize: 52 }}>{selectedAvatar}</Text>
-          </View>
+          <Avatar emoji={selectedAvatar} size={100} color="violet" />
         </View>
 
         {/* Avatar grid */}
@@ -100,13 +93,14 @@ export default function SetupScreen() {
                   setSelectedAvatar(skin.id);
                 }}
                 style={({ pressed }) => ({
-                  width: 52, height: 52, borderRadius: 26,
-                  backgroundColor: isActive ? colors.primaryContainerBg : "#FFFFFF",
-                  borderWidth: isActive ? 2.5 : 0,
-                  borderColor: colors.primaryContainer,
+                  width: 52, height: 52, borderRadius: 16,
+                  backgroundColor: isActive ? colors.hues.violet[2] : colors.surfaceContainer,
                   alignItems: "center", justifyContent: "center",
                   transform: [{ scale: pressed ? 0.9 : 1 }],
                   opacity: skin.unlocked ? 1 : 0.55,
+                  boxShadow: isActive
+                    ? `inset 0 0 0 3px ${colors.hues.violet[0]}, 0 3px 0 ${colors.hues.violet[1]}`
+                    : `0 3px 0 ${colors.panelLip}`,
                 })}
               >
                 <Text style={{ fontSize: 26 }}>{skin.emoji}</Text>
@@ -127,11 +121,12 @@ export default function SetupScreen() {
           style={{
             backgroundColor: colors.surfaceContainer,
             color: colors.onSurface,
-            borderRadius: radii.md,
+            borderRadius: 18,
             paddingHorizontal: 16, paddingVertical: 16,
-            fontSize: 18, fontFamily: "Nunito_600SemiBold",
+            fontSize: 18, fontFamily: "Fredoka_700Bold",
             textAlign: "center",
             marginBottom: error ? 8 : 32,
+            boxShadow: `0 3px 0 ${colors.panelLip}, 0 10px 22px -12px ${colors.panelShadow}`,
           }}
         />
 
@@ -142,8 +137,12 @@ export default function SetupScreen() {
         ) : null}
 
         {/* Continue button */}
-        <Button
-          text={t("setup.continue")}
+        <Btn3D
+          color="violet"
+          size="lg"
+          full
+          haptic="press"
+          label={t("setup.continue")}
           onPress={handleSave}
           disabled={!canContinue}
           loading={loading}

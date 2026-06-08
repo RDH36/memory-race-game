@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import * as Haptics from "expo-haptics";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -8,7 +7,39 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
+import { haptics } from "@/lib/haptics";
 import { useTranslation } from "react-i18next";
+
+function Fighter({
+  avatar,
+  name,
+  hue,
+}: {
+  avatar: string;
+  name: string;
+  hue: readonly [string, string, string];
+}) {
+  return (
+    <View style={{ alignItems: "center" }}>
+      <View
+        style={{
+          width: 96,
+          height: 96,
+          borderRadius: 28,
+          backgroundColor: hue[0],
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: `0 6px 0 ${hue[1]}`,
+        }}
+      >
+        <Text style={{ fontSize: 50 }}>{avatar}</Text>
+      </View>
+      <Text style={{ fontSize: 16, fontFamily: "Fredoka_700Bold", color: hue[1], marginTop: 12 }} numberOfLines={1}>
+        {name}
+      </Text>
+    </View>
+  );
+}
 
 interface CountdownOverlayProps {
   hostAvatar: string;
@@ -50,13 +81,13 @@ export function CountdownOverlay({
 
   useEffect(() => {
     if (count > 0) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      haptics.countdown();
       scale.value = 1.4;
       opacity.value = 0.6;
       scale.value = withSpring(1, { damping: 8, stiffness: 200 });
       opacity.value = withTiming(1, { duration: 300 });
     } else {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptics.go();
       scale.value = withSpring(1.6, { damping: 6, stiffness: 150 });
     }
   }, [count]);
@@ -80,79 +111,49 @@ export function CountdownOverlay({
         zIndex: 100,
       }}
     >
-      {/* Players */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 24,
-          marginBottom: 48,
-        }}
-      >
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: 40 }}>{hostAvatar}</Text>
-          <Text
-            style={{
-              fontSize: 14,
-              fontFamily: "Fredoka_600SemiBold",
-              color: colors.p1,
-              marginTop: 6,
-            }}
-          >
-            {hostNickname}
-          </Text>
-        </View>
-
-        <Text
-          style={{
-            fontSize: 20,
-            fontFamily: "Fredoka_700Bold",
-            color: colors.onSurfaceVariant,
-          }}
-        >
-          VS
-        </Text>
-
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: 40 }}>{guestAvatar}</Text>
-          <Text
-            style={{
-              fontSize: 14,
-              fontFamily: "Fredoka_600SemiBold",
-              color: colors.p2,
-              marginTop: 6,
-            }}
-          >
-            {guestNickname}
-          </Text>
-        </View>
-      </View>
-
-      {/* Countdown label */}
       <Text
         style={{
-          fontSize: 14,
-          fontFamily: "Nunito_600SemiBold",
-          color: colors.onSurfaceVariant,
-          marginBottom: 12,
-          letterSpacing: 1,
+          fontSize: 13,
+          fontFamily: "Fredoka_700Bold",
+          letterSpacing: 2,
+          color: colors.primary,
+          marginBottom: 26,
         }}
       >
-        {t("room.startingIn")}
+        ★ {t("room.startingIn").toUpperCase()} ★
       </Text>
+
+      {/* Fighters */}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 44 }}>
+        <Fighter avatar={hostAvatar} name={hostNickname} hue={colors.hues.blue} />
+        <View
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 999,
+            backgroundColor: colors.hues.coral[0],
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: `0 5px 0 ${colors.hues.coral[1]}`,
+          }}
+        >
+          <Text style={{ fontSize: 20, fontFamily: "Fredoka_700Bold", color: "#fff" }}>VS</Text>
+        </View>
+        <Fighter avatar={guestAvatar} name={guestNickname} hue={colors.hues.coral} />
+      </View>
 
       {/* Number */}
       <Animated.Text
         style={[
           numberStyle,
           {
-            fontSize: count === 0 ? 36 : 72,
+            fontSize: count === 0 ? 54 : 72,
             fontFamily: "Fredoka_700Bold",
-            color: count <= 3 && count > 0 ? colors.error : colors.primaryContainer,
+            color: count === 0 ? colors.success : count <= 3 ? colors.error : colors.primary,
           },
         ]}
       >
-        {count === 0 ? "GO!" : count}
+        {count === 0 ? "GO !" : count}
       </Animated.Text>
 
       {/* Who starts first */}
@@ -160,8 +161,8 @@ export function CountdownOverlay({
         <Text
           style={{
             fontSize: 14,
-            fontFamily: "Nunito_700Bold",
-            color: colors.onSurfaceVariant,
+            fontFamily: "Fredoka_700Bold",
+            color: colors.onSurfaceMuted,
             marginTop: 24,
           }}
         >

@@ -2,18 +2,18 @@ import { useCallback, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import * as Haptics from "expo-haptics";
 import { useTranslation } from "react-i18next";
-import { Label } from "../../components/ui/Label";
-import { ModeBackButton } from "../../components/mode/ModeBackButton";
-import { ModeHero } from "../../components/mode/ModeHero";
-import { ModeStatsStrip } from "../../components/mode/ModeStatsStrip";
-import { ModeOptionCard } from "../../components/mode/ModeOptionCard";
+import type { HueName } from "@/components/ui/theme";
+import { ScreenHeader } from "@/components/ui/arcade";
+import { ChoiceRow } from "@/components/mode/arcade/ChoiceRow";
+import { ModeHeroArcade } from "@/components/mode/arcade/ModeHeroArcade";
+import { ModeStatsArcade } from "@/components/mode/arcade/ModeStatsArcade";
 import { ModeXpBoost } from "../../components/mode/ModeXpBoost";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { useGameModeStats } from "../../lib/gameModeStats";
 import { useRewardedAd } from "../../hooks/useRewardedAd";
+import { haptics } from "@/lib/haptics";
 
 type Difficulty = "easy" | "medium" | "hard";
 
@@ -37,34 +37,34 @@ export default function SoloModeScreen() {
     : 0;
   const aiWinRate = totalAi > 0 ? Math.round((totalAiWon / totalAi) * 100) : 0;
 
-  const options: { key: Difficulty; icon: string; title: string; desc: string; color: string }[] = [
+  const options: { key: Difficulty; icon: string; title: string; desc: string; color: HueName }[] = [
     {
       key: "easy",
       icon: "🐣",
       title: t("home.difficulty.easy"),
       desc: t("home.difficulty.easyDesc"),
-      color: colors.success,
+      color: "green",
     },
     {
       key: "medium",
       icon: "🦊",
       title: t("home.difficulty.medium"),
       desc: t("home.difficulty.mediumDesc"),
-      color: colors.primaryContainer,
+      color: "violet",
     },
     {
       key: "hard",
       icon: "🤖",
       title: t("home.difficulty.hard"),
       desc: t("home.difficulty.hardDesc"),
-      color: colors.p2,
+      color: "coral",
     },
   ];
 
   const handleSelectDifficulty = (difficulty: Difficulty) => {
     if (loading) return;
     setLoading(difficulty);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.tap();
 
     const shouldBoost = xpBoost && rewardedLoaded;
 
@@ -98,27 +98,26 @@ export default function SoloModeScreen() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        <ModeBackButton />
+        <ScreenHeader title={t("home.modes.solo")} onBack={() => router.back()} />
 
-        <ModeHero
-          gradientColors={[colors.primaryContainer, colors.primary]}
-          icon="🎮"
+        <ModeHeroArcade
+          icon="🧠"
           title={t("home.modes.solo")}
           subtitle={t("home.modes.soloDesc")}
+          color="blue"
         />
 
-        <ModeStatsStrip stats={stats} />
+        <ModeStatsArcade stats={stats} />
 
-        <Label text={t("home.difficultyLabel")} />
-        <View style={{ gap: 10, marginBottom: 20 }}>
+        <View style={{ gap: 13, marginBottom: 20 }}>
           {options.map((opt, index) => (
-            <ModeOptionCard
+            <ChoiceRow
               key={opt.key}
               icon={opt.icon}
               title={opt.title}
               desc={opt.desc}
               color={opt.color}
-              index={index}
+              delay={120 + index * 70}
               disabled={!!loading && loading !== opt.key}
               onPress={() => handleSelectDifficulty(opt.key)}
             />

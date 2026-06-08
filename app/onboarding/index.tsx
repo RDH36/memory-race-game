@@ -3,7 +3,6 @@ import { Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
-import * as Haptics from "expo-haptics";
 import Animated, {
   FadeInDown,
   FadeIn,
@@ -16,6 +15,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
+import { Btn3D } from "@/components/ui/arcade";
 
 const TEASER_EMOJIS = ["🐶", "?", "🦊"];
 
@@ -65,16 +65,19 @@ function FloatingCard({ emoji, delay, x }: { emoji: string; delay: number; x: nu
         {
           width: 72,
           height: 90,
-          borderRadius: 12,
-          backgroundColor: isQuestionCard ? colors.p1Bg : colors.surfaceContainer,
+          borderRadius: 16,
+          backgroundColor: isQuestionCard ? colors.hues.violet[0] : colors.surfaceContainer,
           justifyContent: "center",
           alignItems: "center",
           marginHorizontal: x,
+          boxShadow: isQuestionCard
+            ? `0 4px 0 ${colors.hues.violet[1]}, 0 12px 22px -12px ${colors.panelShadow}`
+            : `0 4px 0 ${colors.panelLip}, 0 12px 22px -12px ${colors.panelShadow}`,
         },
       ]}
     >
       {isQuestionCard ? (
-        <Text style={{ fontSize: 28, fontFamily: "Fredoka_700Bold", color: colors.p1 }}>?</Text>
+        <Text style={{ fontSize: 28, fontFamily: "Fredoka_700Bold", color: "#fff" }}>?</Text>
       ) : (
         <Text style={{ fontSize: 32 }}>{emoji}</Text>
       )}
@@ -88,7 +91,6 @@ export default function WelcomeScreen() {
   const { colors } = useTheme();
 
   const handleStart = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push("/onboarding/flip");
   };
 
@@ -150,27 +152,18 @@ export default function WelcomeScreen() {
           </Animated.Text>
         </View>
 
-        {/* CTA — Green zone (bottom) */}
+        {/* CTA */}
         <Animated.View entering={FadeInDown.delay(1000).duration(500)} style={{ paddingBottom: 24 }}>
-          <Animated.View
-            style={{
-              backgroundColor: colors.primaryContainer,
-              borderRadius: 16,
-              paddingVertical: 16,
-              alignItems: "center",
-            }}
+          <Btn3D
+            color="violet"
+            size="lg"
+            full
+            haptic="press"
+            label={t("onboarding.welcome.cta")}
+            onPress={handleStart}
           >
-            <Text
-              onPress={handleStart}
-              style={{
-                fontSize: 16,
-                fontFamily: "Fredoka_600SemiBold",
-                color: "#FFFFFF",
-              }}
-            >
-              {t("onboarding.welcome.cta")} →
-            </Text>
-          </Animated.View>
+            <Text style={{ fontSize: 18, color: "#fff" }}>▶</Text>
+          </Btn3D>
         </Animated.View>
       </View>
     </SafeAreaView>

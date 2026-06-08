@@ -43,10 +43,89 @@
     "dailyReward": "Daily reward",
     "dailyRewardSubtitle": "Claim your +{{xp}} XP for free",
     "dailyRewardClaim": "Claim",
-    "dailyRewardClaimed": "Come back tomorrow!"
+    "dailyRewardClaimed": "Come back tomorrow!",
+    "heroBubble": "Ready for a duel?",
+    "heroBubbles": [
+      "Sly like a fox?",
+      "A hug, then we play?",
+      "Show your fangs!",
+      "Roar and flip the cards!",
+      "Hop onto the pairs!",
+      "Eight arms to play fast!",
+      "Wise like an owl?",
+      "Wake up, let's play!",
+      "Clever one, find the pairs!",
+      "A little magic?",
+      "The pack awaits!",
+      "Bear memory, ready?"
+    ],
+    "heroTagline": "MATCH THE PAIRS • BEAT YOUR RIVAL",
+    "playCta": "PLAY",
+    "quickModes": "Quick modes",
+    "duel": "Duel",
+    "duelDesc": "Create a room",
+    "soloShort": "Solo",
+    "soloShortDesc": "vs AI",
+    "quickShort": "Quick",
+    "quickShortDesc": "Online",
+    "rankedShort": "Ranked",
+    "rankedShortDesc": "Soon",
+    "statGames": "Games",
+    "statWins": "Wins",
+    "statStreak": "Streak",
+    "leaderboardTitle": "Leaderboard",
+    "leaderboardSub": "See your rank this week"
   },
   "game": {
     "menu": "Menu",
+    "turnBadge": "TURN",
+    "personas": {
+      "cute": {
+        "match": ["Yay! Nice!", "So good!", "Hehe, win!"],
+        "miss": ["It's okay!", "Almost there!", "Keep going!"],
+        "encourage": ["You can do it!", "Go go go!", "I believe in you!"]
+      },
+      "sly": {
+        "match": ["Heh, saw that?", "Too easy…", "In the bag."],
+        "miss": ["Mmh, close.", "Next one!", "Nice try."],
+        "encourage": ["Focus…", "Find the gap!", "Aim well."]
+      },
+      "fierce": {
+        "match": ["RAAH! Yeah!", "Power!", "Crush them!"],
+        "miss": ["Grr, again!", "No matter, GO!", "Stay strong!"],
+        "encourage": ["Dominate!", "Show your strength!", "Attack!"]
+      },
+      "robot": {
+        "match": ["Pair validated.", "Exact calc.", "Efficiency 100%."],
+        "miss": ["Error. Recalibrating.", "Bad data.", "Retry."],
+        "encourage": ["Analyzing…", "Optimize choices.", "High probability."]
+      },
+      "zen": {
+        "match": ["Nice move.", "Well seen.", "A clear mind wins."],
+        "miss": ["Breathe, again.", "All in time.", "No panic."],
+        "encourage": ["Stay calm.", "Observe well.", "Confidence."]
+      },
+      "crown": {
+        "match": ["Magnificent.", "As it should be.", "The crown shines."],
+        "miss": ["A king rises again.", "Noblesse oblige.", "Royal patience."],
+        "encourage": ["Rule the board.", "With flair!", "Show your greatness."]
+      },
+      "angel": {
+        "match": ["Divine!", "Blessed move.", "Radiant!"],
+        "miss": ["Keep the faith.", "All will be well.", "Stay serene."],
+        "encourage": ["Let the light guide you.", "Have faith.", "Rise above."]
+      },
+      "demon": {
+        "match": ["Muahaha!", "Burn with victory!", "Infernal!"],
+        "miss": ["Grrr… cursed!", "The flames can wait.", "Another soul…"],
+        "encourage": ["Sow chaos!", "Dominate with fire!", "Be merciless."]
+      },
+      "default": {
+        "match": ["Bravo!", "Got it!", "Well played!"],
+        "miss": ["Oops…", "Almost!", "Keep going!"],
+        "encourage": ["Your turn!", "Focus!", "Find a pair!"]
+      }
+    },
     "ia": "AI",
     "pairs": "PAIRS",
     "you": "You",

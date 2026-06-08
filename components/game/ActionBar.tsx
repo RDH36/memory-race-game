@@ -1,6 +1,7 @@
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../lib/ThemeContext';
+import { Btn3D, Panel } from '@/components/ui/arcade';
 
 interface ActionBarProps {
   canUseTornado: boolean;
@@ -10,7 +11,7 @@ interface ActionBarProps {
 
 export function ActionBar({ canUseTornado, tornadoUsed, onTornado }: ActionBarProps) {
   const { t } = useTranslation();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   const title = tornadoUsed
     ? `🌪️ ${t('tornado.used')}`
@@ -25,10 +26,8 @@ export function ActionBar({ canUseTornado, tornadoUsed, onTornado }: ActionBarPr
       : t('tornado.waitSub');
 
   return (
-    <View
+    <Panel
       style={{
-        backgroundColor: colors.surfaceContainer,
-        borderRadius: 12,
         paddingVertical: 8,
         paddingLeft: 12,
         paddingRight: 8,
@@ -42,43 +41,29 @@ export function ActionBar({ canUseTornado, tornadoUsed, onTornado }: ActionBarPr
         <Text
           style={{
             fontSize: 13,
-            fontFamily: 'Fredoka_600SemiBold',
+            fontFamily: 'Fredoka_700Bold',
             color: canUseTornado ? colors.onSurface : colors.onSurfaceVariant,
           }}
         >
           {title}
         </Text>
-        <Text style={{ fontSize: 11, fontFamily: 'Nunito_400Regular', color: colors.onSurfaceVariant, marginTop: 2 }}>
+        <Text style={{ fontSize: 11, fontFamily: 'Fredoka_700Bold', color: colors.onSurfaceMuted, marginTop: 2 }}>
           {subtitle}
         </Text>
       </View>
 
       {!tornadoUsed && (
-        <View
-          style={{
-            backgroundColor: canUseTornado ? colors.primaryContainer : isDark ? '#333' : '#D5D1D1',
-            borderRadius: 12,
-            overflow: 'hidden',
-          }}
+        <Btn3D
+          color="violet"
+          size="sm"
+          haptic="press"
+          disabled={!canUseTornado}
+          label={t('tornado.launch')}
+          onPress={onTornado}
         >
-          <Pressable
-            onPress={onTornado}
-            disabled={!canUseTornado}
-            android_ripple={{ color: 'rgba(255,255,255,0.2)' }}
-            style={{ paddingHorizontal: 16, paddingVertical: 10 }}
-          >
-            <Text
-              style={{
-                color: canUseTornado ? '#FFFFFF' : colors.onSurfaceVariant,
-                fontSize: 13,
-                fontFamily: 'Nunito_700Bold',
-              }}
-            >
-              🌪️ {t('tornado.launch')}
-            </Text>
-          </Pressable>
-        </View>
+          <Text style={{ fontSize: 15 }}>🌪️</Text>
+        </Btn3D>
       )}
-    </View>
+    </Panel>
   );
 }
