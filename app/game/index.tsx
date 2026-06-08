@@ -31,7 +31,7 @@ export default function GameScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const { avatar, selectedTable } = usePlayerStats();
+  const { avatar, nickname, selectedTable } = usePlayerStats();
   const premium = usePremium();
   const skin = getCardSkin(selectedTable);
   const { game, lastMatchResult, handleCardPress, handleTornado, handleTornadoComplete } =
@@ -112,6 +112,8 @@ export default function GameScreen() {
     status: game.status,
     playerAvatar: avatar,
     opponentAvatar: cpu.avatar,
+    playerName: nickname || t("game.you"),
+    opponentName: cpu.name,
   });
 
   return (

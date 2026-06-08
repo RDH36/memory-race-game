@@ -46,7 +46,7 @@ export default function BattleScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const { avatar } = usePlayerStats();
+  const { avatar, nickname } = usePlayerStats();
 
   const [selected, setSelected] = useState<number[]>([]);
   const [matchedBy, setMatchedBy] = useState<number[]>(Array(8).fill(-1));
@@ -164,6 +164,8 @@ export default function BattleScreen() {
     status: "playing",
     playerAvatar: avatar,
     opponentAvatar: "🐣",
+    playerName: nickname || t("game.you"),
+    opponentName: "BabyBot",
   });
 
   // Few cards (8) → grow them to fill the board instead of a fixed 4 cols.

@@ -3,7 +3,8 @@ import { useTheme } from "@/lib/ThemeContext";
 import { Panel } from "@/components/ui/arcade";
 import { GameFighter } from "./GameFighter";
 
-export type Chatter = { who: 1 | 2; text: string } | null;
+export type { Chatter } from "./useGameChatter";
+import type { Chatter } from "./useGameChatter";
 
 type Fighter = { avatar: string; name: string; score: number; active: boolean };
 
@@ -35,7 +36,7 @@ export function BattleHUD({
         score={player.score}
         color="blue"
         active={player.active}
-        says={chatter?.who === 1 ? chatter.text : null}
+        says={chatter?.who === 1 ? { text: chatter.text, kind: chatter.kind } : null}
       />
 
       {/* center VS + progress */}
@@ -90,7 +91,7 @@ export function BattleHUD({
         score={opponent.score}
         color="coral"
         active={opponent.active}
-        says={chatter?.who === 2 ? chatter.text : null}
+        says={chatter?.who === 2 ? { text: chatter.text, kind: chatter.kind } : null}
       />
     </Panel>
   );

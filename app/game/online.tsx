@@ -186,6 +186,8 @@ export default function OnlineGameScreen() {
     meIsPlayer: isHost ? 1 : 2,
     playerAvatar: avatar,
     opponentAvatar,
+    playerName: myName,
+    opponentName,
   });
 
   // --- Loading ---

@@ -83,47 +83,56 @@
       "cute": {
         "match": ["Yay ! Bravo !", "Trop bien joué !", "Hihi, gagné !"],
         "miss": ["C'est pas grave !", "Tu y es presque !", "Courage, continue !"],
-        "encourage": ["Tu peux le faire !", "Allez allez !", "Je crois en toi !"]
+        "encourage": ["Tu peux le faire {name} !", "Allez {name}, vas-y !", "Je crois en toi {name} !"],
+        "clash": ["Rattrape-moi, {opp} !", "Hihi, t'es lent {opp} !", "Trop facile face à un {opp} !"]
       },
       "sly": {
         "match": ["Hé hé, vu ?", "Trop facile…", "Dans la poche."],
         "miss": ["Mmh, presque.", "La prochaine !", "Bien tenté."],
-        "encourage": ["Concentre-toi…", "Trouve la faille !", "Vise bien."]
+        "encourage": ["Concentre-toi {name}…", "À toi de jouer {name}.", "Reste vif {name}."],
+        "clash": ["Je lis dans ton jeu, {opp}.", "Tu fais quoi là, {opp} ?", "Un {opp} ne me piège pas."]
       },
       "fierce": {
         "match": ["RAAH ! Ouais !", "Puissance !", "On les écrase !"],
         "miss": ["Grr, recommence !", "Pas grave, FONCE !", "Reste fort !"],
-        "encourage": ["Domine le jeu !", "Montre ta force !", "À l'attaque !"]
+        "encourage": ["Domine {name} !", "Montre ta force {name} !", "À l'attaque {name} !"],
+        "clash": ["Tu cours pas plus vite que moi, {opp} !", "Rends-toi, {opp} !", "Aucune chance, {opp} !"]
       },
       "robot": {
         "match": ["Paire validée.", "Calcul exact.", "Efficacité 100%."],
         "miss": ["Erreur. Recalibrage.", "Donnée incorrecte.", "Réessaie."],
-        "encourage": ["Analyse en cours…", "Optimise tes choix.", "Probabilité élevée."]
+        "encourage": ["Optimise, {name}.", "Calcul lancé, {name}.", "Probabilité haute, {name}."],
+        "clash": ["Niveau du {opp} : médiocre.", "Tu calcules mal, {opp}.", "Défaite du {opp} imminente."]
       },
       "zen": {
         "match": ["Joli coup.", "Bien vu.", "L'esprit clair gagne."],
         "miss": ["Respire, recommence.", "Tout vient à point.", "Pas de panique."],
-        "encourage": ["Reste calme.", "Observe bien.", "Confiance."]
+        "encourage": ["Reste calme {name}.", "Observe bien {name}.", "Confiance, {name}."],
+        "clash": ["Tu t'agites pour rien, {opp}.", "Le calme bat le {opp}.", "Observe et apprends, {opp}."]
       },
       "crown": {
         "match": ["Magnifique.", "Comme il se doit.", "La couronne brille."],
         "miss": ["Un roi se relève.", "Noblesse oblige.", "Patience royale."],
-        "encourage": ["Règne sur le plateau.", "Avec panache !", "Montre ta grandeur."]
+        "encourage": ["Règne, {name}.", "Avec panache {name} !", "Montre ta grandeur {name}."],
+        "clash": ["Incline-toi, {opp}.", "Un {opp} de plus à mes pieds.", "La couronne écrase le {opp}."]
       },
       "angel": {
         "match": ["Divin !", "Béni soit ce coup.", "Lumineux !"],
         "miss": ["Garde la foi.", "Tout ira bien.", "Reste serein."],
-        "encourage": ["La lumière te guide.", "Aie confiance.", "Élève ton jeu."]
+        "encourage": ["La lumière te guide, {name}.", "Aie foi {name}.", "Élève-toi {name}."],
+        "clash": ["Que la lumière dépasse le {opp}.", "Trop tard pour prier, {opp}.", "Béni soit mon avance sur le {opp}."]
       },
       "demon": {
         "match": ["Mouhaha !", "Brûle de victoire !", "Infernal !"],
         "miss": ["Grrr… maudit !", "Les flammes attendront.", "Encore une âme…"],
-        "encourage": ["Sème le chaos !", "Domine par le feu !", "Sois impitoyable."]
+        "encourage": ["Sème le chaos {name} !", "Brûle tout {name} !", "Sois impitoyable {name} !"],
+        "clash": ["Ton âme est à moi, {opp} !", "Brûle de jalousie, {opp} !", "Souffre, {opp} !"]
       },
       "default": {
         "match": ["Bravo !", "Trouvé !", "Bien joué !"],
         "miss": ["Oups…", "Presque !", "Continue !"],
-        "encourage": ["À toi !", "Concentre-toi !", "Trouve une paire !"]
+        "encourage": ["Allez {name} !", "Vas-y {name} !", "Concentre-toi {name} !"],
+        "clash": ["Attrape-moi, {opp} !", "Trop lent, {opp} !", "À la traîne, {opp} ?"]
       }
     },
     "ia": "IA",
@@ -597,7 +606,25 @@
     "flamingo": "Flamant",
     "crown": "Couronne",
     "angel": "Ange",
-    "demon": "Démon"
+    "demon": "Démon",
+    "dog": "Chien",
+    "cat": "Chat",
+    "rabbit": "Lapin",
+    "koala": "Koala",
+    "monkey": "Singe",
+    "bear": "Ours",
+    "penguin": "Pingouin",
+    "hamster": "Hamster",
+    "parrot": "Perroquet",
+    "dragon": "Dragon",
+    "lizard": "Lézard",
+    "raccoon": "Raton",
+    "ladybug": "Coccinelle",
+    "ape": "Singe",
+    "croc": "Croco",
+    "sloth": "Paresseux",
+    "chick": "Poussin",
+    "robot": "Robot"
   },
   "plateauPreview": {
     "opponent": "Adversaire",

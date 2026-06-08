@@ -118,13 +118,13 @@ function CardItemImpl({
       >
         <View className="relative w-full h-full">
           <AnimatedView
-            style={[backAnimatedStyle, { backfaceVisibility: 'hidden' }]}
+            style={[backAnimatedStyle, { backfaceVisibility: 'hidden', borderRadius: 12, boxShadow: '0 5px 0 #00000066' }]}
             className="absolute w-full h-full"
           >
             <HeavenCardVisual state="back" fillParent />
           </AnimatedView>
           <AnimatedView
-            style={[frontAnimatedStyle, { backfaceVisibility: 'hidden' }]}
+            style={[frontAnimatedStyle, { backfaceVisibility: 'hidden', borderRadius: 12, boxShadow: '0 5px 0 #00000066' }]}
             className="absolute w-full h-full"
           >
             <HeavenCardVisual state={frontState} emoji={emoji} player={player} fillParent />
@@ -162,13 +162,13 @@ function CardItemImpl({
       >
         <View className="relative w-full h-full">
           <AnimatedView
-            style={[backAnimatedStyle, { backfaceVisibility: 'hidden' }]}
+            style={[backAnimatedStyle, { backfaceVisibility: 'hidden', borderRadius: 12, boxShadow: '0 5px 0 #00000066' }]}
             className="absolute w-full h-full"
           >
             <InfernoCardVisual state="back" fillParent />
           </AnimatedView>
           <AnimatedView
-            style={[frontAnimatedStyle, { backfaceVisibility: 'hidden' }]}
+            style={[frontAnimatedStyle, { backfaceVisibility: 'hidden', borderRadius: 12, boxShadow: '0 5px 0 #00000066' }]}
             className="absolute w-full h-full"
           >
             <InfernoCardVisual state={frontState} emoji={emoji} player={player} fillParent />
@@ -205,13 +205,13 @@ function CardItemImpl({
       >
         <View className="relative w-full h-full">
           <AnimatedView
-            style={[backAnimatedStyle, { backfaceVisibility: 'hidden' }]}
+            style={[backAnimatedStyle, { backfaceVisibility: 'hidden', borderRadius: 12, boxShadow: '0 5px 0 #00000066' }]}
             className="absolute w-full h-full"
           >
             <RoyalCardVisual state="back" fillParent />
           </AnimatedView>
           <AnimatedView
-            style={[frontAnimatedStyle, { backfaceVisibility: 'hidden' }]}
+            style={[frontAnimatedStyle, { backfaceVisibility: 'hidden', borderRadius: 12, boxShadow: '0 5px 0 #00000066' }]}
             className="absolute w-full h-full"
           >
             <RoyalCardVisual state={frontState} emoji={emoji} player={player} fillParent />

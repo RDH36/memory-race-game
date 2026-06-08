@@ -77,17 +77,22 @@ export function Mascot({
 export function Bubble({
   children,
   style,
+  background,
+  textColor,
 }: {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
+  background?: string;
+  textColor?: string;
 }) {
   const { colors } = useTheme();
+  const bg = background ?? colors.surfaceContainer;
   return (
     <View
       style={[
         {
           alignSelf: "flex-start",
-          backgroundColor: colors.surfaceContainer,
+          backgroundColor: bg,
           borderRadius: 16,
           paddingVertical: 10,
           paddingHorizontal: 14,
@@ -96,7 +101,7 @@ export function Bubble({
         style,
       ]}
     >
-      <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 13, color: colors.onSurface }}>
+      <Text style={{ fontFamily: "Fredoka_600SemiBold", fontSize: 13, color: textColor ?? colors.onSurface }}>
         {children}
       </Text>
       {/* tail */}
@@ -107,7 +112,7 @@ export function Bubble({
           left: 22,
           width: 14,
           height: 14,
-          backgroundColor: colors.surfaceContainer,
+          backgroundColor: bg,
           transform: [{ rotate: "45deg" }],
           borderRadius: 3,
         }}

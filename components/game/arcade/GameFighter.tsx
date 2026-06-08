@@ -13,6 +13,7 @@ import type { HueName } from "@/components/ui/theme";
 import { Bubble } from "@/components/ui/arcade";
 import { getAvatarSkin } from "@/lib/skins";
 import { ShapeAura } from "@/components/appearance/ShapeAura";
+import type { ChatterKind } from "./useGameChatter";
 
 export function GameFighter({
   avatar,
@@ -27,12 +28,22 @@ export function GameFighter({
   score: number;
   color: HueName;
   active: boolean;
-  says?: string | null;
+  says?: { text: string; kind: ChatterKind } | null;
 }) {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const [c, cd] = colors.hues[color];
   const auraEnt = getAvatarSkin(avatar)?.requires ?? null;
+
+  // Bubble color reflects the message type.
+  const bubbleStyle =
+    says?.kind === "clash"
+      ? { bg: colors.hues.coral[0], fg: "#fff" }
+      : says?.kind === "encourage"
+        ? { bg: colors.hues.green[0], fg: "#fff" }
+        : says?.kind === "match"
+          ? { bg: colors.hues.gold[0], fg: colors.onSurface }
+          : { bg: undefined, fg: undefined };
 
   // Up/down bob (same feel as the home mascot) — bigger + faster when active.
   const bob = useSharedValue(0);
@@ -55,7 +66,11 @@ export function GameFighter({
     <View style={{ flex: 1, alignItems: "center" }}>
       {/* speech bubble slot — tall enough to show the bubble fully */}
       <View style={{ height: 46, justifyContent: "flex-end", marginBottom: 2, zIndex: 5 }}>
-        {says ? <Bubble style={{ maxWidth: 158 }}>{says}</Bubble> : null}
+        {says ? (
+          <Bubble style={{ maxWidth: 158 }} background={bubbleStyle.bg} textColor={bubbleStyle.fg}>
+            {says.text}
+          </Bubble>
+        ) : null}
       </View>
 
       {/* bare avatar — no tile; premium avatars get their themed aura */}

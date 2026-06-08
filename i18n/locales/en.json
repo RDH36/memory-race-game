@@ -83,47 +83,56 @@
       "cute": {
         "match": ["Yay! Nice!", "So good!", "Hehe, win!"],
         "miss": ["It's okay!", "Almost there!", "Keep going!"],
-        "encourage": ["You can do it!", "Go go go!", "I believe in you!"]
+        "encourage": ["You can do it {name}!", "Go {name}, go!", "I believe in you {name}!"],
+        "clash": ["Catch me, {opp}!", "Hehe, too slow {opp}!", "Too easy against a {opp}!"]
       },
       "sly": {
         "match": ["Heh, saw that?", "Too easy…", "In the bag."],
         "miss": ["Mmh, close.", "Next one!", "Nice try."],
-        "encourage": ["Focus…", "Find the gap!", "Aim well."]
+        "encourage": ["Focus {name}…", "Your move {name}.", "Stay sharp {name}."],
+        "clash": ["I read your game, {opp}.", "What are you doing, {opp}?", "A {opp} won't trap me."]
       },
       "fierce": {
         "match": ["RAAH! Yeah!", "Power!", "Crush them!"],
         "miss": ["Grr, again!", "No matter, GO!", "Stay strong!"],
-        "encourage": ["Dominate!", "Show your strength!", "Attack!"]
+        "encourage": ["Dominate {name}!", "Show your strength {name}!", "Attack {name}!"],
+        "clash": ["You don't run faster than me, {opp}!", "Surrender, {opp}!", "No chance, {opp}!"]
       },
       "robot": {
         "match": ["Pair validated.", "Exact calc.", "Efficiency 100%."],
         "miss": ["Error. Recalibrating.", "Bad data.", "Retry."],
-        "encourage": ["Analyzing…", "Optimize choices.", "High probability."]
+        "encourage": ["Optimize, {name}.", "Calc started, {name}.", "High probability, {name}."],
+        "clash": ["{opp} level: poor.", "You miscalculate, {opp}.", "{opp} defeat imminent."]
       },
       "zen": {
         "match": ["Nice move.", "Well seen.", "A clear mind wins."],
         "miss": ["Breathe, again.", "All in time.", "No panic."],
-        "encourage": ["Stay calm.", "Observe well.", "Confidence."]
+        "encourage": ["Stay calm {name}.", "Observe well {name}.", "Confidence, {name}."],
+        "clash": ["You fret for nothing, {opp}.", "Calm beats the {opp}.", "Watch and learn, {opp}."]
       },
       "crown": {
         "match": ["Magnificent.", "As it should be.", "The crown shines."],
         "miss": ["A king rises again.", "Noblesse oblige.", "Royal patience."],
-        "encourage": ["Rule the board.", "With flair!", "Show your greatness."]
+        "encourage": ["Reign, {name}.", "With flair {name}!", "Show your greatness {name}."],
+        "clash": ["Bow down, {opp}.", "One more {opp} at my feet.", "The crown crushes the {opp}."]
       },
       "angel": {
         "match": ["Divine!", "Blessed move.", "Radiant!"],
         "miss": ["Keep the faith.", "All will be well.", "Stay serene."],
-        "encourage": ["Let the light guide you.", "Have faith.", "Rise above."]
+        "encourage": ["The light guides you, {name}.", "Have faith {name}.", "Rise above {name}."],
+        "clash": ["May the light outpace the {opp}.", "Too late to pray, {opp}.", "Blessed be my lead on the {opp}."]
       },
       "demon": {
         "match": ["Muahaha!", "Burn with victory!", "Infernal!"],
         "miss": ["Grrr… cursed!", "The flames can wait.", "Another soul…"],
-        "encourage": ["Sow chaos!", "Dominate with fire!", "Be merciless."]
+        "encourage": ["Sow chaos {name}!", "Burn it all {name}!", "Be merciless {name}!"],
+        "clash": ["Your soul is mine, {opp}!", "Burn with envy, {opp}!", "Suffer, {opp}!"]
       },
       "default": {
         "match": ["Bravo!", "Got it!", "Well played!"],
         "miss": ["Oops…", "Almost!", "Keep going!"],
-        "encourage": ["Your turn!", "Focus!", "Find a pair!"]
+        "encourage": ["Go {name}!", "Come on {name}!", "Focus {name}!"],
+        "clash": ["Catch me, {opp}!", "Too slow, {opp}!", "Falling behind, {opp}?"]
       }
     },
     "ia": "AI",
@@ -597,7 +606,25 @@
     "flamingo": "Flamingo",
     "crown": "Crown",
     "angel": "Angel",
-    "demon": "Demon"
+    "demon": "Demon",
+    "dog": "Dog",
+    "cat": "Cat",
+    "rabbit": "Rabbit",
+    "koala": "Koala",
+    "monkey": "Monkey",
+    "bear": "Bear",
+    "penguin": "Penguin",
+    "hamster": "Hamster",
+    "parrot": "Parrot",
+    "dragon": "Dragon",
+    "lizard": "Lizard",
+    "raccoon": "Raccoon",
+    "ladybug": "Ladybug",
+    "ape": "Ape",
+    "croc": "Croc",
+    "sloth": "Sloth",
+    "chick": "Chick",
+    "robot": "Robot"
   },
   "plateauPreview": {
     "opponent": "Opponent",
