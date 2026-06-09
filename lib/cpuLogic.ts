@@ -74,7 +74,7 @@ export function cpuDecide(
 ): CpuAction {
   // Tornado decision
   if (
-    !game.tornadoUsed.p2 &&
+    game.powerUsesLeft.p2 > 0 &&
     game.scores.p1 >= 3 &&
     Math.random() > TORNADO_THRESHOLD[difficulty]
   ) {

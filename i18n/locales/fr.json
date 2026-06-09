@@ -2,10 +2,92 @@
   "tabs": {
     "home": "Jouer",
     "leaderboard": "Classement",
+    "builds": "Builds",
     "achievements": "Succès",
     "shop": "Boutique",
     "settings": "Paramètres",
     "profile": "Profil"
+  },
+  "builds": {
+    "title": "Builds",
+    "subtitle": "Débloque et équipe des abilités",
+    "sectionTitle": "Tes abilités",
+    "equipped": "Équipée",
+    "equippedLabel": "Équipée",
+    "equip": "Équiper",
+    "unlock": "Débloquer",
+    "upgrade": "Améliorer",
+    "maxLevel": "Niv. max",
+    "locked": "Verrouillée",
+    "default": "Défaut",
+    "notEnoughGold": "Pas assez d'or",
+    "linkedAvatar": "Avatar lié",
+    "story": "Histoire",
+    "timing": "Quand l'utiliser",
+    "gotIt": "Compris !",
+    "levels": "Niveaux",
+    "level": "Niv. {{n}}",
+    "currentLevel": "Niveau actuel",
+    "maxReached": "Niveau max atteint",
+    "upgradeTitle": "Améliorer l'abilité",
+    "upgradeTo": "Passer au niveau {{n}}",
+    "cancel": "Annuler"
+  },
+  "abilities": {
+    "tornado": {
+      "name": "Tornade",
+      "desc": "Mélange les cartes non trouvées. Abilité par défaut.",
+      "story": "Née d'un souffle légendaire, la Tornade balaie le plateau et rebat toutes les cartes encore cachées. C'est le pouvoir que chaque joueur maîtrise dès ses premiers pas.",
+      "timing": "Déclenche-la quand tu as mémorisé peu de cartes, ou juste avant que ton adversaire n'enchaîne les paires : le mélange efface d'un coup son avantage.",
+      "levels": {
+        "1": "Mélange les cartes non trouvées (1×/partie). Tu passes le tour.",
+        "2": "Tu gardes ton tour après le mélange.",
+        "3": "Utilisable 2× par partie."
+      }
+    },
+    "freeze": {
+      "name": "Gel",
+      "desc": "Fais sauter le prochain tour de l'adversaire.",
+      "story": "Le souffle glacé de la Baleine fige ton adversaire sur place : pendant qu'il reste de marbre, tu enchaînes les coups.",
+      "timing": "Lance-le pour rejouer aussitôt et garder l'initiative quand l'adversaire est sur le point d'enchaîner les paires.",
+      "levels": {
+        "1": "L'adversaire saute son prochain tour.",
+        "2": "L'adversaire saute ses 2 prochains tours.",
+        "3": "L'adversaire saute ses 3 prochains tours."
+      }
+    },
+    "reveal": {
+      "name": "Révélation",
+      "desc": "Dévoile brièvement quelques cartes au hasard.",
+      "story": "Le regard perçant du Hibou transperce le dos des cartes et t'en montre quelques-unes, le temps d'un battement de cils — à toi de les mémoriser.",
+      "timing": "Lance-la pour mémoriser des cartes, puis va les retrouver à ton tour.",
+      "levels": {
+        "1": "Révèle 2 cartes un court instant.",
+        "2": "Révèle 4 cartes.",
+        "3": "Révèle 4 cartes, plus longtemps."
+      }
+    },
+    "swap": {
+      "name": "Vol",
+      "desc": "Vole une paire déjà trouvée par l'adversaire.",
+      "story": "L'Octopus malicieux étend ses tentacules sur le butin adverse et arrache une paire déjà conquise — un vol pur et simple.",
+      "timing": "Garde-le pour les moments clés : renverse le score en arrachant à l'adversaire ses paires durement gagnées.",
+      "levels": {
+        "1": "Vole 1 paire trouvée par l'adversaire.",
+        "2": "Vole 2 paires trouvées par l'adversaire."
+      }
+    },
+    "shield": {
+      "name": "Bouclier",
+      "desc": "Protège ton tour d'une erreur sans le perdre.",
+      "story": "La crinière du Lion se dresse en bouclier doré : même en cas d'erreur, tu gardes la main et continues ton assaut.",
+      "timing": "Enclenche-le avant un coup risqué : si tu te trompes, tu ne cèdes pas ton tour à l'adversaire.",
+      "levels": {
+        "1": "Annule 1 erreur sans perdre le tour.",
+        "2": "Annule jusqu'à 2 erreurs.",
+        "3": "Annule jusqu'à 3 erreurs."
+      }
+    }
   },
   "home": {
     "welcome": "Bienvenue sur",
@@ -41,7 +123,7 @@
     "xpBoost": "XP x1.5 (pub 30s)",
     "xpBoostDesc": "Regarde une pub pour gagner 50% de XP en plus",
     "dailyReward": "Récompense quotidienne",
-    "dailyRewardSubtitle": "Réclame tes +{{xp}} XP gratuits",
+    "dailyRewardSubtitle": "Réclame tes +{{xp}} XP et +{{gold}} 🪙 gratuits",
     "dailyRewardClaim": "Réclamer",
     "dailyRewardClaimed": "Reviens demain !",
     "heroBubble": "Prêt pour un duel ?",
@@ -148,6 +230,14 @@
     "availableSub": "Mélange les cartes · Termine ton tour",
     "waitSub": "Attends ton tour pour lancer",
     "launch": "Lancer"
+  },
+  "power": {
+    "launch": "Lancer",
+    "readySub": "Appuie pour lancer ton pouvoir",
+    "waitSub": "Attends ton tour",
+    "exhaustedSub": "Plus de charge cette partie",
+    "shield": "🛡️ Bouclier actif ×{{n}}",
+    "frozen": "❄️ Adversaire gelé ×{{n}}"
   },
   "feedback": {
     "title": "Retour & Support",

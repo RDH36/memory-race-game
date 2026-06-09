@@ -31,7 +31,14 @@ export function useProfile(userId: string | undefined) {
 export async function saveProfile(
   userId: string,
   profileId: string | null,
-  updates: { nickname?: string; avatar?: string; selectedTable?: string },
+  updates: {
+    nickname?: string;
+    avatar?: string;
+    selectedTable?: string;
+    gold?: number;
+    equippedAbility?: string;
+    abilities?: string;
+  },
 ) {
   if (profileId) {
     await db.transact(tx.profiles[profileId].update(updates));

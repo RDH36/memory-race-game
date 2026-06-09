@@ -12,6 +12,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
+import { usePlayerAbilities } from "../../lib/abilities";
 import {
   findMatchmakingRoom,
   createMatchmakingRoom,
@@ -38,6 +39,9 @@ export default function MatchmakingScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const { userId, nickname, avatar } = usePlayerStats();
+  const { states, equipped } = usePlayerAbilities();
+  const myAb = states.find((s) => s.id === equipped) ?? states[0];
+  const hostAbility = { id: myAb.id, level: myAb.level, emoji: myAb.emoji, nameKey: myAb.nameKey };
 
   const [matchState, setMatchState] = useState<MatchState>("searching");
   const [roomId, setRoomId] = useState<string | null>(null);
@@ -238,7 +242,7 @@ export default function MatchmakingScreen() {
       // Start the game after a short delay
       setTimeout(() => {
         if (!mountedRef.current) return;
-        startRoom(roomId, difficulty, userId!, fakeGuestId);
+        startRoom(roomId, difficulty, userId!, fakeGuestId, hostAbility);
         setMatchState("countdown");
       }, 1500);
     };
@@ -257,7 +261,7 @@ export default function MatchmakingScreen() {
     // Small delay then start
     const timer = setTimeout(() => {
       if (!mountedRef.current) return;
-      startRoom(roomId, difficulty, room.hostId, room.guestId!);
+      startRoom(roomId, difficulty, room.hostId, room.guestId!, hostAbility);
       setMatchState("countdown");
     }, 1500);
 

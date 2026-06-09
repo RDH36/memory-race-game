@@ -18,6 +18,14 @@ const XP_REWARDS: Record<string, { win: number; loss: number }> = {
   hard: { win: 40, loss: 5 },
 };
 
+// Soft currency ("or") earned per game — spent on the Builds page to
+// unlock and upgrade abilities. Win pays more than a loss.
+const GOLD_REWARDS: Record<string, { win: number; loss: number }> = {
+  easy: { win: 12, loss: 4 },
+  medium: { win: 20, loss: 6 },
+  hard: { win: 32, loss: 8 },
+};
+
 // AVATARS lives in lib/skins.ts (re-exported here for back-compat)
 export { AVATARS } from "@/lib/skins";
 
@@ -52,14 +60,22 @@ interface StatsContext {
   selectedTable: string;
   profileId: string | null;
   userId: string | undefined;
+  /** Soft currency for the Builds page. */
+  gold: number;
+  /** Equipped ability id (defaults to "tornado"). */
+  equippedAbility: string;
+  /** Raw JSON map of owned abilities -> level (undefined when none). */
+  abilitiesRaw: string | undefined;
   level: number;
   levelProgress: number;
   xpForNextLevel: number;
   xpInLevel: number;
   winRate: number;
   lastXpGain: number;
+  lastGoldGain: number;
   recordGame: (won: boolean, difficulty?: string, gameData?: GameData, options?: RecordGameOptions) => void;
   addBonusXp: (amount: number) => void;
+  addGold: (amount: number) => void;
 }
 
 const DEFAULT_STATS: PlayerStats = {
@@ -70,6 +86,7 @@ const Ctx = createContext<StatsContext | null>(null);
 
 export function PlayerStatsProvider({ children }: { children: React.ReactNode }) {
   const [lastXpGain, setLastXpGain] = useState(0);
+  const [lastGoldGain, setLastGoldGain] = useState(0);
   const premium = usePremium();
 
   const { user } = db.useAuth();
@@ -81,6 +98,9 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
   const nickname = profile?.nickname ?? "";
   const selectedTable = profile?.selectedTable ?? "classic";
   const profileId = profile?.id ?? null;
+  const gold = profile?.gold ?? 0;
+  const equippedAbility = profile?.equippedAbility ?? "tornado";
+  const abilitiesRaw = profile?.abilities ?? undefined;
 
   // Leaderboard from InstantDB (stats)
   const { data } = db.useQuery(
@@ -136,6 +156,13 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
     const xp = Math.round(baseXp * (options?.xpBoost ?? 1) * premiumBoost);
     setLastXpGain(xp);
 
+    const goldRewards = GOLD_REWARDS[difficulty] ?? GOLD_REWARDS.medium;
+    // Gold boosts: premium +5%, rewarded-ad boost +5% (stackable).
+    const goldPremiumBoost = premium ? 1.05 : 1;
+    const goldAdBoost = (options?.xpBoost ?? 1) > 1 ? 1.05 : 1;
+    const goldEarned = Math.round((won ? goldRewards.win : goldRewards.loss) * goldPremiumBoost * goldAdBoost);
+    setLastGoldGain(goldEarned);
+
     const newStreak = won ? stats.currentStreak + 1 : 0;
     const newStats = {
       gamesPlayed: stats.gamesPlayed + 1,
@@ -174,10 +201,17 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
     if (profileId) {
       ops.push(tx.leaderboard[lbId].link({ profile: profileId }));
       ops.push(tx.games[gameId].link({ player: profileId }));
+      // Persist the gold reward on the profile (Builds currency).
+      ops.push(tx.profiles[profileId].update({ gold: gold + goldEarned }));
     }
 
     db.transact(ops);
-  }, [userId, stats, leaderboardId, profileId, premium]);
+  }, [userId, stats, leaderboardId, profileId, premium, gold]);
+
+  const addGold = useCallback((amount: number) => {
+    if (!profileId) return;
+    db.transact([tx.profiles[profileId].update({ gold: gold + amount })]);
+  }, [profileId, gold]);
 
   const levelInfo = useMemo(() => computeLevel(stats.points), [stats.points]);
 
@@ -187,13 +221,15 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
 
   const value = useMemo(
     () => ({
-      stats, avatar, nickname, selectedTable, profileId, userId, winRate, lastXpGain, recordGame, addBonusXp,
+      stats, avatar, nickname, selectedTable, profileId, userId, winRate,
+      gold, equippedAbility, abilitiesRaw,
+      lastXpGain, lastGoldGain, recordGame, addBonusXp, addGold,
       level: levelInfo.level,
       levelProgress: levelInfo.progress,
       xpForNextLevel: levelInfo.xpForNext,
       xpInLevel: levelInfo.xpInLevel,
     }),
-    [stats, avatar, nickname, selectedTable, profileId, userId, winRate, lastXpGain, recordGame, addBonusXp, levelInfo],
+    [stats, avatar, nickname, selectedTable, profileId, userId, winRate, gold, equippedAbility, abilitiesRaw, lastXpGain, lastGoldGain, recordGame, addBonusXp, addGold, levelInfo],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

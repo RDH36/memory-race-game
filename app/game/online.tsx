@@ -1,9 +1,12 @@
 import { BackHandler, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useOnlineGame } from "../../hooks/useOnlineGame";
+import { usePlayerAbilities, abilityEffect } from "../../lib/abilities";
+import { PowerCastBanner } from "../../components/game/PowerCastBanner";
+import type { HueName } from "@/components/ui/theme";
 import { useBotPlayer } from "../../hooks/useBotPlayer";
 import { useRoom, forfeitRoom } from "../../lib/roomLogic";
 import { GameGrid } from "../../components/game/GameGrid";
@@ -35,14 +38,47 @@ export default function OnlineGameScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const { avatar, userId, nickname, selectedTable } = usePlayerStats();
+  const { states, equipped } = usePlayerAbilities();
+  const eqAbility = states.find((s) => s.id === equipped) ?? states[0];
+  const myAbility = useMemo(
+    () => ({ id: eqAbility.id, level: eqAbility.level, emoji: eqAbility.emoji, nameKey: eqAbility.nameKey }),
+    [eqAbility.id, eqAbility.level, eqAbility.emoji, eqAbility.nameKey],
+  );
   const premium = usePremium();
   const skin = getCardSkin(selectedTable);
   const { room } = useRoom(roomCode);
 
   const {
-    game, isHost, myTurn, lastMatchResult,
-    handleCardPress, handleTornado, handleTornadoComplete,
-  } = useOnlineGame(room, userId, isBotMode);
+    game, isHost, myTurn, lastMatchResult, revealedLocal,
+    handleCardPress, handlePower, handleTornadoComplete,
+  } = useOnlineGame(room, userId, isBotMode, myAbility);
+
+  const myKey = isHost ? "p1" : "p2";
+  const otherKey = isHost ? "p2" : "p1";
+
+  // Power cast banner — fires when either player's uses drop (non-shuffle).
+  const [banner, setBanner] = useState<{ emoji: string; label: string; color: HueName; nonce: number } | null>(null);
+  const prevUsesRef = useRef<{ p1: number; p2: number } | null>(null);
+  const castNonceRef = useRef(0);
+  useEffect(() => {
+    if (!game) return;
+    const prev = prevUsesRef.current;
+    if (prev) {
+      (["p1", "p2"] as const).forEach((k) => {
+        const ab = game.abilities?.[k];
+        if (game.powerUsesLeft[k] < prev[k] && ab && ab.id !== "tornado") {
+          castNonceRef.current += 1;
+          setBanner({
+            emoji: ab.emoji,
+            label: t(`abilities.${ab.nameKey}.name`),
+            color: k === myKey ? "violet" : "coral",
+            nonce: castNonceRef.current,
+          });
+        }
+      });
+    }
+    prevUsesRef.current = { ...game.powerUsesLeft };
+  }, [game?.powerUsesLeft?.p1, game?.powerUsesLeft?.p2]);
 
   // Ghost bot plays as guest when botMode is active
   useBotPlayer(room, game, difficulty as CpuDifficulty, isBotMode);
@@ -120,7 +156,9 @@ export default function OnlineGameScreen() {
         difficulty,
         totalTime: totalTimeSec.toString(),
         p1Attempts: game.p1Attempts.toString(),
-        tornadoUsed: (isHost ? game.tornadoUsed.p1 : game.tornadoUsed.p2) ? "1" : "0",
+        tornadoUsed: (abilityEffect(game.abilities[myKey].id, game.abilities[myKey].level).uses - game.powerUsesLeft[myKey]).toString(),
+        powerEmoji: game.abilities[myKey].emoji,
+        powerNameKey: game.abilities[myKey].nameKey,
         maxStreak: game.p1MaxStreak.toString(),
         mode: "casual",
         roomId: room.id,
@@ -164,7 +202,9 @@ export default function OnlineGameScreen() {
             difficulty,
             totalTime: totalTimeSec.toString(),
             p1Attempts: game.p1Attempts.toString(),
-            tornadoUsed: (isHost ? game.tornadoUsed.p1 : game.tornadoUsed.p2) ? "1" : "0",
+            tornadoUsed: (abilityEffect(game.abilities[myKey].id, game.abilities[myKey].level).uses - game.powerUsesLeft[myKey]).toString(),
+        powerEmoji: game.abilities[myKey].emoji,
+        powerNameKey: game.abilities[myKey].nameKey,
             maxStreak: game.p1MaxStreak.toString(),
             mode: "casual",
             roomId: room.id,
@@ -203,8 +243,10 @@ export default function OnlineGameScreen() {
   const totalPairs = gridConfig.totalCards / 2;
   const myScore = isHost ? game.scores.p1 : game.scores.p2;
   const opponentScore = isHost ? game.scores.p2 : game.scores.p1;
-  const tornadoKey = isHost ? "p1" : "p2";
-  const canUseTornado = myTurn && !game.tornadoUsed[tornadoKey] && !game.locked && !game.tornadoActive && game.status === "playing";
+  const canUsePower =
+    myTurn && game.powerUsesLeft[myKey] > 0 && !game.locked && !game.tornadoActive && game.status === "playing";
+  const myBuild = { emoji: game.abilities[myKey].emoji, name: t(`abilities.${game.abilities[myKey].nameKey}.name`) };
+  const oppBuild = { emoji: game.abilities[otherKey].emoji, name: t(`abilities.${game.abilities[otherKey].nameKey}.name`) };
   const timeLow = turnTimer <= 10;
 
   return (
@@ -225,6 +267,10 @@ export default function OnlineGameScreen() {
           totalPairs={totalPairs}
           chatter={chatter}
           timer={{ text: `${turnTimer}s`, low: timeLow }}
+          playerBadge={game.shieldCharges[myKey] > 0 ? { icon: "🛡️", count: game.shieldCharges[myKey], color: "green" } : null}
+          opponentBadge={game.freezeTurns[otherKey] > 0 ? { icon: "❄️", count: game.freezeTurns[otherKey], color: "blue" } : null}
+          playerBuild={myBuild}
+          opponentBuild={oppBuild}
         />
 
         <View style={{ height: 12 }} />
@@ -240,15 +286,33 @@ export default function OnlineGameScreen() {
             currentTurn={game.currentTurn}
             lastMatchResult={lastMatchResult}
             tornadoActive={game.tornadoActive}
+            revealed={revealedLocal}
             onCardPress={handleCardPress}
             cols={gridConfig.cols}
             skin={skin}
           />
           <MatchFeedback result={lastMatchResult} />
+          {banner && (
+            <PowerCastBanner
+              key={banner.nonce}
+              emoji={banner.emoji}
+              label={banner.label}
+              color={banner.color}
+              onDone={() => setBanner(null)}
+            />
+          )}
         </View>
 
-        {/* Tornado */}
-        <ActionBar canUseTornado={canUseTornado} tornadoUsed={game.tornadoUsed[tornadoKey]} onTornado={handleTornado} />
+        {/* Equipped-ability power */}
+        <ActionBar
+          emoji={game.abilities[myKey].emoji}
+          name={t(`abilities.${game.abilities[myKey].nameKey}.name`)}
+          usesLeft={game.powerUsesLeft[myKey]}
+          canUse={canUsePower}
+          onPress={handlePower}
+          shieldCharges={game.shieldCharges[myKey]}
+          freezeTurns={game.freezeTurns[otherKey]}
+        />
       </View>
 
       {game.tornadoActive && <TornadoOverlay onComplete={handleTornadoComplete} />}

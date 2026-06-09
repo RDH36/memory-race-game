@@ -1,9 +1,10 @@
 import { BackHandler, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocalGame } from "../../hooks/useLocalGame";
+import { abilityEffect, usePlayerAbilities } from "../../lib/abilities";
 import { GameGrid } from "../../components/game/GameGrid";
 import { formatTime } from "../../components/game/PlayerHUD";
 import { BattleHUD } from "../../components/game/arcade/BattleHUD";
@@ -11,6 +12,8 @@ import { useGameChatter } from "../../components/game/arcade/useGameChatter";
 import { IconBtn } from "@/components/ui/arcade";
 import { ActionBar } from "../../components/game/ActionBar";
 import { TornadoOverlay } from "../../components/game/TornadoOverlay";
+import { PowerCastBanner } from "../../components/game/PowerCastBanner";
+import type { HueName } from "@/components/ui/theme";
 import { MatchFeedback } from "../../components/game/MatchFeedback";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import { useTheme } from "../../lib/ThemeContext";
@@ -34,14 +37,50 @@ export default function GameScreen() {
   const { avatar, nickname, selectedTable } = usePlayerStats();
   const premium = usePremium();
   const skin = getCardSkin(selectedTable);
-  const { game, lastMatchResult, handleCardPress, handleTornado, handleTornadoComplete } =
-    useLocalGame(difficulty as CpuDifficulty);
+
+  // Equipped ability → in-game power for P1.
+  const { states, equipped } = usePlayerAbilities();
+  const equippedAbility = states.find((s) => s.id === equipped) ?? states[0];
+  const effect = useMemo(
+    () => abilityEffect(equippedAbility.id, equippedAbility.level),
+    [equippedAbility.id, equippedAbility.level],
+  );
+  const myAbility = useMemo(
+    () => ({
+      id: equippedAbility.id,
+      level: equippedAbility.level,
+      emoji: equippedAbility.emoji,
+      nameKey: equippedAbility.nameKey,
+    }),
+    [equippedAbility.id, equippedAbility.level, equippedAbility.emoji, equippedAbility.nameKey],
+  );
+
+  const { game, lastMatchResult, handleCardPress, handlePower, handleTornadoComplete } =
+    useLocalGame(difficulty as CpuDifficulty, myAbility);
 
   const cpu = CPU_PROFILES[difficulty] ?? CPU_PROFILES.medium;
   const [turnTimer, setTurnTimer] = useState(0);
   const [showQuitModal, setShowQuitModal] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const gameStartRef = useRef(Date.now());
+
+  // "Power cast!" banner — shown when P1 fires a non-shuffle ability
+  // (shuffle already has the TornadoOverlay).
+  const [banner, setBanner] = useState<{ emoji: string; label: string; color: HueName; nonce: number } | null>(null);
+  const prevUsesRef = useRef(game.powerUsesLeft.p1);
+  const castNonceRef = useRef(0);
+  useEffect(() => {
+    if (game.powerUsesLeft.p1 < prevUsesRef.current && effect.kind !== "shuffle") {
+      castNonceRef.current += 1;
+      setBanner({
+        emoji: equippedAbility.emoji,
+        label: t(`abilities.${equippedAbility.nameKey}.name`),
+        color: equippedAbility.hue,
+        nonce: castNonceRef.current,
+      });
+    }
+    prevUsesRef.current = game.powerUsesLeft.p1;
+  }, [game.powerUsesLeft.p1]);
 
   useEffect(() => {
     if (game.status !== "playing") return;
@@ -63,7 +102,9 @@ export default function GameScreen() {
             difficulty,
             totalTime: totalTimeSec.toString(),
             p1Attempts: game.p1Attempts.toString(),
-            tornadoUsed: game.tornadoUsed.p1 ? "1" : "0",
+            tornadoUsed: (effect.uses - game.powerUsesLeft.p1).toString(),
+            powerEmoji: game.abilities.p1.emoji,
+            powerNameKey: game.abilities.p1.nameKey,
             maxStreak: game.p1MaxStreak.toString(),
             xpBoost,
           },
@@ -97,9 +138,9 @@ export default function GameScreen() {
     return () => handler.remove();
   }, [game.status]);
 
-  const canUseTornado =
+  const canUsePower =
     game.currentTurn === 1 &&
-    !game.tornadoUsed.p1 &&
+    game.powerUsesLeft.p1 > 0 &&
     !game.locked &&
     !game.tornadoActive &&
     game.status === "playing";
@@ -144,6 +185,10 @@ export default function GameScreen() {
           totalPairs={totalPairs}
           chatter={chatter}
           timer={{ text: formatTime(turnTimer) }}
+          playerBadge={game.shieldCharges.p1 > 0 ? { icon: "🛡️", count: game.shieldCharges.p1, color: "green" } : null}
+          opponentBadge={game.freezeTurns.p2 > 0 ? { icon: "❄️", count: game.freezeTurns.p2, color: "blue" } : null}
+          playerBuild={{ emoji: game.abilities.p1.emoji, name: t(`abilities.${game.abilities.p1.nameKey}.name`) }}
+          opponentBuild={{ emoji: game.abilities.p2.emoji, name: t(`abilities.${game.abilities.p2.nameKey}.name`) }}
         />
 
         <View style={{ height: 12 }} />
@@ -159,15 +204,33 @@ export default function GameScreen() {
             currentTurn={game.currentTurn}
             lastMatchResult={lastMatchResult}
             tornadoActive={game.tornadoActive}
+            revealed={game.revealed}
             onCardPress={handleCardPress}
             cols={gridConfig.cols}
             skin={skin}
           />
           <MatchFeedback result={lastMatchResult} />
+          {banner && (
+            <PowerCastBanner
+              key={banner.nonce}
+              emoji={banner.emoji}
+              label={banner.label}
+              color={banner.color}
+              onDone={() => setBanner(null)}
+            />
+          )}
         </View>
 
-        {/* Tornado card */}
-        <ActionBar canUseTornado={canUseTornado} tornadoUsed={game.tornadoUsed.p1} onTornado={handleTornado} />
+        {/* Equipped-ability power */}
+        <ActionBar
+          emoji={equippedAbility.emoji}
+          name={t(`abilities.${equippedAbility.nameKey}.name`)}
+          usesLeft={game.powerUsesLeft.p1}
+          canUse={canUsePower}
+          onPress={handlePower}
+          shieldCharges={game.shieldCharges.p1}
+          freezeTurns={game.freezeTurns.p2}
+        />
       </View>
 
       {game.tornadoActive && (

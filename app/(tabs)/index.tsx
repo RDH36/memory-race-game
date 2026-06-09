@@ -15,6 +15,7 @@ import { HomeStats } from "@/components/home/arcade/HomeStats";
 
 const DAILY_REWARD_KEY = "daily_reward_last_claimed";
 const DAILY_REWARD_XP = 15;
+const DAILY_REWARD_GOLD = 30;
 
 function isSameDay(ts1: number, ts2: number) {
   const d1 = new Date(ts1);
@@ -29,7 +30,7 @@ function isSameDay(ts1: number, ts2: number) {
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const { level, levelProgress, xpInLevel, xpForNextLevel, addBonusXp } = usePlayerStats();
+  const { level, levelProgress, xpInLevel, xpForNextLevel, addBonusXp, addGold } = usePlayerStats();
   const [dailyClaimed, setDailyClaimed] = useState(true);
 
   useEffect(() => {
@@ -43,10 +44,11 @@ export default function HomeScreen() {
   const claimDailyReward = useCallback(() => {
     if (dailyClaimed) return;
     addBonusXp(DAILY_REWARD_XP);
+    addGold(DAILY_REWARD_GOLD);
     setDailyClaimed(true);
     AsyncStorage.setItem(DAILY_REWARD_KEY, Date.now().toString());
     haptics.coin();
-  }, [dailyClaimed, addBonusXp]);
+  }, [dailyClaimed, addBonusXp, addGold]);
 
   const [gold, goldD, goldBg] = colors.hues.gold;
 
@@ -99,7 +101,7 @@ export default function HomeScreen() {
                   {t("home.dailyReward")}
                 </Text>
                 <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 11.5, color: gold }}>
-                  {t("home.dailyRewardSubtitle", { xp: DAILY_REWARD_XP })}
+                  {t("home.dailyRewardSubtitle", { xp: DAILY_REWARD_XP, gold: DAILY_REWARD_GOLD })}
                 </Text>
               </View>
               <Ribbon color="gold">{t("home.dailyRewardClaim")}</Ribbon>

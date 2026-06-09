@@ -141,7 +141,7 @@ export default function PlateauPreviewScreen() {
           )}
         </View>
 
-        <ActionBar canUseTornado={false} tornadoUsed={false} onTornado={() => {}} />
+        <ActionBar emoji="🌪️" name={t("tornado.default")} usesLeft={1} canUse={false} onPress={() => {}} />
 
         <View style={{ flexDirection: "row", alignItems: "center", marginTop: 10, gap: 10 }}>
           <View

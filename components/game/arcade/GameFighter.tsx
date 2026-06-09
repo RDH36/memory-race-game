@@ -22,6 +22,8 @@ export function GameFighter({
   color,
   active,
   says,
+  badge,
+  build,
 }: {
   avatar: string;
   name: string;
@@ -29,6 +31,10 @@ export function GameFighter({
   color: HueName;
   active: boolean;
   says?: { text: string; kind: ChatterKind } | null;
+  /** Persistent status chip near the avatar (e.g. 🛡️×2 shield, ❄️ frozen). */
+  badge?: { icon: string; count?: number; color: HueName } | null;
+  /** Equipped ability ("build") shown as a small chip. */
+  build?: { emoji: string; name: string } | null;
 }) {
   const { colors } = useTheme();
   const { t } = useTranslation();
@@ -76,6 +82,32 @@ export function GameFighter({
       {/* bare avatar — no tile; premium avatars get their themed aura */}
       <Animated.View style={bobStyle}>
         <View style={{ width: 54, height: 54, alignItems: "center", justifyContent: "center" }}>
+          {badge ? (
+            <View
+              pointerEvents="none"
+              style={{
+                position: "absolute",
+                top: -4,
+                right: -10,
+                zIndex: 7,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 2,
+                backgroundColor: colors.hues[badge.color][2],
+                borderRadius: 999,
+                paddingHorizontal: 6,
+                paddingVertical: 2,
+                boxShadow: `0 2px 0 ${colors.hues[badge.color][1]}55`,
+              }}
+            >
+              <Text style={{ fontSize: 12 }}>{badge.icon}</Text>
+              {badge.count != null && badge.count > 1 && (
+                <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 10, color: colors.hues[badge.color][1] }}>
+                  ×{badge.count}
+                </Text>
+              )}
+            </View>
+          ) : null}
           {auraEnt ? (
             <View
               pointerEvents="none"
@@ -118,6 +150,30 @@ export function GameFighter({
         >
           <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 9, letterSpacing: 0.5, color: "#fff" }}>
             {t("game.turnBadge", "JOUE")}
+          </Text>
+        </View>
+      )}
+
+      {build && (
+        <View
+          style={{
+            marginTop: 4,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 3,
+            maxWidth: 96,
+            backgroundColor: colors.hues[color][2],
+            borderRadius: 999,
+            paddingHorizontal: 7,
+            paddingVertical: 2,
+          }}
+        >
+          <Text style={{ fontSize: 11 }}>{build.emoji}</Text>
+          <Text
+            numberOfLines={1}
+            style={{ fontFamily: "Fredoka_700Bold", fontSize: 9.5, color: colors.hues[color][1] }}
+          >
+            {build.name}
           </Text>
         </View>
       )}

@@ -25,6 +25,7 @@ interface GameGridProps {
   currentTurn: 1 | 2;
   lastMatchResult: MatchResult;
   tornadoActive: boolean;
+  revealed?: number[];
   onCardPress: (cardId: number) => void;
   cols?: number;
   skin?: CardSkin;
@@ -114,6 +115,7 @@ export function GameGrid({
   currentTurn,
   lastMatchResult,
   tornadoActive,
+  revealed,
   onCardPress,
   cols = 4,
   skin = 'classic',
@@ -164,10 +166,11 @@ export function GameGrid({
           {gridIndices.map((gridIdx) => {
             const cardId = positions[gridIdx];
             const emoji = cardEmojis[cardId];
+            const isRevealed = revealed?.includes(cardId) ?? false;
             const isFaceUp =
-              selected.includes(cardId) || matchedBy[cardId] !== -1;
+              selected.includes(cardId) || matchedBy[cardId] !== -1 || isRevealed;
             const isDisabled =
-              matchedBy[cardId] !== -1 || locked;
+              matchedBy[cardId] !== -1 || locked || isRevealed;
 
             const isJustMatched =
               lastMatchResult?.type === 'match' &&

@@ -262,9 +262,11 @@ export default function TornadoScreen() {
             </Btn3D>
           ) : (
             <ActionBar
-              canUseTornado={phase === "ready"}
-              tornadoUsed={false}
-              onTornado={handleTornado}
+              emoji="🌪️"
+              name={t("tornado.default")}
+              usesLeft={1}
+              canUse={phase === "ready"}
+              onPress={handleTornado}
             />
           )}
         </Animated.View>

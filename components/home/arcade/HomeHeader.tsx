@@ -10,7 +10,7 @@ export function HomeHeader() {
   const router = useRouter();
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const { avatar, nickname, level, stats } = usePlayerStats();
+  const { avatar, nickname, level, stats, gold } = usePlayerStats();
 
   return (
     <Rise>
@@ -49,7 +49,7 @@ export function HomeHeader() {
           </View>
         </Pressable>
         <View style={{ flexDirection: "row", gap: 8 }}>
-          <CoinBar icon="⚡" value={stats.points} color="gold" />
+          <CoinBar icon="🪙" value={gold} color="gold" />
           <CoinBar icon="🔥" value={stats.currentStreak} color="blue" />
         </View>
       </View>

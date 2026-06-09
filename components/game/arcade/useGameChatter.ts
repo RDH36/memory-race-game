@@ -123,8 +123,8 @@ export function useGameChatter({
   // never on a constant timer. A cooldown + random skips keep it SPARSE so the
   // avatars stay quiet most of the time instead of chattering non-stop.
   const lastSpokeRef = useRef(0);
-  const COOLDOWN = 5000; // min ms of silence between bubbles
-  const SPEAK_CHANCE = 0.5; // only ~half the eligible actions trigger a line
+  const COOLDOWN = 2500; // min ms of silence between bubbles
+  const SPEAK_CHANCE = 0.8; // most eligible actions trigger a line
 
   useEffect(() => {
     if (!lastMatchResult || status !== "playing") return;

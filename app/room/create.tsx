@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
+import { usePlayerAbilities } from "../../lib/abilities";
 import { haptics } from "@/lib/haptics";
 import { createRoom, startRoom, deleteRoom, useRoom } from "../../lib/roomLogic";
 import { ScreenHeader } from "@/components/ui/arcade";
@@ -31,6 +32,9 @@ export default function CreateRoomScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const { userId, nickname, avatar } = usePlayerStats();
+  const { states, equipped } = usePlayerAbilities();
+  const myAb = states.find((s) => s.id === equipped) ?? states[0];
+  const hostAbility = { id: myAb.id, level: myAb.level, emoji: myAb.emoji, nameKey: myAb.nameKey };
 
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [roomId, setRoomId] = useState<string | null>(null);
@@ -59,7 +63,7 @@ export default function CreateRoomScreen() {
       return;
 
     startedRef.current = true;
-    startRoom(roomId, difficulty, room.hostId, room.guestId);
+    startRoom(roomId, difficulty, room.hostId, room.guestId, hostAbility);
     setShowCountdown(true);
   }, [room?.guestId]);
 

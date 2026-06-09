@@ -1,18 +1,23 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import * as Haptics from "expo-haptics";
 import {
   LocalGameState,
   CpuDifficulty,
+  PlayerAbility,
+  TORNADO_ABILITY,
   initGame,
   applyTornadoShuffle,
   isGameFinished,
 } from "../lib/gameLogic";
+import { abilityEffect } from "../lib/abilities";
+import { applyPower } from "../lib/powerEffects";
 import { CpuMemory, cpuDecide, updateMemory } from "../lib/cpuLogic";
 import { playFlip, playMatch } from "../lib/sound";
 
 const FLIP_DELAY = 800;
 const CPU_DELAY = 600;
 const FEEDBACK_DURATION = 900;
+const FREEZE_DELAY = 650;
 
 export type MatchResult = {
   type: "match" | "mismatch";
@@ -20,12 +25,14 @@ export type MatchResult = {
   cards: [number, number];
 } | null;
 
-export function useLocalGame(difficulty: CpuDifficulty) {
-  const [game, setGame] = useState<LocalGameState>(() => initGame(difficulty));
+export function useLocalGame(difficulty: CpuDifficulty, ability: PlayerAbility = TORNADO_ABILITY) {
+  const effect = useMemo(() => abilityEffect(ability.id, ability.level), [ability.id, ability.level]);
+  const [game, setGame] = useState<LocalGameState>(() => initGame(difficulty, ability));
   const [lastMatchResult, setLastMatchResult] = useState<MatchResult>(null);
   const cpuMemoryRef = useRef<CpuMemory>({});
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const revealTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const update = useCallback(
     (patch: Partial<LocalGameState>) =>
@@ -114,10 +121,13 @@ export function useLocalGame(difficulty: CpuDifficulty) {
         setLastMatchResult({ type: "mismatch", player: game.currentTurn, cards: [a, b] });
 
         const isP1 = game.currentTurn === 1;
+        // "shield" power: P1 keeps the turn instead of passing it on a miss.
+        const useShield = isP1 && game.shieldCharges.p1 > 0;
         update({
           selected: [],
           locked: false,
-          currentTurn: game.currentTurn === 1 ? 2 : 1,
+          currentTurn: useShield ? 1 : game.currentTurn === 1 ? 2 : 1,
+          ...(useShield && { shieldCharges: { ...game.shieldCharges, p1: game.shieldCharges.p1 - 1 } }),
           ...(isP1 && {
             p1Attempts: game.p1Attempts + 1,
             p1Streak: 0,
@@ -143,6 +153,16 @@ export function useLocalGame(difficulty: CpuDifficulty) {
     )
       return;
 
+    // "freeze" power: the opponent (P2) skips its turn(s) and play returns to P1.
+    if (game.freezeTurns.p2 > 0) {
+      timeoutRef.current = setTimeout(() => {
+        update({ freezeTurns: { ...game.freezeTurns, p2: game.freezeTurns.p2 - 1 }, currentTurn: 1 });
+      }, FREEZE_DELAY);
+      return () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      };
+    }
+
     timeoutRef.current = setTimeout(() => {
       const decision = cpuDecide(game, cpuMemoryRef.current, difficulty);
 
@@ -159,7 +179,7 @@ export function useLocalGame(difficulty: CpuDifficulty) {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [game.currentTurn, game.locked, game.tornadoActive, game.status]);
+  }, [game.currentTurn, game.locked, game.tornadoActive, game.status, game.freezeTurns.p2]);
 
   const executeCpuFlip = useCallback(
     (cards: [number, number]) => {
@@ -199,12 +219,12 @@ export function useLocalGame(difficulty: CpuDifficulty) {
     [difficulty],
   );
 
-  // --- P1 tornado ---
-  const handleTornado = useCallback(() => {
+  // --- P1 power (equipped ability) ---
+  const handlePower = useCallback(() => {
     setGame((g) => {
       if (
         g.currentTurn !== 1 ||
-        g.tornadoUsed.p1 ||
+        g.powerUsesLeft.p1 <= 0 ||
         g.locked ||
         g.tornadoActive ||
         g.status !== "playing"
@@ -213,17 +233,17 @@ export function useLocalGame(difficulty: CpuDifficulty) {
 
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
       const seed = Date.now() & 0xffff;
-      return {
-        ...g,
-        tornadoUsed: { ...g.tornadoUsed, p1: true },
-        tornadoSeed: seed,
-        tornadoActive: true,
-        selected: [],
-        locked: true,
-        currentTurn: 2,
-      };
+      const res = applyPower(g, effect, seed, 1);
+
+      // "reveal" auto-hides after a delay (kept local — single client).
+      if (res.revealMs > 0) {
+        if (revealTimerRef.current) clearTimeout(revealTimerRef.current);
+        revealTimerRef.current = setTimeout(() => update({ revealed: [] }), res.revealMs);
+      }
+
+      return { ...g, ...res.patch, revealed: res.revealCards, tornadoUsed: { ...g.tornadoUsed, p1: true } };
     });
-  }, []);
+  }, [effect, update]);
 
   // --- CPU tornado ---
   const handleCpuTornado = useCallback(() => {
@@ -231,13 +251,14 @@ export function useLocalGame(difficulty: CpuDifficulty) {
     const seed = Date.now() & 0xffff;
     update({
       tornadoUsed: { ...game.tornadoUsed, p2: true },
+      powerUsesLeft: { ...game.powerUsesLeft, p2: game.powerUsesLeft.p2 - 1 },
       tornadoSeed: seed,
       tornadoActive: true,
       selected: [],
       locked: true,
       currentTurn: 1,
     });
-  }, [game.tornadoUsed]);
+  }, [game.tornadoUsed, game.powerUsesLeft]);
 
   // --- Tornado complete ---
   const handleTornadoComplete = useCallback(() => {
@@ -258,14 +279,15 @@ export function useLocalGame(difficulty: CpuDifficulty) {
   // --- Reset ---
   const resetGame = useCallback(() => {
     cpuMemoryRef.current = {};
-    setGame(initGame(difficulty));
-  }, []);
+    if (revealTimerRef.current) clearTimeout(revealTimerRef.current);
+    setGame(initGame(difficulty, ability));
+  }, [difficulty, ability]);
 
   return {
     game,
     lastMatchResult,
     handleCardPress,
-    handleTornado,
+    handlePower,
     handleTornadoComplete,
     resetGame,
   };

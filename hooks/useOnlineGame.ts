@@ -2,10 +2,13 @@ import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import * as Haptics from "expo-haptics";
 import {
   type LocalGameState,
-  type CpuDifficulty,
+  type PlayerAbility,
+  TORNADO_ABILITY,
   applyTornadoShuffle,
   isGameFinished,
 } from "../lib/gameLogic";
+import { abilityEffect } from "../lib/abilities";
+import { applyPower } from "../lib/powerEffects";
 import {
   updateRoomGameState,
   type RoomData,
@@ -14,6 +17,7 @@ import { playFlip, playMatch } from "../lib/sound";
 
 const FLIP_DELAY = 800;
 const FEEDBACK_DURATION = 900;
+const FREEZE_DELAY = 650;
 
 export type MatchResult = {
   type: "match" | "mismatch";
@@ -25,12 +29,16 @@ export function useOnlineGame(
   room: RoomData | null,
   myUserId: string | undefined,
   isBotMode: boolean = false,
+  myAbility: PlayerAbility = TORNADO_ABILITY,
 ) {
   const [lastMatchResult, setLastMatchResult] = useState<MatchResult>(null);
+  const [revealedLocal, setRevealedLocal] = useState<number[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const revealTimerRef = useRef<NodeJS.Timeout | null>(null);
   const prevSelectedRef = useRef<number[]>([]);
   const resolvingRef = useRef(false);
+  const syncedRef = useRef(false);
 
   const game: LocalGameState | null = useMemo(() => {
     if (!room?.gameState) return null;
@@ -43,19 +51,39 @@ export function useOnlineGame(
 
   // Determine if I'm player 1 (host) or player 2 (guest)
   const isHost = myUserId === room?.hostId;
+  const myKey = isHost ? "p1" : "p2";
+  const myCaster: 1 | 2 = isHost ? 1 : 2;
   const myTurn = game
     ? (isHost && game.currentTurn === 1) ||
       (!isHost && game.currentTurn === 2)
     : false;
 
+  const effect = useMemo(() => abilityEffect(myAbility.id, myAbility.level), [myAbility.id, myAbility.level]);
+
+  // --- Sync my equipped ability into the shared state once per game ---
+  useEffect(() => {
+    if (!game || !room || syncedRef.current || game.status !== "playing") return;
+    const mine = game.abilities?.[myKey];
+    if (mine && mine.id === myAbility.id && mine.level === myAbility.level) {
+      syncedRef.current = true;
+      return;
+    }
+    syncedRef.current = true;
+    updateRoomGameState(
+      room.id,
+      {
+        ...game,
+        abilities: { ...game.abilities, [myKey]: myAbility },
+        powerUsesLeft: { ...game.powerUsesLeft, [myKey]: effect.uses },
+      },
+      room.currentPlayerId!,
+    );
+  }, [game?.abilities?.[myKey]?.id, room?.id]);
+
   // --- Detect match resolution (when 2 cards selected + locked) ---
   useEffect(() => {
     if (!game || !room || game.selected.length !== 2 || !game.locked) return;
-
-    // Only the player whose turn it is resolves the match
     if (!myTurn) return;
-
-    // Idempotency guard: skip if a resolution is already in flight
     if (resolvingRef.current) return;
     resolvingRef.current = true;
 
@@ -93,10 +121,13 @@ export function useOnlineGame(
       } else {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         const isP1 = game.currentTurn === 1;
+        // "shield" power: keep the turn instead of passing it on a miss.
+        const useShield = game.shieldCharges[myKey] > 0;
         Object.assign(newState, {
           selected: [],
           locked: false,
-          currentTurn: game.currentTurn === 1 ? 2 : 1,
+          currentTurn: useShield ? game.currentTurn : game.currentTurn === 1 ? 2 : 1,
+          ...(useShield && { shieldCharges: { ...game.shieldCharges, [myKey]: game.shieldCharges[myKey] - 1 } }),
           ...(isP1 && { p1Attempts: game.p1Attempts + 1, p1Streak: 0 }),
         });
 
@@ -133,12 +164,25 @@ export function useOnlineGame(
     };
   }, [game?.selected?.length, game?.locked]);
 
-  // --- Detect opponent's match result for feedback ---
+  // --- "freeze" power: if it's my turn but I'm frozen, skip and hand over ---
   useEffect(() => {
-    if (!game || game.selected.length !== 0 || myTurn) return;
-    // When opponent resolves (selected goes back to 0), we show feedback based on matchedBy changes
-    // This is handled by the state update propagation
-  }, [game?.selected]);
+    if (!game || !room || !myTurn || isBotMode) return;
+    if (game.locked || game.tornadoActive || game.status !== "playing") return;
+    if (game.freezeTurns[myKey] <= 0) return;
+
+    const t = setTimeout(() => {
+      updateRoomGameState(
+        room.id,
+        {
+          ...game,
+          freezeTurns: { ...game.freezeTurns, [myKey]: game.freezeTurns[myKey] - 1 },
+          currentTurn: isHost ? 2 : 1,
+        },
+        isHost ? room.guestId! : room.hostId,
+      );
+    }, FREEZE_DELAY);
+    return () => clearTimeout(t);
+  }, [game?.currentTurn, game?.freezeTurns?.[myKey], myTurn]);
 
   // --- Track selection changes for haptics on opponent moves ---
   useEffect(() => {
@@ -161,7 +205,7 @@ export function useOnlineGame(
     myTurnRef.current = myTurn;
   });
 
-  // --- P1 card press ---
+  // --- Card press ---
   const handleCardPress = useCallback((cardId: number) => {
     const g = gameRef.current;
     const r = roomRef.current;
@@ -182,47 +226,43 @@ export function useOnlineGame(
     const newSelected = [...g.selected, cardId];
     const isSecondCard = newSelected.length === 2;
 
-    const newState: LocalGameState = {
-      ...g,
-      selected: newSelected,
-      locked: isSecondCard,
-    };
-
-    updateRoomGameState(r.id, newState, r.currentPlayerId!);
+    updateRoomGameState(
+      r.id,
+      { ...g, selected: newSelected, locked: isSecondCard },
+      r.currentPlayerId!,
+    );
   }, []);
 
-  // --- Tornado ---
-  const handleTornado = useCallback(() => {
+  // --- Equipped-ability power ---
+  const handlePower = useCallback(() => {
     if (!game || !room || !myTurn) return;
-    if (
-      game.locked ||
-      game.tornadoActive ||
-      game.status !== "playing"
-    )
-      return;
-
-    const tornadoKey = isHost ? "p1" : "p2";
-    if (game.tornadoUsed[tornadoKey]) return;
+    if (game.locked || game.tornadoActive || game.status !== "playing") return;
+    if (game.powerUsesLeft[myKey] <= 0) return;
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     const seed = Date.now() & 0xffff;
-    const nextTurn = game.currentTurn === 1 ? 2 : 1;
-    const nextPlayerId = nextTurn === 1 ? room.hostId : room.guestId!;
+    const res = applyPower(game, effect, seed, myCaster);
+
+    // "reveal" stays private — shown only on my client, never synced.
+    if (res.revealMs > 0) {
+      setRevealedLocal(res.revealCards);
+      if (revealTimerRef.current) clearTimeout(revealTimerRef.current);
+      revealTimerRef.current = setTimeout(() => setRevealedLocal([]), res.revealMs);
+    }
+
+    // No-op power (e.g. steal with nothing to take) — don't write.
+    if (Object.keys(res.patch).length === 0) return;
 
     const newState: LocalGameState = {
       ...game,
-      tornadoUsed: { ...game.tornadoUsed, [tornadoKey]: true },
-      tornadoSeed: seed,
-      tornadoActive: true,
-      selected: [],
-      locked: true,
-      currentTurn: nextTurn as 1 | 2,
+      ...res.patch,
+      tornadoUsed: { ...game.tornadoUsed, [myKey]: true },
     };
-
+    const nextPlayerId = newState.currentTurn === 1 ? room.hostId : room.guestId!;
     updateRoomGameState(room.id, newState, nextPlayerId);
-  }, [game, room, myTurn, isHost]);
+  }, [game, room, myTurn, myKey, myCaster, effect]);
 
-  // --- Tornado complete ---
+  // --- Tornado/shuffle overlay complete ---
   const handleTornadoComplete = useCallback(() => {
     if (!game || !room) return;
 
@@ -235,9 +275,6 @@ export function useOnlineGame(
       tornadoSeed: null,
     };
 
-    // In bot mode, the host always writes completion — no separate bot client exists
-    // to write it, so gating on iAmNext would leave tornadoActive stuck when it's the
-    // bot's turn (e.g. after the host launches tornado).
     const iAmNext =
       (isHost && game.currentTurn === 1) ||
       (!isHost && game.currentTurn === 2);
@@ -252,8 +289,9 @@ export function useOnlineGame(
     isHost,
     myTurn,
     lastMatchResult,
+    revealedLocal,
     handleCardPress,
-    handleTornado,
+    handlePower,
     handleTornadoComplete,
   };
 }

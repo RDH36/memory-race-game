@@ -59,6 +59,23 @@ export function useBotPlayer(
     )
       return;
 
+    // "freeze" cast on the bot (p2): skip its turn and hand back to host.
+    if (game.freezeTurns.p2 > 0) {
+      actingRef.current = true;
+      const skipTimer = setTimeout(() => {
+        updateRoomGameState(
+          room.id,
+          { ...game, freezeTurns: { ...game.freezeTurns, p2: game.freezeTurns.p2 - 1 }, currentTurn: 1 },
+          room.hostId,
+        );
+        actingRef.current = false;
+      }, BOT_DELAY);
+      return () => {
+        clearTimeout(skipTimer);
+        actingRef.current = false;
+      };
+    }
+
     actingRef.current = true;
 
     const timer = setTimeout(() => {
@@ -69,6 +86,7 @@ export function useBotPlayer(
         const newState: LocalGameState = {
           ...game,
           tornadoUsed: { ...game.tornadoUsed, p2: true },
+          powerUsesLeft: { ...game.powerUsesLeft, p2: game.powerUsesLeft.p2 - 1 },
           tornadoSeed: seed,
           tornadoActive: true,
           selected: [],
@@ -119,7 +137,7 @@ export function useBotPlayer(
       clearTimeout(timer);
       actingRef.current = false;
     };
-  }, [game?.currentTurn, game?.locked, game?.tornadoActive, game?.status, enabled, difficulty]);
+  }, [game?.currentTurn, game?.locked, game?.tornadoActive, game?.status, game?.freezeTurns?.p2, enabled, difficulty]);
 }
 
 /** Resolve a bot flip: update scores/turn and write back to room */

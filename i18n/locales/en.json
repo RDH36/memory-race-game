@@ -2,10 +2,92 @@
   "tabs": {
     "home": "Play",
     "leaderboard": "Leaderboard",
+    "builds": "Builds",
     "achievements": "Achievements",
     "shop": "Shop",
     "settings": "Settings",
     "profile": "Profile"
+  },
+  "builds": {
+    "title": "Builds",
+    "subtitle": "Unlock and equip abilities",
+    "sectionTitle": "Your abilities",
+    "equipped": "Equipped",
+    "equippedLabel": "Equipped",
+    "equip": "Equip",
+    "unlock": "Unlock",
+    "upgrade": "Upgrade",
+    "maxLevel": "Max lvl",
+    "locked": "Locked",
+    "default": "Default",
+    "notEnoughGold": "Not enough gold",
+    "linkedAvatar": "Linked avatar",
+    "story": "Story",
+    "timing": "When to use",
+    "gotIt": "Got it!",
+    "levels": "Levels",
+    "level": "Lvl {{n}}",
+    "currentLevel": "Current level",
+    "maxReached": "Max level reached",
+    "upgradeTitle": "Upgrade ability",
+    "upgradeTo": "Upgrade to level {{n}}",
+    "cancel": "Cancel"
+  },
+  "abilities": {
+    "tornado": {
+      "name": "Tornado",
+      "desc": "Shuffles the unmatched cards. Default ability.",
+      "story": "Born from a legendary gust, the Tornado sweeps the board and reshuffles every still-hidden card. It's the power every player masters from their very first steps.",
+      "timing": "Trigger it when you've memorized few cards, or right before your opponent chains pairs: the shuffle wipes out their advantage in one move.",
+      "levels": {
+        "1": "Shuffles the unmatched cards (1×/game). You pass the turn.",
+        "2": "You keep your turn after the shuffle.",
+        "3": "Usable twice per game."
+      }
+    },
+    "freeze": {
+      "name": "Freeze",
+      "desc": "Make the opponent skip their next turn.",
+      "story": "The Whale's icy breath freezes your opponent in place: while they stand still, you chain your moves.",
+      "timing": "Use it to play again right away and keep the initiative when your opponent is about to chain pairs.",
+      "levels": {
+        "1": "The opponent skips their next turn.",
+        "2": "The opponent skips their next 2 turns.",
+        "3": "The opponent skips their next 3 turns."
+      }
+    },
+    "reveal": {
+      "name": "Reveal",
+      "desc": "Briefly reveals a few random cards.",
+      "story": "The Owl's piercing gaze sees through the back of the cards and shows you a few of them in the blink of an eye — it's up to you to memorize them.",
+      "timing": "Use it to memorize cards, then go find them on your turn.",
+      "levels": {
+        "1": "Reveals 2 cards briefly.",
+        "2": "Reveals 4 cards.",
+        "3": "Reveals 4 cards, for longer."
+      }
+    },
+    "swap": {
+      "name": "Steal",
+      "desc": "Steal a pair the opponent already found.",
+      "story": "The mischievous Octopus reaches its tentacles over the enemy's loot and snatches a pair they already won — daylight robbery.",
+      "timing": "Save it for key moments: swing the score by ripping away the opponent's hard-earned pairs.",
+      "levels": {
+        "1": "Steal 1 pair found by the opponent.",
+        "2": "Steal 2 pairs found by the opponent."
+      }
+    },
+    "shield": {
+      "name": "Shield",
+      "desc": "Shields your turn from one mistake without losing it.",
+      "story": "The Lion's mane rises into a golden shield: even on a miss, you keep the turn and press your assault.",
+      "timing": "Switch it on before a risky move: if you're wrong, you won't hand your turn to the opponent.",
+      "levels": {
+        "1": "Cancels 1 mistake without losing the turn.",
+        "2": "Cancels up to 2 mistakes.",
+        "3": "Cancels up to 3 mistakes."
+      }
+    }
   },
   "home": {
     "welcome": "Welcome to",
@@ -41,7 +123,7 @@
     "xpBoost": "XP x1.5 (ad 30s)",
     "xpBoostDesc": "Watch an ad to earn 50% more XP",
     "dailyReward": "Daily reward",
-    "dailyRewardSubtitle": "Claim your +{{xp}} XP for free",
+    "dailyRewardSubtitle": "Claim your +{{xp}} XP and +{{gold}} 🪙 for free",
     "dailyRewardClaim": "Claim",
     "dailyRewardClaimed": "Come back tomorrow!",
     "heroBubble": "Ready for a duel?",
@@ -148,6 +230,14 @@
     "availableSub": "Shuffle cards · End your turn",
     "waitSub": "Wait for your turn to launch",
     "launch": "Launch"
+  },
+  "power": {
+    "launch": "Use",
+    "readySub": "Tap to use your power",
+    "waitSub": "Wait for your turn",
+    "exhaustedSub": "No charge left this game",
+    "shield": "🛡️ Shield active ×{{n}}",
+    "frozen": "❄️ Opponent frozen ×{{n}}"
   },
   "feedback": {
     "title": "Feedback & Support",

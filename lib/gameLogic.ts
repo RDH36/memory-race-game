@@ -1,4 +1,20 @@
+import { abilityEffect } from "./abilities";
+
 export type CpuDifficulty = "easy" | "medium" | "hard";
+
+/** Per-player counter (p1 = host/human, p2 = guest/CPU). */
+export interface PerPlayer { p1: number; p2: number }
+
+/** A player's equipped ability, mirrored into the shared state so both
+ *  clients can render the build and resolve effects. */
+export interface PlayerAbility {
+  id: string;
+  level: number;
+  emoji: string;
+  nameKey: string;
+}
+
+export const TORNADO_ABILITY: PlayerAbility = { id: "tornado", level: 1, emoji: "🌪️", nameKey: "tornado" };
 
 export interface LocalGameState {
   positions: number[];        // positions[gridIdx] = cardId
@@ -15,6 +31,14 @@ export interface LocalGameState {
   p1Attempts: number;
   p1Streak: number;
   p1MaxStreak: number;
+  // --- Equipped-ability powers (per player) ---
+  powerUsesLeft: PerPlayer;   // activations remaining this game
+  freezeTurns: PerPlayer;     // turns each player must still skip ("freeze")
+  shieldCharges: PerPlayer;   // mismatch protections left ("shield")
+  abilities: { p1: PlayerAbility; p2: PlayerAbility };
+  // Transient visual; only ever set locally for the casting client (never
+  // written to a synced room — keeps "reveal" private from the opponent).
+  revealed: number[];
 }
 
 // All available emojis for card pairs
@@ -54,12 +78,19 @@ export function seededShuffle<T>(arr: T[], seed: number): T[] {
   return result;
 }
 
-// Initialize a new game
-export function initGame(difficulty: CpuDifficulty = 'medium'): LocalGameState {
+// Initialize a new game. Each player's equipped ability configures their
+// power (uses count, etc.); both default to the tornado when omitted.
+export function initGame(
+  difficulty: CpuDifficulty = 'medium',
+  p1Ability: PlayerAbility = TORNADO_ABILITY,
+  p2Ability: PlayerAbility = TORNADO_ABILITY,
+): LocalGameState {
   const config = GRID_CONFIG[difficulty];
   const numPairs = config.totalCards / 2;
   const emojis = ALL_EMOJIS.slice(0, numPairs);
   const pairs = shuffle([...emojis, ...emojis]);
+  const p1Uses = abilityEffect(p1Ability.id, p1Ability.level).uses;
+  const p2Uses = abilityEffect(p2Ability.id, p2Ability.level).uses;
   return {
     positions: shuffle([...Array(config.totalCards).keys()]),
     cardEmojis: pairs,
@@ -75,6 +106,11 @@ export function initGame(difficulty: CpuDifficulty = 'medium'): LocalGameState {
     p1Attempts: 0,
     p1Streak: 0,
     p1MaxStreak: 0,
+    powerUsesLeft: { p1: p1Uses, p2: p2Uses },
+    freezeTurns: { p1: 0, p2: 0 },
+    shieldCharges: { p1: 0, p2: 0 },
+    abilities: { p1: p1Ability, p2: p2Ability },
+    revealed: [],
   };
 }
 

@@ -4,26 +4,39 @@ import { useTheme } from '../../lib/ThemeContext';
 import { Btn3D, Panel } from '@/components/ui/arcade';
 
 interface ActionBarProps {
-  canUseTornado: boolean;
-  tornadoUsed: boolean;
-  onTornado: () => void;
+  emoji: string;
+  name: string;
+  usesLeft: number;
+  canUse: boolean;
+  onPress: () => void;
+  shieldCharges?: number;
+  freezeTurns?: number;
 }
 
-export function ActionBar({ canUseTornado, tornadoUsed, onTornado }: ActionBarProps) {
+export function ActionBar({
+  emoji,
+  name,
+  usesLeft,
+  canUse,
+  onPress,
+  shieldCharges = 0,
+  freezeTurns = 0,
+}: ActionBarProps) {
   const { t } = useTranslation();
   const { colors } = useTheme();
 
-  const title = tornadoUsed
-    ? `🌪️ ${t('tornado.used')}`
-    : canUseTornado
-      ? `🌪️ ${t('tornado.available')}`
-      : `🌪️ ${t('tornado.default')}`;
+  const exhausted = usesLeft <= 0 && shieldCharges <= 0 && freezeTurns <= 0;
 
-  const subtitle = tornadoUsed
-    ? t('tornado.usedSub')
-    : canUseTornado
-      ? t('tornado.availableSub')
-      : t('tornado.waitSub');
+  const subtitle =
+    shieldCharges > 0
+      ? t('power.shield', { n: shieldCharges })
+      : freezeTurns > 0
+        ? t('power.frozen', { n: freezeTurns })
+        : usesLeft <= 0
+          ? t('power.exhaustedSub')
+          : canUse
+            ? t('power.readySub')
+            : t('power.waitSub');
 
   return (
     <Panel
@@ -34,34 +47,50 @@ export function ActionBar({ canUseTornado, tornadoUsed, onTornado }: ActionBarPr
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,
-        opacity: tornadoUsed ? 0.5 : 1,
+        opacity: exhausted ? 0.5 : 1,
       }}
     >
       <View style={{ flex: 1 }}>
-        <Text
-          style={{
-            fontSize: 13,
-            fontFamily: 'Fredoka_700Bold',
-            color: canUseTornado ? colors.onSurface : colors.onSurfaceVariant,
-          }}
-        >
-          {title}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text
+            style={{
+              fontSize: 13,
+              fontFamily: 'Fredoka_700Bold',
+              color: canUse ? colors.onSurface : colors.onSurfaceVariant,
+            }}
+          >
+            {emoji} {name}
+          </Text>
+          {usesLeft > 1 && (
+            <View
+              style={{
+                borderRadius: 999,
+                paddingHorizontal: 7,
+                paddingVertical: 1,
+                backgroundColor: colors.hues.gold[2],
+              }}
+            >
+              <Text style={{ fontSize: 10.5, fontFamily: 'Fredoka_700Bold', color: colors.hues.gold[1] }}>
+                ×{usesLeft}
+              </Text>
+            </View>
+          )}
+        </View>
         <Text style={{ fontSize: 11, fontFamily: 'Fredoka_700Bold', color: colors.onSurfaceMuted, marginTop: 2 }}>
           {subtitle}
         </Text>
       </View>
 
-      {!tornadoUsed && (
+      {usesLeft > 0 && (
         <Btn3D
           color="violet"
           size="sm"
           haptic="press"
-          disabled={!canUseTornado}
-          label={t('tornado.launch')}
-          onPress={onTornado}
+          disabled={!canUse}
+          label={t('power.launch')}
+          onPress={onPress}
         >
-          <Text style={{ fontSize: 15 }}>🌪️</Text>
+          <Text style={{ fontSize: 15 }}>{emoji}</Text>
         </Btn3D>
       )}
     </Panel>

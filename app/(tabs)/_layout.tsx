@@ -153,11 +153,11 @@ export default function TabsLayout() {
   return (
     <Tabs detachInactiveScreens screenOptions={screenOptions}>
       <Tabs.Screen
-        name="leaderboard"
+        name="builds"
         options={{
-          title: t("tabs.leaderboard"),
+          title: t("tabs.builds", "Builds"),
           tabBarIcon: ({ color }) => (
-            <Ionicons name="trophy" size={22} color={color} />
+            <Ionicons name="flash" size={22} color={color} />
           ),
         }}
       />
@@ -201,6 +201,9 @@ export default function TabsLayout() {
           ),
         }}
       />
+      {/* Hidden routes — reachable via router.push only. Leaderboard is
+          linked from the Home screen (HomeStats). */}
+      <Tabs.Screen name="leaderboard" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
     </Tabs>
   );

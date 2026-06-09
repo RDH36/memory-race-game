@@ -1,6 +1,6 @@
 import { db } from "@/lib/instant";
 import { id, tx } from "@instantdb/react-native";
-import { initGame, type CpuDifficulty, type LocalGameState } from "./gameLogic";
+import { initGame, type CpuDifficulty, type LocalGameState, type PlayerAbility, TORNADO_ABILITY } from "./gameLogic";
 import { APP_VERSION } from "./constants";
 
 export interface RoomData {
@@ -101,8 +101,10 @@ export function initRoomGame(
   difficulty: CpuDifficulty,
   hostId: string,
   guestId: string,
+  hostAbility: PlayerAbility = TORNADO_ABILITY,
 ): { gameState: string; currentPlayerId: string } {
-  const game = initGame(difficulty);
+  // Host = p1 (ability known now); guest = p2 (syncs its own ability on load).
+  const game = initGame(difficulty, hostAbility, TORNADO_ABILITY);
   const firstIsHost = Math.random() < 0.5;
   const currentPlayerId = firstIsHost ? hostId : guestId;
   // currentTurn 1 = host, 2 = guest
@@ -119,11 +121,13 @@ export async function startRoom(
   difficulty: CpuDifficulty,
   hostId: string,
   guestId: string,
+  hostAbility: PlayerAbility = TORNADO_ABILITY,
 ) {
   const { gameState, currentPlayerId } = initRoomGame(
     difficulty,
     hostId,
     guestId,
+    hostAbility,
   );
   const now = Date.now();
 

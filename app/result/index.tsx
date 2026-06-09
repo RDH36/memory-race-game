@@ -61,6 +61,8 @@ export default function ResultScreen() {
     forfeitWon = "0",
     matchmaking = "0",
     xpBoost = "0",
+    powerEmoji = "🌪️",
+    powerNameKey = "tornado",
   } = useLocalSearchParams<{
     p1Score?: string;
     p2Score?: string;
@@ -78,6 +80,8 @@ export default function ResultScreen() {
     forfeitWon?: string;
     matchmaking?: string;
     xpBoost?: string;
+    powerEmoji?: string;
+    powerNameKey?: string;
   }>();
   const router = useRouter();
   const { t } = useTranslation();
@@ -330,7 +334,7 @@ export default function ResultScreen() {
             <StatItem value={`${precision}%`} label={t("result.precision")} />
           </View>
           <View style={{ flexDirection: "row", gap: 10, marginBottom: 24 }}>
-            <StatItem value={`🌪️ x${tornado}`} label={t("result.tornadoUsed")} />
+            <StatItem value={`${powerEmoji} x${tornado}`} label={t(`abilities.${powerNameKey}.name`)} />
             <StatItem value={`${streak} 🔥`} label={t("result.streak")} />
           </View>
         </Animated.View>
