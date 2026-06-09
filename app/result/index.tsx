@@ -19,6 +19,7 @@ import { ConfettiParticles } from "../../components/result/ConfettiParticles";
 import { ScoreCard } from "../../components/result/ScoreCard";
 import { StatItem } from "../../components/result/StatItem";
 import { XpRewardBar } from "../../components/result/XpRewardBar";
+import { CoinRewardBar } from "../../components/result/CoinRewardBar";
 import { Btn3D, Mascot } from "@/components/ui/arcade";
 import { useTheme } from "../../lib/ThemeContext";
 import { deleteRoom } from "../../lib/roomLogic";
@@ -90,7 +91,7 @@ export default function ResultScreen() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState<"new" | "home" | null>(null);
   const [bonusClaimed, setBonusClaimed] = useState(false);
-  const { avatar, stats, recordGame, addBonusXp, addGold, lastXpGain, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
+  const { avatar, stats, recordGame, addBonusXp, addGold, lastXpGain, lastGoldGain, gold, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
   const recorded = useRef(false);
   const initialLevelRef = useRef<number | null>(null);
   const initialUnlockedRef = useRef<AchievementId[] | null>(null);
@@ -284,6 +285,11 @@ export default function ResultScreen() {
             won={effectiveWinner === "p1"}
             premiumBoosted={premium}
           />
+        </Animated.View>
+
+        {/* Coins Reward */}
+        <Animated.View style={[xpStyle, { marginBottom: 12 }]}>
+          <CoinRewardBar coinsGained={lastGoldGain} total={gold} premiumBonus={premium} />
         </Animated.View>
 
         {/* Rewarded ad → free coins (hidden for premium). */}

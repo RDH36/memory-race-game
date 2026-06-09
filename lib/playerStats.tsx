@@ -26,6 +26,9 @@ const GOLD_REWARDS: Record<string, { win: number; loss: number }> = {
   hard: { win: 32, loss: 8 },
 };
 
+// Flat coins premium players get every game (matches the free rewarded-ad bonus).
+const PREMIUM_GOLD_BONUS = 50;
+
 // AVATARS lives in lib/skins.ts (re-exported here for back-compat)
 export { AVATARS } from "@/lib/skins";
 
@@ -157,10 +160,11 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
     setLastXpGain(xp);
 
     const goldRewards = GOLD_REWARDS[difficulty] ?? GOLD_REWARDS.medium;
-    // Gold boosts: premium +5%, rewarded-ad boost +5% (stackable).
-    const goldPremiumBoost = premium ? 1.05 : 1;
+    // Rewarded-ad boost (+5%) for the in-mode ad. Premium players don't watch
+    // ads, so they get the same flat +50 coins the free rewarded ad grants.
     const goldAdBoost = (options?.xpBoost ?? 1) > 1 ? 1.05 : 1;
-    const goldEarned = Math.round((won ? goldRewards.win : goldRewards.loss) * goldPremiumBoost * goldAdBoost);
+    let goldEarned = Math.round((won ? goldRewards.win : goldRewards.loss) * goldAdBoost);
+    if (premium) goldEarned += PREMIUM_GOLD_BONUS;
     setLastGoldGain(goldEarned);
 
     const newStreak = won ? stats.currentStreak + 1 : 0;

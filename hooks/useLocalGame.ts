@@ -25,9 +25,14 @@ export type MatchResult = {
   cards: [number, number];
 } | null;
 
-export function useLocalGame(difficulty: CpuDifficulty, ability: PlayerAbility = TORNADO_ABILITY) {
+export function useLocalGame(
+  difficulty: CpuDifficulty,
+  ability: PlayerAbility = TORNADO_ABILITY,
+  cpuAbility: PlayerAbility = TORNADO_ABILITY,
+) {
   const effect = useMemo(() => abilityEffect(ability.id, ability.level), [ability.id, ability.level]);
-  const [game, setGame] = useState<LocalGameState>(() => initGame(difficulty, ability));
+  const cpuEffect = useMemo(() => abilityEffect(cpuAbility.id, cpuAbility.level), [cpuAbility.id, cpuAbility.level]);
+  const [game, setGame] = useState<LocalGameState>(() => initGame(difficulty, ability, cpuAbility));
   const [lastMatchResult, setLastMatchResult] = useState<MatchResult>(null);
   const cpuMemoryRef = useRef<CpuMemory>({});
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -48,6 +53,7 @@ export function useLocalGame(difficulty: CpuDifficulty, ability: PlayerAbility =
           g.currentTurn !== 1 ||
           g.locked ||
           g.tornadoActive ||
+          g.freezeTurns.p1 > 0 ||
           g.matchedBy[cardId] !== -1 ||
           g.selected.includes(cardId) ||
           g.selected.length >= 2 ||
@@ -121,13 +127,14 @@ export function useLocalGame(difficulty: CpuDifficulty, ability: PlayerAbility =
         setLastMatchResult({ type: "mismatch", player: game.currentTurn, cards: [a, b] });
 
         const isP1 = game.currentTurn === 1;
-        // "shield" power: P1 keeps the turn instead of passing it on a miss.
-        const useShield = isP1 && game.shieldCharges.p1 > 0;
+        // "shield" power: the player keeps the turn instead of passing on a miss.
+        const meKey = isP1 ? "p1" : "p2";
+        const useShield = game.shieldCharges[meKey] > 0;
         update({
           selected: [],
           locked: false,
-          currentTurn: useShield ? 1 : game.currentTurn === 1 ? 2 : 1,
-          ...(useShield && { shieldCharges: { ...game.shieldCharges, p1: game.shieldCharges.p1 - 1 } }),
+          currentTurn: useShield ? game.currentTurn : game.currentTurn === 1 ? 2 : 1,
+          ...(useShield && { shieldCharges: { ...game.shieldCharges, [meKey]: game.shieldCharges[meKey] - 1 } }),
           ...(isP1 && {
             p1Attempts: game.p1Attempts + 1,
             p1Streak: 0,
@@ -164,10 +171,10 @@ export function useLocalGame(difficulty: CpuDifficulty, ability: PlayerAbility =
     }
 
     timeoutRef.current = setTimeout(() => {
-      const decision = cpuDecide(game, cpuMemoryRef.current, difficulty);
+      const decision = cpuDecide(game, cpuMemoryRef.current, difficulty, cpuEffect.kind);
 
-      if (decision.action === "tornado") {
-        handleCpuTornado();
+      if (decision.action === "power") {
+        handleCpuPower();
         return;
       }
 
@@ -180,6 +187,24 @@ export function useLocalGame(difficulty: CpuDifficulty, ability: PlayerAbility =
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [game.currentTurn, game.locked, game.tornadoActive, game.status, game.freezeTurns.p2]);
+
+  // --- P1 frozen: skip the player's turn and hand back to the CPU ---
+  useEffect(() => {
+    if (
+      game.currentTurn !== 1 ||
+      game.locked ||
+      game.tornadoActive ||
+      game.status !== "playing" ||
+      game.freezeTurns.p1 <= 0
+    )
+      return;
+    timeoutRef.current = setTimeout(() => {
+      update({ freezeTurns: { ...game.freezeTurns, p1: game.freezeTurns.p1 - 1 }, currentTurn: 2 });
+    }, FREEZE_DELAY);
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [game.currentTurn, game.locked, game.tornadoActive, game.status, game.freezeTurns.p1]);
 
   const executeCpuFlip = useCallback(
     (cards: [number, number]) => {
@@ -245,20 +270,33 @@ export function useLocalGame(difficulty: CpuDifficulty, ability: PlayerAbility =
     });
   }, [effect, update]);
 
-  // --- CPU tornado ---
-  const handleCpuTornado = useCallback(() => {
+  // --- CPU power (its equipped ability) ---
+  const handleCpuPower = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     const seed = Date.now() & 0xffff;
-    update({
-      tornadoUsed: { ...game.tornadoUsed, p2: true },
-      powerUsesLeft: { ...game.powerUsesLeft, p2: game.powerUsesLeft.p2 - 1 },
-      tornadoSeed: seed,
-      tornadoActive: true,
-      selected: [],
-      locked: true,
-      currentTurn: 1,
+    setGame((g) => {
+      const res = applyPower(g, cpuEffect, seed, 2);
+      // No-op (e.g. steal with nothing to take) — just flip instead next tick.
+      if (Object.keys(res.patch).length === 0 && !res.shuffle) return g;
+
+      // "reveal" → the CPU memorizes the revealed cards.
+      if (res.revealCards.length) {
+        const mem = { ...cpuMemoryRef.current };
+        res.revealCards.forEach((cardId) => { mem[cardId] = g.cardEmojis[cardId]; });
+        cpuMemoryRef.current = mem;
+      }
+
+      // The CPU spends its turn casting, then hands back to P1.
+      return {
+        ...g,
+        ...res.patch,
+        tornadoUsed: { ...g.tornadoUsed, p2: true },
+        selected: [],
+        locked: res.shuffle,
+        currentTurn: 1,
+      };
     });
-  }, [game.tornadoUsed, game.powerUsesLeft]);
+  }, [cpuEffect]);
 
   // --- Tornado complete ---
   const handleTornadoComplete = useCallback(() => {
@@ -280,8 +318,8 @@ export function useLocalGame(difficulty: CpuDifficulty, ability: PlayerAbility =
   const resetGame = useCallback(() => {
     cpuMemoryRef.current = {};
     if (revealTimerRef.current) clearTimeout(revealTimerRef.current);
-    setGame(initGame(difficulty, ability));
-  }, [difficulty, ability]);
+    setGame(initGame(difficulty, ability, cpuAbility));
+  }, [difficulty, ability, cpuAbility]);
 
   return {
     game,

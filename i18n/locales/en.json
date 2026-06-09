@@ -239,7 +239,9 @@
     "shield": "🛡️ Shield active ×{{n}}",
     "frozen": "❄️ Opponent frozen ×{{n}}",
     "firstTip": "Use your power {{emoji}}",
-    "firstTipSub": "Swap your ability in the Builds tab"
+    "firstTipSub": "Swap your ability in the Builds tab",
+    "frozenYou": "You're frozen!",
+    "robbed": "Pairs stolen!"
   },
   "feedback": {
     "title": "Feedback & Support",
@@ -277,6 +279,9 @@
     "tornadoUsed": "Tornado used",
     "streak": "Streak",
     "xpGained": "XP EARNED",
+    "coinsGained": "COINS EARNED",
+    "coinsTotal": "Total: {{total}} 🪙",
+    "premiumCoins": "+50",
     "rankUp": "Rank up!",
     "rematch": "Rematch",
     "newGame": "New",

@@ -80,6 +80,28 @@ export default function OnlineGameScreen() {
     prevUsesRef.current = { ...game.powerUsesLeft };
   }, [game?.powerUsesLeft?.p1, game?.powerUsesLeft?.p2]);
 
+  // Victim feedback — when I get frozen or my pairs get stolen.
+  const prevFreezeRef = useRef<number | null>(null);
+  const prevScoreRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!game) return;
+    const fz = game.freezeTurns[myKey];
+    if (prevFreezeRef.current !== null && fz > prevFreezeRef.current) {
+      castNonceRef.current += 1;
+      setBanner({ emoji: "❄️", label: t("power.frozenYou"), color: "blue", nonce: castNonceRef.current });
+    }
+    prevFreezeRef.current = fz;
+  }, [game?.freezeTurns?.[myKey]]);
+  useEffect(() => {
+    if (!game) return;
+    const sc = game.scores[myKey];
+    if (prevScoreRef.current !== null && sc < prevScoreRef.current) {
+      castNonceRef.current += 1;
+      setBanner({ emoji: "🪝", label: t("power.robbed"), color: "pink", nonce: castNonceRef.current });
+    }
+    prevScoreRef.current = sc;
+  }, [game?.scores?.[myKey]]);
+
   // Ghost bot plays as guest when botMode is active
   useBotPlayer(room, game, difficulty as CpuDifficulty, isBotMode);
 

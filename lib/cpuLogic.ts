@@ -3,7 +3,7 @@ import { LocalGameState, CpuDifficulty, getAvailableCards } from './gameLogic';
 export type CpuMemory = Record<number, string>; // cardId → emoji
 
 export interface CpuAction {
-  action: 'tornado' | 'flip';
+  action: 'power' | 'flip';
   cards?: [number, number];
 }
 
@@ -13,11 +13,16 @@ const MEMORY_RATE: Record<CpuDifficulty, number> = {
   hard: 0.85,
 };
 
-const TORNADO_THRESHOLD: Record<CpuDifficulty, number> = {
+const POWER_THRESHOLD: Record<CpuDifficulty, number> = {
   easy: 0.7,
   medium: 0.4,
   hard: 0.1,
 };
+
+// True if player `owner` (1|2) has at least one completed pair on the board.
+function hasOwnedPairs(game: LocalGameState, owner: number): boolean {
+  return game.matchedBy.filter((m) => m === owner).length >= 2;
+}
 
 // Update CPU memory when a card is revealed
 // Only remembers based on difficulty rate
@@ -66,19 +71,23 @@ function pickRandomCards(
   return shuffled.slice(0, count);
 }
 
-// Main CPU decision function
+// Main CPU decision function. `powerKind` is the CPU's equipped ability kind
+// (so it won't try to "steal" when the player has no pairs to take).
 export function cpuDecide(
   game: LocalGameState,
   memory: CpuMemory,
-  difficulty: CpuDifficulty
+  difficulty: CpuDifficulty,
+  powerKind?: string,
 ): CpuAction {
-  // Tornado decision
+  // Power decision — use the equipped ability when the player is pulling ahead.
+  const stealUseless = powerKind === "steal" && !hasOwnedPairs(game, 1);
   if (
     game.powerUsesLeft.p2 > 0 &&
     game.scores.p1 >= 3 &&
-    Math.random() > TORNADO_THRESHOLD[difficulty]
+    !stealUseless &&
+    Math.random() > POWER_THRESHOLD[difficulty]
   ) {
-    return { action: 'tornado' };
+    return { action: 'power' };
   }
 
   const available = getAvailableCards(game);

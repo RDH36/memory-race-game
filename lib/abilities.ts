@@ -51,6 +51,13 @@ export function getAbility(id: string): Ability | undefined {
   return ABILITIES.find((a) => a.id === id);
 }
 
+/** A random ability + level (1-2) for a CPU/bot opponent. */
+export function randomBotAbility(): { id: string; level: number; emoji: string; nameKey: string } {
+  const a = ABILITIES[Math.floor(Math.random() * ABILITIES.length)];
+  const level = 1 + Math.floor(Math.random() * Math.min(2, a.maxLevel));
+  return { id: a.id, level, emoji: a.emoji, nameKey: a.nameKey };
+}
+
 // --- In-game effect resolution -------------------------------------------
 // Maps an ability id + level to the concrete parameters consumed by the
 // local game loop (see hooks/useLocalGame.ts + lib/powerEffects.ts).

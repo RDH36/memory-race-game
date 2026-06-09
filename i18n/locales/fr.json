@@ -239,7 +239,9 @@
     "shield": "🛡️ Bouclier actif ×{{n}}",
     "frozen": "❄️ Adversaire gelé ×{{n}}",
     "firstTip": "Lance ton pouvoir {{emoji}}",
-    "firstTipSub": "Change ton abilité dans l'onglet Builds"
+    "firstTipSub": "Change ton abilité dans l'onglet Builds",
+    "frozenYou": "Tu es gelé !",
+    "robbed": "Paires volées !"
   },
   "feedback": {
     "title": "Retour & Support",
@@ -277,6 +279,9 @@
     "tornadoUsed": "Tornade utilisée",
     "streak": "Streak",
     "xpGained": "XP GAGNÉS",
+    "coinsGained": "PIÈCES GAGNÉES",
+    "coinsTotal": "Total : {{total}} 🪙",
+    "premiumCoins": "+50",
     "rankUp": "Rang supérieur !",
     "rematch": "Revanche",
     "newGame": "Nouvelle",

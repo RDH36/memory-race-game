@@ -6,7 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { HandPointer } from "../../components/onboarding/HandPointer";
 import { useTranslation } from "react-i18next";
 import { useLocalGame } from "../../hooks/useLocalGame";
-import { abilityEffect, usePlayerAbilities } from "../../lib/abilities";
+import { abilityEffect, randomBotAbility, usePlayerAbilities } from "../../lib/abilities";
 import { GameGrid } from "../../components/game/GameGrid";
 import { formatTime } from "../../components/game/PlayerHUD";
 import { BattleHUD } from "../../components/game/arcade/BattleHUD";
@@ -57,8 +57,10 @@ export default function GameScreen() {
     [equippedAbility.id, equippedAbility.level, equippedAbility.emoji, equippedAbility.nameKey],
   );
 
+  // The CPU gets a random equipped ability (not always tornado).
+  const cpuAbility = useMemo(() => randomBotAbility(), []);
   const { game, lastMatchResult, handleCardPress, handlePower, handleTornadoComplete } =
-    useLocalGame(difficulty as CpuDifficulty, myAbility);
+    useLocalGame(difficulty as CpuDifficulty, myAbility, cpuAbility);
 
   const cpu = CPU_PROFILES[difficulty] ?? CPU_PROFILES.medium;
   const [turnTimer, setTurnTimer] = useState(0);
@@ -83,6 +85,24 @@ export default function GameScreen() {
     }
     prevUsesRef.current = game.powerUsesLeft.p1;
   }, [game.powerUsesLeft.p1]);
+
+  // Victim feedback — tell P1 when the CPU froze them or stole their pairs.
+  const prevFreezeRef = useRef(game.freezeTurns.p1);
+  const prevScoreRef = useRef(game.scores.p1);
+  useEffect(() => {
+    if (game.freezeTurns.p1 > prevFreezeRef.current) {
+      castNonceRef.current += 1;
+      setBanner({ emoji: "❄️", label: t("power.frozenYou"), color: "blue", nonce: castNonceRef.current });
+    }
+    prevFreezeRef.current = game.freezeTurns.p1;
+  }, [game.freezeTurns.p1]);
+  useEffect(() => {
+    if (game.scores.p1 < prevScoreRef.current) {
+      castNonceRef.current += 1;
+      setBanner({ emoji: "🪝", label: t("power.robbed"), color: "pink", nonce: castNonceRef.current });
+    }
+    prevScoreRef.current = game.scores.p1;
+  }, [game.scores.p1]);
 
   // One-time contextual hint: introduce the equipped-ability power the first
   // time it becomes usable. Dismisses once used (or tapped) and never again.

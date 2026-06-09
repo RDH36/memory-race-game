@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import type { LocalGameState, CpuDifficulty } from "../lib/gameLogic";
 import { isGameFinished } from "../lib/gameLogic";
+import { abilityEffect } from "../lib/abilities";
+import { applyPower } from "../lib/powerEffects";
 import { updateRoomGameState, type RoomData } from "../lib/roomLogic";
 import { cpuDecide, updateMemory, type CpuMemory } from "../lib/cpuLogic";
 
@@ -78,24 +80,34 @@ export function useBotPlayer(
 
     actingRef.current = true;
 
-    const timer = setTimeout(() => {
-      const decision = cpuDecide(game, memoryRef.current, difficulty);
+    const cpuEffect = abilityEffect(game.abilities.p2.id, game.abilities.p2.level);
 
-      if (decision.action === "tornado") {
+    const timer = setTimeout(() => {
+      const decision = cpuDecide(game, memoryRef.current, difficulty, cpuEffect.kind);
+
+      if (decision.action === "power") {
         const seed = Date.now() & 0xffff;
-        const newState: LocalGameState = {
-          ...game,
-          tornadoUsed: { ...game.tornadoUsed, p2: true },
-          powerUsesLeft: { ...game.powerUsesLeft, p2: game.powerUsesLeft.p2 - 1 },
-          tornadoSeed: seed,
-          tornadoActive: true,
-          selected: [],
-          locked: true,
-          currentTurn: 1,
-        };
-        updateRoomGameState(room.id, newState, room.hostId);
-        actingRef.current = false;
-        return;
+        const res = applyPower(game, cpuEffect, seed, 2);
+        // No-op (e.g. steal with nothing to take) → fall through to a flip.
+        if (Object.keys(res.patch).length > 0 || res.shuffle) {
+          // "reveal" → bot memorizes the revealed cards.
+          if (res.revealCards.length) {
+            for (const cardId of res.revealCards) {
+              memoryRef.current = { ...memoryRef.current, [cardId]: game.cardEmojis[cardId] };
+            }
+          }
+          const newState: LocalGameState = {
+            ...game,
+            ...res.patch,
+            tornadoUsed: { ...game.tornadoUsed, p2: true },
+            selected: [],
+            locked: res.shuffle,
+            currentTurn: 1,
+          };
+          updateRoomGameState(room.id, newState, room.hostId);
+          actingRef.current = false;
+          return;
+        }
       }
 
       if (!decision.cards) {
@@ -181,13 +193,16 @@ function resolveBot(
 
     updateRoomGameState(room.id, newState, nextPlayerId, finishedData);
   } else {
+    // "shield" power: the bot keeps the turn instead of passing on a miss.
+    const useShield = game.shieldCharges.p2 > 0;
     const newState: LocalGameState = {
       ...game,
       selected: [],
       locked: false,
-      currentTurn: 1,
+      currentTurn: useShield ? 2 : 1,
+      ...(useShield && { shieldCharges: { ...game.shieldCharges, p2: game.shieldCharges.p2 - 1 } }),
     };
 
-    updateRoomGameState(room.id, newState, room.hostId);
+    updateRoomGameState(room.id, newState, useShield ? room.guestId! : room.hostId);
   }
 }

@@ -102,9 +102,11 @@ export function initRoomGame(
   hostId: string,
   guestId: string,
   hostAbility: PlayerAbility = TORNADO_ABILITY,
+  guestAbility: PlayerAbility = TORNADO_ABILITY,
 ): { gameState: string; currentPlayerId: string } {
-  // Host = p1 (ability known now); guest = p2 (syncs its own ability on load).
-  const game = initGame(difficulty, hostAbility, TORNADO_ABILITY);
+  // Host = p1 (ability known now). Guest = p2: a real guest syncs its own
+  // ability on load; a bot keeps the (random) ability passed here.
+  const game = initGame(difficulty, hostAbility, guestAbility);
   const firstIsHost = Math.random() < 0.5;
   const currentPlayerId = firstIsHost ? hostId : guestId;
   // currentTurn 1 = host, 2 = guest
@@ -122,12 +124,14 @@ export async function startRoom(
   hostId: string,
   guestId: string,
   hostAbility: PlayerAbility = TORNADO_ABILITY,
+  guestAbility: PlayerAbility = TORNADO_ABILITY,
 ) {
   const { gameState, currentPlayerId } = initRoomGame(
     difficulty,
     hostId,
     guestId,
     hostAbility,
+    guestAbility,
   );
   const now = Date.now();
 

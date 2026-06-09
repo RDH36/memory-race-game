@@ -12,7 +12,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
-import { usePlayerAbilities } from "../../lib/abilities";
+import { usePlayerAbilities, randomBotAbility } from "../../lib/abilities";
 import {
   findMatchmakingRoom,
   createMatchmakingRoom,
@@ -242,7 +242,7 @@ export default function MatchmakingScreen() {
       // Start the game after a short delay
       setTimeout(() => {
         if (!mountedRef.current) return;
-        startRoom(roomId, difficulty, userId!, fakeGuestId, hostAbility);
+        startRoom(roomId, difficulty, userId!, fakeGuestId, hostAbility, randomBotAbility());
         setMatchState("countdown");
       }, 1500);
     };
