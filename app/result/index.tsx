@@ -43,6 +43,9 @@ const CPU_PROFILES: Record<string, { name: string; avatar: string }> = {
 
 type Winner = "p1" | "p2" | "draw";
 
+// Coins granted for watching a rewarded ad after a game.
+const REWARD_AD_GOLD = 50;
+
 export default function ResultScreen() {
   const {
     p1Score = "0",
@@ -87,7 +90,7 @@ export default function ResultScreen() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState<"new" | "home" | null>(null);
   const [bonusClaimed, setBonusClaimed] = useState(false);
-  const { avatar, stats, recordGame, addBonusXp, lastXpGain, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
+  const { avatar, stats, recordGame, addBonusXp, addGold, lastXpGain, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
   const recorded = useRef(false);
   const initialLevelRef = useRef<number | null>(null);
   const initialUnlockedRef = useRef<AchievementId[] | null>(null);
@@ -95,9 +98,10 @@ export default function ResultScreen() {
 
   const onBonusReward = useCallback(() => {
     addBonusXp(10);
+    addGold(REWARD_AD_GOLD);
     setBonusClaimed(true);
     haptics.coin();
-  }, [addBonusXp]);
+  }, [addBonusXp, addGold]);
   const { isLoaded: rewardedLoaded, showAd: showRewardedAd } = useRewardedAd(onBonusReward);
   const premium = usePremium();
 
@@ -282,8 +286,8 @@ export default function ResultScreen() {
           />
         </Animated.View>
 
-        {/* Rewarded bonus after defeat (hidden for premium — they already get +10% XP) */}
-        {effectiveWinner === "p2" && !bonusClaimed && !premium && (
+        {/* Rewarded ad → free coins (hidden for premium). */}
+        {!bonusClaimed && !premium && (
           <Animated.View style={[statsStyle, { marginBottom: 12 }]}>
             <Pressable
               onPress={() => {
@@ -292,20 +296,51 @@ export default function ResultScreen() {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
+                gap: 12,
                 backgroundColor: colors.hues.gold[2],
-                borderRadius: 16,
-                paddingVertical: 14,
-                paddingHorizontal: 16,
+                borderRadius: 18,
+                paddingVertical: 12,
+                paddingHorizontal: 14,
                 opacity: rewardedLoaded ? 1 : 0.5,
-                boxShadow: `0 3px 0 ${colors.panelLip}`,
+                boxShadow: `0 4px 0 ${colors.hues.gold[1]}, 0 12px 22px -12px ${colors.panelShadow}`,
               }}
             >
-              <Text style={{ fontSize: 18 }}>🎬</Text>
-              <Text style={{ fontSize: 14, fontFamily: "Fredoka_700Bold", color: colors.warning }}>
-                {t("result.watchAdBonus")}
-              </Text>
+              <View
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 14,
+                  backgroundColor: colors.hues.gold[0],
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: `0 3px 0 ${colors.hues.gold[1]}`,
+                }}
+              >
+                <Text style={{ fontSize: 22 }}>🎬</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14.5, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
+                  {t("result.watchAdCoins")}
+                </Text>
+                <Text style={{ fontSize: 11.5, fontFamily: "Nunito_700Bold", color: colors.hues.gold[1], marginTop: 1 }}>
+                  {t("result.watchAdCoinsSub")}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 3,
+                  backgroundColor: colors.hues.gold[0],
+                  borderRadius: 999,
+                  paddingVertical: 5,
+                  paddingHorizontal: 11,
+                  boxShadow: `0 2px 0 ${colors.hues.gold[1]}`,
+                }}
+              >
+                <Text style={{ fontSize: 13 }}>🪙</Text>
+                <Text style={{ fontSize: 14, fontFamily: "Fredoka_700Bold", color: "#fff" }}>+{REWARD_AD_GOLD}</Text>
+              </View>
             </Pressable>
           </Animated.View>
         )}
@@ -321,7 +356,7 @@ export default function ResultScreen() {
               }}
             >
               <Text style={{ fontSize: 14, fontFamily: "Nunito_700Bold", color: colors.success }}>
-                ✓ {t("result.bonusClaimed")}
+                ✓ {t("result.coinsClaimed", { gold: REWARD_AD_GOLD })}
               </Text>
             </View>
           </Animated.View>

@@ -120,8 +120,8 @@
       "pairs": "pairs"
     },
     "featuredMode": "FEATURED MODE",
-    "xpBoost": "XP x1.5 (ad 30s)",
-    "xpBoostDesc": "Watch an ad to earn 50% more XP",
+    "xpBoost": "Ad boost: ×1.5 XP + coins",
+    "xpBoostDesc": "Watch an ad: +50% XP and +5% coins",
     "dailyReward": "Daily reward",
     "dailyRewardSubtitle": "Claim your +{{xp}} XP and +{{gold}} 🪙 for free",
     "dailyRewardClaim": "Claim",
@@ -283,6 +283,9 @@
     "goHome": "Home",
     "watchAdBonus": "+10 XP (ad)",
     "bonusClaimed": "Bonus claimed!",
+    "watchAdCoins": "Watch an ad",
+    "watchAdCoinsSub": "Free coins in 30s",
+    "coinsClaimed": "+{{gold}} 🪙 claimed!",
     "premiumBoost": "+10% Premium"
   },
   "mode": {

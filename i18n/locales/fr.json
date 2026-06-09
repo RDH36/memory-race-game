@@ -120,8 +120,8 @@
       "pairs": "paires"
     },
     "featuredMode": "MODE VEDETTE",
-    "xpBoost": "XP x1.5 (pub 30s)",
-    "xpBoostDesc": "Regarde une pub pour gagner 50% de XP en plus",
+    "xpBoost": "Boost pub : XP ×1.5 + or",
+    "xpBoostDesc": "Regarde une pub : +50% XP et +5% pièces",
     "dailyReward": "Récompense quotidienne",
     "dailyRewardSubtitle": "Réclame tes +{{xp}} XP et +{{gold}} 🪙 gratuits",
     "dailyRewardClaim": "Réclamer",
@@ -283,6 +283,9 @@
     "goHome": "Accueil",
     "watchAdBonus": "+10 XP (pub)",
     "bonusClaimed": "Bonus récupéré !",
+    "watchAdCoins": "Regarde une pub",
+    "watchAdCoinsSub": "Des pièces gratuites en 30 s",
+    "coinsClaimed": "+{{gold}} 🪙 récupérés !",
     "premiumBoost": "+10% Premium"
   },
   "mode": {

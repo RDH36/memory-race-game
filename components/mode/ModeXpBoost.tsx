@@ -74,35 +74,47 @@ export function ModeXpBoost({ value, onChange }: ModeXpBoostProps) {
           flexDirection: "row",
           alignItems: "center",
           gap: 12,
-          backgroundColor: value ? colors.warningBg : colors.surfaceContainer,
-          borderRadius: 14,
-          paddingVertical: 12,
-          paddingHorizontal: 14,
+          backgroundColor: value ? colors.hues.gold[2] : colors.surfaceContainer,
+          borderRadius: 16,
+          paddingVertical: 11,
+          paddingHorizontal: 13,
+          boxShadow: value ? `0 3px 0 ${colors.hues.gold[1]}33` : undefined,
         }}
       >
-        <Text style={{ fontSize: 22 }}>🎬</Text>
+        <View
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 14,
+            backgroundColor: colors.hues.gold[0],
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+            boxShadow: `0 3px 0 ${colors.hues.gold[1]}`,
+          }}
+        >
+          {/* gloss */}
+          <View pointerEvents="none" style={{ position: "absolute", left: 5, right: 5, top: 4, height: 13, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.32)" }} />
+          <Text style={{ fontSize: 20 }}>🎬</Text>
+        </View>
         <View style={{ flex: 1 }}>
-          <Text
-            style={{ fontSize: 13, fontFamily: "Fredoka_600SemiBold", color: colors.onSurface }}
-          >
+          <Text style={{ fontSize: 13.5, fontFamily: "Fredoka_700Bold", color: colors.onSurface }}>
             {t("home.xpBoost")}
           </Text>
-          <Text
-            style={{
-              fontSize: 10,
-              fontFamily: "Nunito_400Regular",
-              color: colors.onSurfaceMuted,
-              marginTop: 1,
-            }}
-          >
-            {t("home.xpBoostDesc")}
-          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4 }}>
+            <View style={{ backgroundColor: colors.hues.violet[2], borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2 }}>
+              <Text style={{ fontSize: 10.5, fontFamily: "Fredoka_700Bold", color: colors.hues.violet[0] }}>⚡ ×1.5 XP</Text>
+            </View>
+            <View style={{ backgroundColor: colors.hues.gold[2], borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2 }}>
+              <Text style={{ fontSize: 10.5, fontFamily: "Fredoka_700Bold", color: colors.hues.gold[1] }}>🪙 +5%</Text>
+            </View>
+          </View>
         </View>
         <Switch
           value={value}
           onValueChange={onChange}
-          trackColor={{ false: colors.surfaceContainerLow, true: colors.warning + "80" }}
-          thumbColor={value ? colors.warning : "#FFFFFF"}
+          trackColor={{ false: colors.surfaceContainerLow, true: colors.hues.gold[0] + "99" }}
+          thumbColor={value ? colors.hues.gold[1] : "#FFFFFF"}
         />
       </Pressable>
     </Animated.View>
