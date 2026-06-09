@@ -1,6 +1,7 @@
-import { useMemo } from "react";
-import { Pressable, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { Pressable, Text, View } from "react-native";
 import { Tabs } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../lib/ThemeContext";
@@ -120,6 +121,17 @@ export default function TabsLayout() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
+  // "NEW" badge on the Builds tab until the player opens it once.
+  const [buildsSeen, setBuildsSeen] = useState(true);
+  useEffect(() => {
+    AsyncStorage.getItem("builds_seen").then((v) => setBuildsSeen(v === "true"));
+  }, []);
+  const markBuildsSeen = () => {
+    if (buildsSeen) return;
+    setBuildsSeen(true);
+    AsyncStorage.setItem("builds_seen", "true");
+  };
+
   const screenOptions = useMemo(
     () => ({
       headerShown: false,
@@ -154,10 +166,32 @@ export default function TabsLayout() {
     <Tabs detachInactiveScreens screenOptions={screenOptions}>
       <Tabs.Screen
         name="builds"
+        listeners={{ focus: markBuildsSeen }}
         options={{
           title: t("tabs.builds", "Builds"),
           tabBarIcon: ({ color }) => (
-            <Ionicons name="flash" size={22} color={color} />
+            <View>
+              <Ionicons name="flash" size={22} color={color} />
+              {!buildsSeen && (
+                <View
+                  style={{
+                    position: "absolute",
+                    top: -5,
+                    right: -9,
+                    minWidth: 16,
+                    height: 16,
+                    paddingHorizontal: 3,
+                    borderRadius: 8,
+                    backgroundColor: colors.hues.coral[0],
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: `0 1px 0 ${colors.hues.coral[1]}`,
+                  }}
+                >
+                  <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 8, color: "#fff" }}>NEW</Text>
+                </View>
+              )}
+            </View>
           ),
         }}
       />

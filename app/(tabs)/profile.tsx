@@ -11,6 +11,7 @@ import { ProfileStats, type StatsTab } from "../../components/profile/ProfileSta
 import { RecentMatches } from "../../components/profile/RecentMatches";
 import { APP_VERSION } from "../../lib/constants";
 import { useDeferredAnimation } from "../../lib/perf";
+import { CoachBubble, useCoachMark } from "@/components/onboarding/CoachBubble";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<StatsTab>("global");
   const matchesReady = useDeferredAnimation();
+  const coach = useCoachMark("coach_profile");
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }} edges={["top"]}>
@@ -89,11 +91,16 @@ export default function ProfileScreen() {
           />
         </Panel>
 
-        <ProfileStats
-          showProgress={false}
-          activeTab={activeTab}
-          onChangeTab={setActiveTab}
-        />
+        <View>
+          <ProfileStats
+            showProgress={false}
+            activeTab={activeTab}
+            onChangeTab={setActiveTab}
+          />
+          {coach.show && (
+            <CoachBubble text={t("onboarding.coach.profile")} onDismiss={coach.dismiss} side="above" hue="coral" />
+          )}
+        </View>
 
         {matchesReady && <RecentMatches tab={activeTab} />}
 

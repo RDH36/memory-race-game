@@ -237,7 +237,9 @@
     "waitSub": "Attends ton tour",
     "exhaustedSub": "Plus de charge cette partie",
     "shield": "🛡️ Bouclier actif ×{{n}}",
-    "frozen": "❄️ Adversaire gelé ×{{n}}"
+    "frozen": "❄️ Adversaire gelé ×{{n}}",
+    "firstTip": "Lance ton pouvoir {{emoji}}",
+    "firstTipSub": "Change ton abilité dans l'onglet Builds"
   },
   "feedback": {
     "title": "Retour & Support",
@@ -493,6 +495,13 @@
       "question": "Tu penses avoir\nune bonne mémoire ?",
       "subtitle": "Découvre Flipia, le jeu de mémoire où chaque carte compte.",
       "cta": "Découvrir le jeu"
+    },
+    "coach": {
+      "tap": "Touche pour continuer",
+      "home": "Choisis un mode pour lancer ta partie !",
+      "builds": "Débloque et équipe tes abilités ici.",
+      "shop": "Passe en Premium pour tout débloquer.",
+      "profile": "Suis ta progression et tes stats ici."
     },
     "flip": {
       "title": "Tape une carte",

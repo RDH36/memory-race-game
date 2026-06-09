@@ -138,13 +138,26 @@ export default function BattleScreen() {
     lockedRef.current = true;
     const available = EMOJIS.map((_, i) => i).filter((i) => currentMatchedBy[i] === -1);
     if (available.length < 2) return;
+
+    // Scripted guaranteed win: the tutorial bot deliberately MISSES — it picks
+    // two non-matching cards whenever possible, so the player always wins.
     const shuffled = [...available].sort(() => Math.random() - 0.5);
+    let first = shuffled[0];
+    let second = shuffled[1];
+    const mismatch = shuffled.find((j) => j !== first && EMOJIS[j] !== EMOJIS[first]);
+    if (mismatch !== undefined) {
+      second = mismatch;
+    } else {
+      // Only matching pairs remain (very end) — bob a card, then resolve.
+      const alt = available.find((j) => j !== first);
+      if (alt !== undefined) second = alt;
+    }
 
     setTimeout(() => {
-      setSelected([shuffled[0]]);
+      setSelected([first]);
       setTimeout(() => {
-        setSelected([shuffled[0], shuffled[1]]);
-        setTimeout(() => resolve(shuffled[0], shuffled[1], 2), 500);
+        setSelected([first, second]);
+        setTimeout(() => resolve(first, second, 2), 500);
       }, 800);
     }, 1000);
   }, [resolve]);
@@ -168,18 +181,16 @@ export default function BattleScreen() {
     opponentName: "BabyBot",
   });
 
-  // Few cards (8) → grow them to fill the board instead of a fixed 4 cols.
+  // 8 cards on a 4×2 grid — sized to fit but capped so they don't grow huge.
+  const MAX_CARD = 84;
   const { gCols, cardSize } = useMemo(() => {
     if (!gridDims) return { gCols: 4, cardSize: 0 };
-    let best = { cols: 4, size: 0 };
-    for (const c of [2, 4]) {
-      const r = Math.ceil(EMOJIS.length / c);
-      const w = (gridDims.w - (c - 1) * 8) / c;
-      const h = (gridDims.h - (r - 1) * 8) / r;
-      const s = Math.min(w, h);
-      if (s > best.size) best = { cols: c, size: s };
-    }
-    return { gCols: best.cols, cardSize: Math.floor(best.size) };
+    const c = 4;
+    const r = Math.ceil(EMOJIS.length / c);
+    const w = (gridDims.w - (c - 1) * 8) / c;
+    const h = (gridDims.h - (r - 1) * 8) / r;
+    const s = Math.min(w, h, MAX_CARD);
+    return { gCols: c, cardSize: Math.floor(s) };
   }, [gridDims]);
 
   return (

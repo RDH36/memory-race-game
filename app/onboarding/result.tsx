@@ -14,6 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { usePlayerStats } from "../../lib/playerStats";
+import { haptics } from "../../lib/haptics";
 import { ConfettiParticles } from "../../components/result/ConfettiParticles";
 import { Btn3D, Mascot } from "@/components/ui/arcade";
 
@@ -51,6 +52,12 @@ export default function ResultScreen() {
   const p1 = Number(params.p1 ?? 0);
   const p2 = Number(params.p2 ?? 0);
   const result = p1 > p2 ? "won" : p1 < p2 ? "lost" : "draw";
+
+  // Peak-end juice: celebrate the (scripted) first win.
+  useEffect(() => {
+    if (result === "won") haptics.win();
+    else if (result === "lost") haptics.lose();
+  }, [result]);
 
   const titleColor =
     result === "won"

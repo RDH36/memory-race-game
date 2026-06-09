@@ -237,7 +237,9 @@
     "waitSub": "Wait for your turn",
     "exhaustedSub": "No charge left this game",
     "shield": "🛡️ Shield active ×{{n}}",
-    "frozen": "❄️ Opponent frozen ×{{n}}"
+    "frozen": "❄️ Opponent frozen ×{{n}}",
+    "firstTip": "Use your power {{emoji}}",
+    "firstTipSub": "Swap your ability in the Builds tab"
   },
   "feedback": {
     "title": "Feedback & Support",
@@ -493,6 +495,13 @@
       "question": "Think you have\na good memory?",
       "subtitle": "Discover Flipia, the memory game where every card counts.",
       "cta": "Discover the game"
+    },
+    "coach": {
+      "tap": "Tap to continue",
+      "home": "Pick a mode to start your game!",
+      "builds": "Unlock and equip your abilities here.",
+      "shop": "Go Premium to unlock everything.",
+      "profile": "Track your progress and stats here."
     },
     "flip": {
       "title": "Tap a card",

@@ -174,7 +174,7 @@ export default function MatchScreen() {
   );
 
   const handleContinue = () => {
-    router.push("/onboarding/tornado");
+    router.push("/onboarding/battle");
   };
 
   return (
@@ -185,7 +185,7 @@ export default function MatchScreen() {
           entering={FadeIn.delay(100).duration(400)}
           style={{ flexDirection: "row", justifyContent: "center", gap: 8, marginTop: 16 }}
         >
-          {[0, 1, 2, 3, 4].map((i) => (
+          {[0, 1, 2].map((i) => (
             <View
               key={i}
               style={{

@@ -1,7 +1,9 @@
-import { BackHandler, View } from "react-native";
+import { BackHandler, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { HandPointer } from "../../components/onboarding/HandPointer";
 import { useTranslation } from "react-i18next";
 import { useLocalGame } from "../../hooks/useLocalGame";
 import { abilityEffect, usePlayerAbilities } from "../../lib/abilities";
@@ -82,6 +84,20 @@ export default function GameScreen() {
     prevUsesRef.current = game.powerUsesLeft.p1;
   }, [game.powerUsesLeft.p1]);
 
+  // One-time contextual hint: introduce the equipped-ability power the first
+  // time it becomes usable. Dismisses once used (or tapped) and never again.
+  const [powerTipSeen, setPowerTipSeen] = useState<boolean | null>(null);
+  useEffect(() => {
+    AsyncStorage.getItem("power_tip_seen").then((v) => setPowerTipSeen(v === "true"));
+  }, []);
+  const dismissPowerTip = useCallback(() => {
+    setPowerTipSeen(true);
+    AsyncStorage.setItem("power_tip_seen", "true");
+  }, []);
+  useEffect(() => {
+    if (powerTipSeen === false && game.powerUsesLeft.p1 < effect.uses) dismissPowerTip();
+  }, [game.powerUsesLeft.p1, powerTipSeen, effect.uses, dismissPowerTip]);
+
   useEffect(() => {
     if (game.status !== "playing") return;
     setTurnTimer(0);
@@ -144,6 +160,7 @@ export default function GameScreen() {
     !game.locked &&
     !game.tornadoActive &&
     game.status === "playing";
+  const showPowerTip = powerTipSeen === false && canUsePower;
 
   const gridConfig = GRID_CONFIG[(difficulty as CpuDifficulty) ?? 'medium'];
   const totalPairs = gridConfig.totalCards / 2;
@@ -222,15 +239,42 @@ export default function GameScreen() {
         </View>
 
         {/* Equipped-ability power */}
-        <ActionBar
-          emoji={equippedAbility.emoji}
-          name={t(`abilities.${equippedAbility.nameKey}.name`)}
-          usesLeft={game.powerUsesLeft.p1}
-          canUse={canUsePower}
-          onPress={handlePower}
-          shieldCharges={game.shieldCharges.p1}
-          freezeTurns={game.freezeTurns.p2}
-        />
+        <View>
+          {showPowerTip && (
+            <Pressable
+              onPress={dismissPowerTip}
+              style={{ position: "absolute", bottom: "100%", left: 0, right: 0, marginBottom: 8, alignItems: "center", zIndex: 20 }}
+            >
+              <View
+                style={{
+                  maxWidth: "88%",
+                  backgroundColor: colors.hues.violet[0],
+                  borderRadius: 16,
+                  paddingVertical: 10,
+                  paddingHorizontal: 16,
+                  boxShadow: `0 4px 0 ${colors.hues.violet[1]}, 0 12px 24px -10px ${colors.panelShadow}`,
+                }}
+              >
+                <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 14, color: "#fff", textAlign: "center" }}>
+                  {t("power.firstTip", { emoji: equippedAbility.emoji })}
+                </Text>
+                <Text style={{ fontFamily: "Nunito_700Bold", fontSize: 11.5, color: "rgba(255,255,255,0.85)", textAlign: "center", marginTop: 2 }}>
+                  {t("power.firstTipSub")}
+                </Text>
+              </View>
+              <HandPointer pointing="down" size={34} style={{ right: 24, bottom: -26 }} />
+            </Pressable>
+          )}
+          <ActionBar
+            emoji={equippedAbility.emoji}
+            name={t(`abilities.${equippedAbility.nameKey}.name`)}
+            usesLeft={game.powerUsesLeft.p1}
+            canUse={canUsePower}
+            onPress={handlePower}
+            shieldCharges={game.shieldCharges.p1}
+            freezeTurns={game.freezeTurns.p2}
+          />
+        </View>
       </View>
 
       {game.tornadoActive && (

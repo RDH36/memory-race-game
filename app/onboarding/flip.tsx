@@ -16,6 +16,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useTheme } from "../../lib/ThemeContext";
 import { playFlip, playMatch } from "../../lib/sound";
+import { HandPointer } from "../../components/onboarding/HandPointer";
 
 const EMOJI = "🐶";
 const AnimatedView = Animated.createAnimatedComponent(View);
@@ -148,7 +149,7 @@ export default function FlipScreen() {
           entering={FadeIn.delay(100).duration(400)}
           style={{ flexDirection: "row", justifyContent: "center", gap: 8, marginTop: 16 }}
         >
-          {[0, 1, 2, 3, 4].map((i) => (
+          {[0, 1, 2].map((i) => (
             <View
               key={i}
               style={{
@@ -177,6 +178,10 @@ export default function FlipScreen() {
               onPress={() => handleFlip(1)}
               disabled={flipped[1]}
             />
+
+            {/* Tap guidance finger — points at the card to flip */}
+            {step === "tap1" && <HandPointer style={{ left: 28, top: 116 }} />}
+            {step === "tap2" && <HandPointer style={{ left: 148, top: 116 }} />}
           </Animated.View>
 
           {/* Instruction text */}

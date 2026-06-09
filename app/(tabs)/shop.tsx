@@ -15,6 +15,7 @@ import { useRevenueCat, restorePurchases, PRODUCT_ID } from "../../lib/revenueca
 import { PACKS } from "../../lib/packs";
 import { PremiumHero } from "../../components/shop/PremiumHero";
 import { PackCard } from "../../components/shop/PackCard";
+import { CoachBubble, useCoachMark } from "@/components/onboarding/CoachBubble";
 
 export default function ShopScreen() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function ShopScreen() {
   const ents = useEntitlements();
   const [restoring, setRestoring] = useState(false);
   const [info, setInfo] = useState<{ icon: string; title: string; message: string } | null>(null);
+  const coach = useCoachMark("coach_shop");
 
   const priceFor = (productId: string, fallback: string) => {
     const pkg = offering?.availablePackages.find((p) => p.product.identifier === productId);
@@ -93,6 +95,9 @@ export default function ShopScreen() {
             ownedLabel={t("shop.ownedPremium", "✓ Premium acquis")}
             onPress={() => goToPaywall("premium")}
           />
+          {coach.show && !info && (
+            <CoachBubble text={t("onboarding.coach.shop")} onDismiss={coach.dismiss} side="below" hue="gold" />
+          )}
         </Animated.View>
 
         {/* Section label row */}

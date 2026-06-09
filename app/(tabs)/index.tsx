@@ -12,6 +12,7 @@ import { HomeHeader } from "@/components/home/arcade/HomeHeader";
 import { ArcadeHero } from "@/components/home/arcade/ArcadeHero";
 import { QuickModes } from "@/components/home/arcade/QuickModes";
 import { HomeStats } from "@/components/home/arcade/HomeStats";
+import { CoachBubble, useCoachMark } from "@/components/onboarding/CoachBubble";
 
 const DAILY_REWARD_KEY = "daily_reward_last_claimed";
 const DAILY_REWARD_XP = 15;
@@ -40,6 +41,9 @@ export default function HomeScreen() {
       }
     });
   }, []);
+
+  // First-visit coach-mark anchored to the play-modes panel.
+  const coach = useCoachMark("coach_home");
 
   const claimDailyReward = useCallback(() => {
     if (dailyClaimed) return;
@@ -110,7 +114,12 @@ export default function HomeScreen() {
         )}
 
         <Rise delay={120}>
-          <QuickModes />
+          <View>
+            <QuickModes />
+            {coach.show && (
+              <CoachBubble text={t("onboarding.coach.home")} onDismiss={coach.dismiss} side="above" hue="violet" />
+            )}
+          </View>
         </Rise>
 
         <Rise delay={160}>

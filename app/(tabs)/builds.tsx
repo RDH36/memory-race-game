@@ -10,6 +10,7 @@ import { BuildsHeader } from "@/components/builds/BuildsHeader";
 import { AbilityCard } from "@/components/builds/AbilityCard";
 import { AbilityInfoModal } from "@/components/builds/AbilityInfoModal";
 import { UpgradeModal } from "@/components/builds/UpgradeModal";
+import { CoachBubble, useCoachMark } from "@/components/onboarding/CoachBubble";
 
 const H_PADDING = 20;
 const GAP = 12;
@@ -22,6 +23,7 @@ export default function BuildsScreen() {
   const { states, gold, unlock, upgrade, equip } = usePlayerAbilities();
   const [infoAbility, setInfoAbility] = useState<AbilityState | null>(null);
   const [upgradeAbility, setUpgradeAbility] = useState<AbilityState | null>(null);
+  const coach = useCoachMark("coach_builds");
 
   const cardWidth = (width - H_PADDING * 2 - GAP * (COLUMNS - 1)) / COLUMNS;
 
@@ -69,6 +71,9 @@ export default function BuildsScreen() {
               />
             </Rise>
           ))}
+          {coach.show && !infoAbility && !upgradeAbility && (
+            <CoachBubble text={t("onboarding.coach.builds")} onDismiss={coach.dismiss} side="above" hue="violet" />
+          )}
         </View>
       </ScrollView>
 
