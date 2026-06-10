@@ -11,11 +11,6 @@ import type { HueName } from "@/components/ui/theme";
 
 export const DEFAULT_ABILITY_ID = "tornado";
 
-// TEMP — testing flag: treat every ability as owned (level ≥ 1) so any
-// ability can be equipped without spending gold. Set back to false to
-// restore the real unlock economy.
-export const TEST_UNLOCK_ALL = true;
-
 export interface Ability {
   id: string;
   /** Glyph shown on the ability badge. */
@@ -40,11 +35,11 @@ export interface Ability {
 // Upgrades cost double the unlock price (upgradeCost = 2 × baseCost).
 // Tornado is free to unlock, so it gets a flat upgrade price.
 export const ABILITIES: Ability[] = [
-  { id: "tornado", emoji: "🌪️", nameKey: "tornado", avatarId: "🦊", hue: "blue",   default: true, baseCost: 0,    maxLevel: 3, upgradeCost: 800 },
-  { id: "freeze",  emoji: "❄️", nameKey: "freeze",  avatarId: "🐳", hue: "blue",   baseCost: 1000, maxLevel: 3, upgradeCost: 2000 },
-  { id: "reveal",  emoji: "👁️", nameKey: "reveal",  avatarId: "🦉", hue: "violet", baseCost: 1400, maxLevel: 3, upgradeCost: 2800 },
-  { id: "swap",    emoji: "🪝", nameKey: "swap",    avatarId: "🐙", hue: "pink",   baseCost: 4000, maxLevel: 2, upgradeCost: 8000 },
-  { id: "shield",  emoji: "🛡️", nameKey: "shield",  avatarId: "🦁", hue: "gold",   baseCost: 1800, maxLevel: 3, upgradeCost: 3600 },
+  { id: "tornado", emoji: "🌪️", nameKey: "tornado", avatarId: "🦊", hue: "blue",   default: true, baseCost: 0,   maxLevel: 3, upgradeCost: 400 },
+  { id: "freeze",  emoji: "❄️", nameKey: "freeze",  avatarId: "🐳", hue: "blue",   baseCost: 400,  maxLevel: 3, upgradeCost: 800 },
+  { id: "reveal",  emoji: "👁️", nameKey: "reveal",  avatarId: "🦉", hue: "violet", baseCost: 600,  maxLevel: 3, upgradeCost: 1200 },
+  { id: "swap",    emoji: "🪝", nameKey: "swap",    avatarId: "🐙", hue: "pink",   baseCost: 1500, maxLevel: 2, upgradeCost: 3000 },
+  { id: "shield",  emoji: "🛡️", nameKey: "shield",  avatarId: "🦁", hue: "gold",   baseCost: 800,  maxLevel: 3, upgradeCost: 1600 },
 ];
 
 export function getAbility(id: string): Ability | undefined {
@@ -134,14 +129,11 @@ function serializeOwned(map: OwnedMap): string {
 }
 
 export function isOwned(owned: OwnedMap, id: string): boolean {
-  if (TEST_UNLOCK_ALL) return true;
   return id === DEFAULT_ABILITY_ID || (owned[id] ?? 0) > 0;
 }
 
 export function getLevel(owned: OwnedMap, id: string): number {
-  const lvl = owned[id] ?? (id === DEFAULT_ABILITY_ID ? 1 : 0);
-  if (TEST_UNLOCK_ALL && lvl <= 0) return 1;
-  return lvl;
+  return owned[id] ?? (id === DEFAULT_ABILITY_ID ? 1 : 0);
 }
 
 /** Gold needed to go from `level` to `level + 1`. */
