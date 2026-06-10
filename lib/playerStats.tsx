@@ -3,6 +3,11 @@ import { db } from "@/lib/instant";
 import { id, tx } from "@instantdb/react-native";
 import { useProfile } from "@/lib/identity";
 import { usePremium } from "@/hooks/useEntitlements";
+import { localDayIndex, nextDayStreak } from "@/lib/dailyStreak";
+import { nextQuestCounters } from "@/lib/questPeriods";
+import { computeLevel } from "@/lib/leveling";
+import { XP_REWARDS, GOLD_REWARDS, PREMIUM_GOLD_BONUS } from "@/lib/economy";
+import type { QuestProfile } from "@/lib/questCatalog";
 
 export interface PlayerStats {
   gamesPlayed: number;
@@ -12,38 +17,8 @@ export interface PlayerStats {
   points: number;
 }
 
-const XP_REWARDS: Record<string, { win: number; loss: number }> = {
-  easy: { win: 15, loss: 5 },
-  medium: { win: 25, loss: 5 },
-  hard: { win: 40, loss: 5 },
-};
-
-// Soft currency ("or") earned per game — spent on the Builds page to
-// unlock and upgrade abilities. Win pays more than a loss.
-const GOLD_REWARDS: Record<string, { win: number; loss: number }> = {
-  easy: { win: 12, loss: 4 },
-  medium: { win: 20, loss: 6 },
-  hard: { win: 32, loss: 8 },
-};
-
-// Flat coins premium players get every game (matches the free rewarded-ad bonus).
-const PREMIUM_GOLD_BONUS = 50;
-
 // AVATARS lives in lib/skins.ts (re-exported here for back-compat)
 export { AVATARS } from "@/lib/skins";
-
-function computeLevel(xp: number) {
-  let level = 1;
-  let total = 0;
-  while (true) {
-    const needed = level * 75;
-    if (xp < total + needed) {
-      return { level, xpInLevel: xp - total, xpForNext: needed, progress: (xp - total) / needed };
-    }
-    total += needed;
-    level++;
-  }
-}
 
 interface GameData {
   scoreP1: number;
@@ -69,6 +44,8 @@ interface StatsContext {
   equippedAbility: string;
   /** Raw JSON map of owned abilities -> level (undefined when none). */
   abilitiesRaw: string | undefined;
+  /** All quest-related raw profile fields (daily/weekly/achievements). */
+  questData: QuestProfile;
   level: number;
   levelProgress: number;
   xpForNextLevel: number;
@@ -104,6 +81,23 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
   const gold = profile?.gold ?? 0;
   const equippedAbility = profile?.equippedAbility ?? "tornado";
   const abilitiesRaw = profile?.abilities ?? undefined;
+  const dayStreak = profile?.dayStreak ?? 0;
+  const lastPlayedDay = profile?.lastPlayedDay ?? undefined;
+  const questData: QuestProfile = useMemo(
+    () => ({
+      claimedQuestsRaw: profile?.claimedQuests ?? undefined,
+      dayStreak: profile?.dayStreak ?? 0,
+      dailyPeriod: profile?.dailyPeriod ?? undefined,
+      dailyGames: profile?.dailyGames ?? 0,
+      dailyWins: profile?.dailyWins ?? 0,
+      claimedDailyRaw: profile?.claimedDaily ?? undefined,
+      weeklyPeriod: profile?.weeklyPeriod ?? undefined,
+      weeklyGames: profile?.weeklyGames ?? 0,
+      weeklyWins: profile?.weeklyWins ?? 0,
+      claimedWeeklyRaw: profile?.claimedWeekly ?? undefined,
+    }),
+    [profile?.claimedQuests, profile?.dayStreak, profile?.dailyPeriod, profile?.dailyGames, profile?.dailyWins, profile?.claimedDaily, profile?.weeklyPeriod, profile?.weeklyGames, profile?.weeklyWins, profile?.claimedWeekly],
+  );
 
   // Leaderboard from InstantDB (stats)
   const { data } = db.useQuery(
@@ -205,12 +199,18 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
     if (profileId) {
       ops.push(tx.leaderboard[lbId].link({ profile: profileId }));
       ops.push(tx.games[gameId].link({ player: profileId }));
-      // Persist the gold reward on the profile (Builds currency).
-      ops.push(tx.profiles[profileId].update({ gold: gold + goldEarned }));
+      // Persist gold + daily-streak + daily/weekly quest counters.
+      const today = localDayIndex();
+      ops.push(tx.profiles[profileId].update({
+        gold: gold + goldEarned,
+        dayStreak: nextDayStreak(dayStreak, lastPlayedDay, today),
+        lastPlayedDay: today,
+        ...nextQuestCounters(questData, won),
+      }));
     }
 
     db.transact(ops);
-  }, [userId, stats, leaderboardId, profileId, premium, gold]);
+  }, [userId, stats, leaderboardId, profileId, premium, gold, dayStreak, lastPlayedDay, questData]);
 
   const addGold = useCallback((amount: number) => {
     if (!profileId) return;
@@ -226,14 +226,14 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
   const value = useMemo(
     () => ({
       stats, avatar, nickname, selectedTable, profileId, userId, winRate,
-      gold, equippedAbility, abilitiesRaw,
+      gold, equippedAbility, abilitiesRaw, questData,
       lastXpGain, lastGoldGain, recordGame, addBonusXp, addGold,
       level: levelInfo.level,
       levelProgress: levelInfo.progress,
       xpForNextLevel: levelInfo.xpForNext,
       xpInLevel: levelInfo.xpInLevel,
     }),
-    [stats, avatar, nickname, selectedTable, profileId, userId, winRate, gold, equippedAbility, abilitiesRaw, lastXpGain, lastGoldGain, recordGame, addBonusXp, addGold, levelInfo],
+    [stats, avatar, nickname, selectedTable, profileId, userId, winRate, gold, equippedAbility, abilitiesRaw, questData, lastXpGain, lastGoldGain, recordGame, addBonusXp, addGold, levelInfo],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

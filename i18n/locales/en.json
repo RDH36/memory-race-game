@@ -3,7 +3,7 @@
     "home": "Play",
     "leaderboard": "Leaderboard",
     "builds": "Builds",
-    "achievements": "Achievements",
+    "achievements": "Quests",
     "shop": "Shop",
     "settings": "Settings",
     "profile": "Profile"
@@ -19,6 +19,8 @@
     "upgrade": "Upgrade",
     "maxLevel": "Max lvl",
     "locked": "Locked",
+    "questRibbon": "Quest",
+    "unlockViaQuest": "View quest",
     "default": "Default",
     "notEnoughGold": "Not enough gold",
     "linkedAvatar": "Linked avatar",
@@ -490,7 +492,11 @@
   },
   "notifications": {
     "dailyRewardTitle": "🎁 Your daily reward is ready!",
-    "dailyRewardBody": "Claim your +15 XP and jump into a match."
+    "dailyRewardBody": "Claim your +15 XP and jump into a match.",
+    "questDailyTitle": "🎯 Your daily quests are live!",
+    "questDailyBody": "Complete your daily quests and earn gold.",
+    "questWeeklyTitle": "🏆 New weekly quests!",
+    "questWeeklyBody": "This week's quests are available. Time to play!"
   },
   "offline": {
     "title": "No Internet Connection",
@@ -751,13 +757,30 @@
     "later": "Later"
   },
   "achievements": {
-    "title": "Achievements",
-    "unlockedCount": "{{unlocked}} / {{total}} unlocked",
-    "comingSoon": {
-      "title": "More achievements soon",
-      "message": "New challenges are coming in upcoming updates"
+    "title": "Quests",
+    "subtitle": "Complete them to earn rewards",
+    "resetIn": "Resets in {{time}}",
+    "claim": "Claim",
+    "claimed": "Claimed",
+    "reward": {
+      "ability": "Ability"
+    },
+    "featured": {
+      "eyebrow": "Ability to unlock"
+    },
+    "tabs": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "achievement": "Feats"
     },
     "items": {
+      "daily-play-3":   { "title": "Warm-up",        "description": "Play 3 games today" },
+      "daily-win-1":    { "title": "Daily win",      "description": "Win 1 game today" },
+      "daily-win-3":    { "title": "Hat-trick",      "description": "Win 3 games today" },
+      "weekly-play-15": { "title": "Marathon",       "description": "Play 15 games this week" },
+      "weekly-win-7":   { "title": "Weekly streak",  "description": "Win 7 games this week" },
+      "weekly-play-30": { "title": "Relentless",     "description": "Play 30 games this week" },
+      "daily-7":     { "title": "Dedicated",       "description": "Finish a match 7 days in a row" },
       "first-win":   { "title": "First win",       "description": "Win your first game" },
       "ten-games":   { "title": "Regular player",  "description": "Play 10 games" },
       "wins-10":     { "title": "Winner",          "description": "Win 10 games" },

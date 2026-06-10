@@ -27,14 +27,14 @@ import { maybeRequestReview } from "../../lib/storeReview";
 import { MitsitsyCard } from "../../components/promo/MitsitsyCard";
 import { CelebrationModal } from "../../components/celebration/CelebrationModal";
 import {
-  computeUnlockedAchievementIds,
-  getAchievementEmoji,
-  type AchievementId,
-} from "../../lib/achievements";
+  getQuestEmoji,
+  metAchievementIds,
+  type QuestContext,
+} from "../../lib/questCatalog";
 
 type CelebrationItem =
   | { type: "levelUp"; level: number }
-  | { type: "achievement"; achievementId: AchievementId };
+  | { type: "achievement"; achievementId: string };
 
 const CPU_PROFILES: Record<string, { name: string; avatar: string }> = {
   easy: { name: "BabyBot", avatar: "🐣" },
@@ -91,10 +91,18 @@ export default function ResultScreen() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState<"new" | "home" | null>(null);
   const [bonusClaimed, setBonusClaimed] = useState(false);
-  const { avatar, stats, recordGame, addBonusXp, addGold, lastXpGain, lastGoldGain, gold, level, levelProgress, xpInLevel, xpForNextLevel } = usePlayerStats();
+  const { avatar, stats, recordGame, addBonusXp, addGold, lastXpGain, lastGoldGain, gold, level, levelProgress, xpInLevel, xpForNextLevel, questData } = usePlayerStats();
+  const dayStreak = questData.dayStreak;
   const recorded = useRef(false);
   const initialLevelRef = useRef<number | null>(null);
-  const initialUnlockedRef = useRef<AchievementId[] | null>(null);
+  const initialUnlockedRef = useRef<string[] | null>(null);
+
+  // Achievement-type quests only depend on lifetime stats/level/streak.
+  const achievementCtx = (): QuestContext => ({
+    stats, level, dayStreak,
+    daily: { games: 0, wins: 0 },
+    weekly: { games: 0, wins: 0 },
+  });
   const [celebrationQueue, setCelebrationQueue] = useState<CelebrationItem[]>([]);
 
   const onBonusReward = useCallback(() => {
@@ -149,7 +157,7 @@ export default function ResultScreen() {
     if (!recorded.current) {
       recorded.current = true;
       initialLevelRef.current = level;
-      initialUnlockedRef.current = computeUnlockedAchievementIds(stats, level);
+      initialUnlockedRef.current = metAchievementIds(achievementCtx());
       recordGame(effectiveWinner === "p1", difficulty as string, {
         scoreP1: s1,
         scoreP2: s2,
@@ -163,7 +171,7 @@ export default function ResultScreen() {
   useEffect(() => {
     if (initialLevelRef.current === null || initialUnlockedRef.current === null) return;
 
-    const currentUnlocked = computeUnlockedAchievementIds(stats, level);
+    const currentUnlocked = metAchievementIds(achievementCtx());
     const newCelebrations: CelebrationItem[] = [];
 
     if (level > initialLevelRef.current) {
@@ -182,7 +190,7 @@ export default function ResultScreen() {
       initialLevelRef.current = level;
       initialUnlockedRef.current = currentUnlocked;
     }
-  }, [stats.points, level]);
+  }, [stats.points, level, dayStreak]);
 
   // Dynamic stats
   const attempts = parseInt(p1Attempts, 10);
@@ -441,7 +449,7 @@ export default function ResultScreen() {
           }
           emoji={
             celebrationQueue[0].type === "achievement"
-              ? getAchievementEmoji(celebrationQueue[0].achievementId)
+              ? getQuestEmoji(celebrationQueue[0].achievementId)
               : undefined
           }
           onContinue={() => setCelebrationQueue((q) => q.slice(1))}

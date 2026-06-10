@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Tabs } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../lib/ThemeContext";
 import { haptics } from "../../lib/haptics";
+import { useQuests } from "../../lib/quests";
+import { TabBadge } from "../../components/navigation/TabBadge";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   useSharedValue,
@@ -120,6 +122,7 @@ export default function TabsLayout() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { totalClaimable } = useQuests();
 
   // "NEW" badge on the Builds tab until the player opens it once.
   const [buildsSeen, setBuildsSeen] = useState(true);
@@ -173,23 +176,7 @@ export default function TabsLayout() {
             <View>
               <Ionicons name="flash" size={22} color={color} />
               {!buildsSeen && (
-                <View
-                  style={{
-                    position: "absolute",
-                    top: -5,
-                    right: -9,
-                    minWidth: 16,
-                    height: 16,
-                    paddingHorizontal: 3,
-                    borderRadius: 8,
-                    backgroundColor: colors.hues.coral[0],
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: `0 1px 0 ${colors.hues.coral[1]}`,
-                  }}
-                >
-                  <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 8, color: "#fff" }}>NEW</Text>
-                </View>
+                <TabBadge label="NEW" color={colors.hues.coral[0]} lip={colors.hues.coral[1]} />
               )}
             </View>
           ),
@@ -198,9 +185,14 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="achievements"
         options={{
-          title: t("tabs.achievements", "Succès"),
+          title: t("tabs.achievements", "Quêtes"),
           tabBarIcon: ({ color }) => (
-            <Ionicons name="medal" size={22} color={color} />
+            <View>
+              <Ionicons name="medal" size={22} color={color} />
+              {totalClaimable > 0 && (
+                <TabBadge label={String(totalClaimable)} color={colors.error} lip={colors.hues.coral[1]} />
+              )}
+            </View>
           ),
         }}
       />

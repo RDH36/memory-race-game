@@ -17,12 +17,14 @@ import { ThemeProvider, useTheme } from "../lib/ThemeContext";
 import { ConnectivityProvider } from "../lib/ConnectivityContext";
 import { RevenueCatProvider } from "../lib/revenuecat";
 import { setupDailyReminder } from "../lib/notifications";
+import { useQuestReminders } from "../lib/quests";
 import { configureAudioMode } from "../lib/sound";
 
 SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
   const { colors, isDark } = useTheme();
+  useQuestReminders();
 
   useEffect(() => {
     SystemUI.setBackgroundColorAsync(colors.surface);

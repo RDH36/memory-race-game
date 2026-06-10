@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../lib/ThemeContext";
 import { haptics } from "../../lib/haptics";
@@ -19,6 +20,7 @@ const COLUMNS = 2;
 export default function BuildsScreen() {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const { states, gold, unlock, upgrade, equip } = usePlayerAbilities();
   const [infoAbility, setInfoAbility] = useState<AbilityState | null>(null);
@@ -68,6 +70,7 @@ export default function BuildsScreen() {
                 onUnlock={handleUnlock}
                 onUpgrade={setUpgradeAbility}
                 onInfo={setInfoAbility}
+                onQuestNav={() => router.navigate("/achievements")}
               />
             </Rise>
           ))}

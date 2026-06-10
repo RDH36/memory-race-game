@@ -29,17 +29,19 @@ export interface Ability {
   maxLevel: number;
   /** Base gold cost of an upgrade — scaled by current level. */
   upgradeCost: number;
+  /** Unlocked by completing a quest instead of spending gold. */
+  questLocked?: boolean;
 }
 
 // --- Ability registry ---
 // Upgrades cost double the unlock price (upgradeCost = 2 × baseCost).
 // Tornado is free to unlock, so it gets a flat upgrade price.
 export const ABILITIES: Ability[] = [
-  { id: "tornado", emoji: "🌪️", nameKey: "tornado", avatarId: "🦊", hue: "blue",   default: true, baseCost: 0,   maxLevel: 3, upgradeCost: 400 },
-  { id: "freeze",  emoji: "❄️", nameKey: "freeze",  avatarId: "🐳", hue: "blue",   baseCost: 400,  maxLevel: 3, upgradeCost: 800 },
-  { id: "reveal",  emoji: "👁️", nameKey: "reveal",  avatarId: "🦉", hue: "violet", baseCost: 600,  maxLevel: 3, upgradeCost: 1200 },
-  { id: "swap",    emoji: "🪝", nameKey: "swap",    avatarId: "🐙", hue: "pink",   baseCost: 1500, maxLevel: 2, upgradeCost: 3000 },
-  { id: "shield",  emoji: "🛡️", nameKey: "shield",  avatarId: "🦁", hue: "gold",   baseCost: 800,  maxLevel: 3, upgradeCost: 1600 },
+  { id: "tornado", emoji: "🌪️", nameKey: "tornado", avatarId: "🦊", hue: "blue",   default: true, baseCost: 0,   maxLevel: 3, upgradeCost: 600 },
+  { id: "freeze",  emoji: "❄️", nameKey: "freeze",  avatarId: "🐳", hue: "blue",   baseCost: 800,  maxLevel: 3, upgradeCost: 1500 },
+  { id: "reveal",  emoji: "👁️", nameKey: "reveal",  avatarId: "🦉", hue: "violet", baseCost: 1200, maxLevel: 3, upgradeCost: 2200, questLocked: true },
+  { id: "swap",    emoji: "🪝", nameKey: "swap",    avatarId: "🐙", hue: "pink",   baseCost: 2600, maxLevel: 2, upgradeCost: 5200 },
+  { id: "shield",  emoji: "🛡️", nameKey: "shield",  avatarId: "🦁", hue: "gold",   baseCost: 1500, maxLevel: 3, upgradeCost: 2800 },
 ];
 
 export function getAbility(id: string): Ability | undefined {
@@ -124,7 +126,7 @@ export function parseOwned(raw: string | undefined | null): OwnedMap {
   }
 }
 
-function serializeOwned(map: OwnedMap): string {
+export function serializeOwned(map: OwnedMap): string {
   return JSON.stringify(map);
 }
 
@@ -177,6 +179,7 @@ export function usePlayerAbilities() {
 
   const unlock = useCallback(
     (ability: Ability): boolean => {
+      if (ability.questLocked) return false; // unlocked via quest, not gold
       if (!profileId || isOwned(owned, ability.id) || gold < ability.baseCost) return false;
       const next = serializeOwned({ ...owned, [ability.id]: 1 });
       db.transact(tx.profiles[profileId].update({ gold: gold - ability.baseCost, abilities: next }));

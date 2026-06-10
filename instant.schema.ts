@@ -51,6 +51,22 @@ const _schema = i.schema({
       equippedAbility: i.string().optional(),
       // JSON map of owned abilities -> level, e.g. {"freeze":2}.
       abilities: i.string().optional(),
+      // Achievements ("hauts faits") — JSON array of claimed quest ids.
+      claimedQuests: i.string().optional(),
+      // Consecutive calendar days with at least one finished match.
+      dayStreak: i.number().optional(),
+      // Local day index (days since epoch) of the last finished match.
+      lastPlayedDay: i.number().optional(),
+      // Daily quests — counters + claimed ids for the current local day.
+      dailyPeriod: i.number().optional(),
+      dailyGames: i.number().optional(),
+      dailyWins: i.number().optional(),
+      claimedDaily: i.string().optional(),
+      // Weekly quests — counters + claimed ids for the current week.
+      weeklyPeriod: i.number().optional(),
+      weeklyGames: i.number().optional(),
+      weeklyWins: i.number().optional(),
+      claimedWeekly: i.string().optional(),
     }),
     rooms: i.entity({
       appVersion: i.string().optional(),

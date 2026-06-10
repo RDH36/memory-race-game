@@ -68,6 +68,7 @@ export function AbilityCard({
   onUnlock,
   onUpgrade,
   onInfo,
+  onQuestNav,
 }: {
   ability: AbilityState;
   gold: number;
@@ -76,13 +77,15 @@ export function AbilityCard({
   onUnlock: (a: AbilityState) => void;
   onUpgrade: (a: AbilityState) => void;
   onInfo: (a: AbilityState) => void;
+  onQuestNav: (a: AbilityState) => void;
 }) {
   const { colors } = useTheme();
   const { t } = useTranslation();
 
-  const { owned, equipped, level, maxLevel, baseCost } = ability;
+  const { owned, equipped, level, maxLevel, baseCost, questLocked } = ability;
   const canAffordUnlock = gold >= baseCost;
   const isMax = owned && level >= maxLevel;
+  const lockedByQuest = !owned && questLocked;
 
   return (
     <View style={{ width, opacity: owned ? 1 : 0.94 }}>
@@ -100,6 +103,8 @@ export function AbilityCard({
           <Ribbon color="blue">{t("builds.default")}</Ribbon>
         ) : equipped ? (
           <Ribbon color="green">{t("builds.equipped")}</Ribbon>
+        ) : lockedByQuest ? (
+          <Ribbon color="violet">{t("builds.questRibbon")}</Ribbon>
         ) : !owned ? (
           <Ribbon color="white">{t("builds.locked")}</Ribbon>
         ) : (
@@ -133,7 +138,15 @@ export function AbilityCard({
 
         {/* Action */}
         <View style={{ width: "100%", marginTop: 2 }}>
-          {!owned ? (
+          {lockedByQuest ? (
+            <Btn3D
+              color="violet"
+              size="md"
+              full
+              label={t("builds.unlockViaQuest")}
+              onPress={() => onQuestNav(ability)}
+            />
+          ) : !owned ? (
             <Btn3D
               color="gold"
               size="md"

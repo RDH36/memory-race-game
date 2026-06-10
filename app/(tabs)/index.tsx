@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/lib/ThemeContext";
 import { usePlayerStats } from "@/lib/playerStats";
+import { useQuests } from "@/lib/quests";
 import { haptics } from "@/lib/haptics";
 import { MitsitsyCard } from "@/components/promo/MitsitsyCard";
 import { Panel, Pop, Rise, Ribbon, XPBar } from "@/components/ui/arcade";
@@ -12,6 +14,7 @@ import { HomeHeader } from "@/components/home/arcade/HomeHeader";
 import { ArcadeHero } from "@/components/home/arcade/ArcadeHero";
 import { QuickModes } from "@/components/home/arcade/QuickModes";
 import { HomeStats } from "@/components/home/arcade/HomeStats";
+import { FeaturedQuest } from "@/components/achievements/FeaturedQuest";
 import { CoachBubble, useCoachMark } from "@/components/onboarding/CoachBubble";
 
 const DAILY_REWARD_KEY = "daily_reward_last_claimed";
@@ -31,7 +34,9 @@ function isSameDay(ts1: number, ts2: number) {
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const router = useRouter();
   const { level, levelProgress, xpInLevel, xpForNextLevel, addBonusXp, addGold } = usePlayerStats();
+  const { featured, claim } = useQuests();
   const [dailyClaimed, setDailyClaimed] = useState(true);
 
   useEffect(() => {
@@ -111,6 +116,20 @@ export default function HomeScreen() {
               <Ribbon color="gold">{t("home.dailyRewardClaim")}</Ribbon>
             </Panel>
           </Pop>
+        )}
+
+        {featured && !featured.claimed && (
+          <Rise delay={100}>
+            <View style={{ marginBottom: 16 }}>
+              <FeaturedQuest
+                state={featured}
+                onClaim={() => {
+                  if (claim(featured.id)) haptics.coin();
+                }}
+                onPress={() => router.navigate("/achievements")}
+              />
+            </View>
+          </Rise>
         )}
 
         <Rise delay={120}>

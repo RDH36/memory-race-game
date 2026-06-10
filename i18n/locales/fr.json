@@ -3,7 +3,7 @@
     "home": "Jouer",
     "leaderboard": "Classement",
     "builds": "Builds",
-    "achievements": "Succès",
+    "achievements": "Quêtes",
     "shop": "Boutique",
     "settings": "Paramètres",
     "profile": "Profil"
@@ -19,6 +19,8 @@
     "upgrade": "Améliorer",
     "maxLevel": "Niv. max",
     "locked": "Verrouillée",
+    "questRibbon": "Quête",
+    "unlockViaQuest": "Voir la quête",
     "default": "Défaut",
     "notEnoughGold": "Pas assez d'or",
     "linkedAvatar": "Avatar lié",
@@ -490,7 +492,11 @@
   },
   "notifications": {
     "dailyRewardTitle": "🎁 Ta récompense quotidienne t'attend !",
-    "dailyRewardBody": "Réclame tes +15 XP et lance une partie."
+    "dailyRewardBody": "Réclame tes +15 XP et lance une partie.",
+    "questDailyTitle": "🎯 Tes quêtes du jour sont là !",
+    "questDailyBody": "Termine tes quêtes quotidiennes et gagne de l'or.",
+    "questWeeklyTitle": "🏆 Nouvelles quêtes hebdo !",
+    "questWeeklyBody": "Les quêtes de la semaine sont disponibles. À toi de jouer !"
   },
   "offline": {
     "title": "Pas de connexion Internet",
@@ -751,13 +757,30 @@
     "later": "Plus tard"
   },
   "achievements": {
-    "title": "Succès",
-    "unlockedCount": "{{unlocked}} / {{total}} débloqués",
-    "comingSoon": {
-      "title": "Plus de succès bientôt",
-      "message": "De nouveaux défis arrivent dans les prochaines mises à jour"
+    "title": "Quêtes",
+    "subtitle": "Complète pour gagner des récompenses",
+    "resetIn": "Reset dans {{time}}",
+    "claim": "Réclamer",
+    "claimed": "Réclamé",
+    "reward": {
+      "ability": "Abilité"
+    },
+    "featured": {
+      "eyebrow": "Abilité à débloquer"
+    },
+    "tabs": {
+      "daily": "Quotidien",
+      "weekly": "Hebdo",
+      "achievement": "Hauts faits"
     },
     "items": {
+      "daily-play-3":   { "title": "Échauffement",    "description": "Joue 3 parties aujourd'hui" },
+      "daily-win-1":    { "title": "Victoire du jour", "description": "Gagne 1 partie aujourd'hui" },
+      "daily-win-3":    { "title": "Triplé",           "description": "Gagne 3 parties aujourd'hui" },
+      "weekly-play-15": { "title": "Marathon",         "description": "Joue 15 parties cette semaine" },
+      "weekly-win-7":   { "title": "Série hebdo",      "description": "Gagne 7 parties cette semaine" },
+      "weekly-play-30": { "title": "Acharné",          "description": "Joue 30 parties cette semaine" },
+      "daily-7":     { "title": "Assidu",            "description": "Termine un match 7 jours d'affilée" },
       "first-win":   { "title": "Première victoire", "description": "Gagne ta première partie" },
       "ten-games":   { "title": "Joueur régulier",   "description": "Joue 10 parties" },
       "wins-10":     { "title": "Vainqueur",         "description": "Gagne 10 parties" },
