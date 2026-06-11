@@ -125,6 +125,9 @@
     "xpBoost": "Ad boost: ×1.5 XP + coins",
     "xpBoostDesc": "Watch an ad: +50% XP and +5% coins",
     "dailyReward": "Daily reward",
+    "storyEyebrow": "Story",
+    "storyTitle": "Prelude",
+    "storySubtitle": "Replay the story and the fight against Gromak",
     "dailyRewardSubtitle": "Claim your +{{xp}} XP and +{{gold}} 🪙 for free",
     "dailyRewardClaim": "Claim",
     "dailyRewardClaimed": "Come back tomorrow!",
@@ -296,6 +299,12 @@
     "premiumBoost": "+10% Premium"
   },
   "mode": {
+    "sectionStory": "Story",
+    "sectionOnline": "Online",
+    "sectionSolo": "Solo",
+    "campaignTitle": "Story Campaign",
+    "campaignDesc": "Fight the Demon King's brigades and free FLIPIA",
+    "campaignBadge": "Soon",
     "xpBoostPremium": {
       "title": "+10% XP · Premium active",
       "desc": "Permanent bonus applied automatically",
@@ -384,18 +393,27 @@
     "successMessage": "Your data is linked to {{email}}. You can recover it on another device.",
     "close": "Close",
     "linked": "Account linked to",
-    "tagline": "Memorize\nCompete\nDominate!",
-    "continueGuest": "Continue as guest",
-    "guestWarning": "As a guest, <u>your ELO won't be saved</u>. You can create an account later.",
+    "guildRibbon": "Memory Guild",
+    "guildTitle": "Sign the heroes' register",
+    "guildSubtitle": "Join heroes from around the world to bring FLIPIA's memory back.",
+    "guildWelcome": "Welcome to the Guild, hero!",
+    "joinGuild": "Join the Guild with Google",
+    "vagabond": "Continue as a wanderer",
+    "guestWarning": "A wanderer is not in the register: <u>your ELO won't be saved</u>. You can join the Guild later.",
     "legal": "By continuing, you accept our <conditions>Terms</conditions> and <privacy>Privacy Policy</privacy>.",
     "or": "or",
     "back": "Back"
   },
   "setup": {
-    "title": "Avatar",
-    "subtitle": "Choose your avatar and nickname",
-    "nicknameLabel": "Nickname",
-    "continue": "Let's go!",
+    "ribbonGuild": "Guild Register",
+    "ribbonVagabond": "Wanderer's Card",
+    "title": "Reincarnate!",
+    "subtitleGuild": "Complete your hero record: your reincarnation emoji and your legend name.",
+    "subtitleVagabond": "Fill in your wanderer's card: your reincarnation emoji and your traveler name.",
+    "avatarLabel": "Your reincarnation",
+    "nicknameLabel": "Hero name",
+    "continueGuild": "Sign the register",
+    "continueVagabond": "Hit the road",
     "nicknameTaken": "This nickname is already taken",
     "saveError": "Failed to save"
   },
@@ -503,12 +521,60 @@
     "message": "This feature requires an internet connection. Please connect to Wi-Fi or mobile data and try again.",
     "ok": "OK"
   },
+  "story": {
+    "prelude": {
+      "s1": "Once upon a time, FLIPIA, the world of emojis, was a happy land where everyone had a perfect memory.",
+      "s2": "But one day, the Demon King unleashed his weapon and erased the memory of all FLIPIA...",
+      "s3": "Thanks to the power of the Angels, a few emojis gained abilities to resist the Demon King and his army.",
+      "s4": "To lead the battle, the Royal Emojis summoned a hero from another world... You!",
+      "s5": "Reincarnated as an emoji, master every ability, defeat the Demon King and bring memory back to FLIPIA!",
+      "s6": "But during the summoning, something went wrong... the portal hurled you far away from the castle!",
+      "s7": "You crash-land near a village under attack by Gromak, a Brigade Chief of the Demon King.",
+      "s8": "Save the village! Challenge Gromak to a memory battle and give the villagers their memories back.",
+      "b1": "What a beautiful day!",
+      "b2": "Your memories are MINE!",
+      "b3": "Receive our powers...",
+      "b4": "O hero, hear our call!",
+      "b5": "The hero... is YOU!",
+      "b6": "Whoaaa!!",
+      "b7": "Erase all their memories!",
+      "b8": "You dare challenge me, hero?!",
+      "chapterTitle": "Prelude — The Lost Memory",
+      "scroll": "Scroll to follow the story",
+      "tap": "Tap to continue",
+      "cta": "First step"
+    },
+    "epilogue": {
+      "title": "Epilogue — The Memory Guild",
+      "belicWinText": "Gromak is defeated! But Belic, an officer of the Demon King, swoops in and carries him into the shadows...",
+      "belicLoseText": "Belic, an officer of the Demon King, swoops in to carry Gromak away... then they vanish.",
+      "belicBubble": "You may have saved this village, hero... but you will NEVER defeat us!",
+      "winText": "The village is saved! The villagers get their memories back and invite you to join the village Memory Guild.",
+      "winBubble": "Thank you, hero! Join our Guild!",
+      "loseText": "An imperial guard charges in and sends Gromak fleeing. You're saved just in time!",
+      "loseBubble": "Not so fast, demon!",
+      "encourageText": "The villagers help you up and cheer you on: the village Memory Guild will help you take your revenge!",
+      "encourageBubble": "Join our Guild, hero!",
+      "cta": "Join the Guild",
+      "ctaReplay": "Back to the village"
+    },
+    "brigadeChief": {
+      "role": "Brigade Chief of the Demon King",
+      "intro": "So YOU are the \"hero\"? My brigade already erased this village's memory. You're next!"
+    },
+    "belic": {
+      "role": "Officer of the Demon King"
+    },
+    "demonKing": {
+      "role": "Demon King of FLIPIA"
+    }
+  },
   "onboarding": {
     "skip": "Skip",
     "welcome": {
-      "question": "Think you have\na good memory?",
-      "subtitle": "Discover Flipia, the memory game where every card counts.",
-      "cta": "Discover the game"
+      "question": "A world has lost\nits memory...",
+      "subtitle": "Every card you flip awakens a memory. FLIPIA awaits its hero: you.",
+      "cta": "Enter the story"
     },
     "coach": {
       "tap": "Tap to continue",
@@ -517,62 +583,14 @@
       "shop": "Go Premium to unlock everything.",
       "profile": "Track your progress and stats here."
     },
-    "flip": {
-      "title": "Tap a card",
-      "subtitle": "to flip it over",
-      "hint": "Now flip the other one!",
-      "match": "It's a match!"
-    },
-    "match": {
-      "title": "Find the pairs",
-      "subtitle": "Flip 2 identical cards to find a pair",
-      "bravo": "Well done!",
-      "allFound": "You found all the pairs!",
-      "cta": "Continue"
-    },
-    "tornado": {
-      "title": "Your secret weapon",
-      "subtitle": "Your opponent memorizes cards as they play.\nThe Tornado shuffles everything and wipes their memory!",
-      "hint": "Tap Launch to trigger the Tornado ↓",
-      "wow": "Boom! All cards have been shuffled!",
-      "detail": "Your opponent forgot everything! You get one Tornado per game — use it when they're ahead to turn the tide.",
-      "cta": "Got it, let's go!"
-    },
-    "ready": {
-      "title": "You're ready!",
-      "subtitle": "You'll face BabyBot to prove your worth.",
-      "opponents": "Your opponents",
-      "babyBot": "BabyBot",
-      "babyBotDesc": "Distracted, perfect to start",
-      "nekoFlash": "NekoFlash",
-      "nekoFlashDesc": "Smart, a real challenge",
-      "alphaMemory": "AlphaMemory",
-      "alphaMemoryDesc": "Unbeatable... or almost",
-      "cta": "Fight BabyBot"
-    },
     "battle": {
       "you": "You",
       "yourTurn": "Your turn! Flip 2 cards",
       "matchFound": "Nice one! It's still your turn!",
-      "mismatch": "Missed! It's BabyBot's turn",
-      "cpuTurn": "BabyBot is thinking...",
-      "cpuMatch": "BabyBot found a pair!",
-      "cpuMiss": "BabyBot missed!"
-    },
-    "result": {
-      "won": "Victory!",
-      "wonSub": "You dominated BabyBot!",
-      "wonHook": "Real players are waiting.\nAre you ready to face them?",
-      "lost": "Defeat...",
-      "lostSub": "BabyBot got you this time!",
-      "lostHook": "BabyBot is just the beginning.\nShow what you're made of!",
-      "draw": "Draw!",
-      "drawSub": "Close match!",
-      "drawHook": "You can do better.\nThe real challenges start now!",
-      "you": "You",
-      "ctaWon": "Crush other players",
-      "ctaLost": "Get my revenge",
-      "ctaDraw": "Prove I'm better"
+      "mismatch": "Missed! It's Gromak's turn",
+      "cpuTurn": "Gromak is thinking...",
+      "cpuMatch": "Gromak found a pair!",
+      "cpuMiss": "Gromak missed!"
     }
   },
   "shop": {
@@ -774,8 +792,11 @@
       "achievement": "Feats"
     },
     "items": {
+      "daily-play-1":   { "title": "First step",     "description": "Play 1 game today" },
       "daily-play-3":   { "title": "Warm-up",        "description": "Play 3 games today" },
+      "daily-play-5":   { "title": "Marathon",       "description": "Play 5 games today" },
       "daily-win-1":    { "title": "Daily win",      "description": "Win 1 game today" },
+      "daily-win-2":    { "title": "Double",         "description": "Win 2 games today" },
       "daily-win-3":    { "title": "Hat-trick",      "description": "Win 3 games today" },
       "weekly-play-15": { "title": "Marathon",       "description": "Play 15 games this week" },
       "weekly-win-7":   { "title": "Weekly streak",  "description": "Win 7 games this week" },

@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import type { HueName } from "@/components/ui/theme";
-import { ScreenHeader } from "@/components/ui/arcade";
+import { ScreenHeader, SectionTitle } from "@/components/ui/arcade";
 import { ChoiceRow } from "@/components/mode/arcade/ChoiceRow";
 import { ModeHeroArcade } from "@/components/mode/arcade/ModeHeroArcade";
 import { ModeStatsArcade } from "@/components/mode/arcade/ModeStatsArcade";
@@ -104,6 +104,22 @@ export default function CasualModeScreen() {
 
         <ModeStatsArcade stats={stats} />
 
+        {/* Story campaign teaser — chapters against the Demon King, coming soon */}
+        <SectionTitle style={{ marginBottom: 10 }}>{t("mode.sectionStory")}</SectionTitle>
+        <View style={{ marginBottom: 20 }}>
+          <ChoiceRow
+            icon="📖"
+            title={t("mode.campaignTitle")}
+            desc={t("mode.campaignDesc")}
+            color="violet"
+            badge={t("mode.campaignBadge")}
+            locked
+            delay={100}
+          />
+        </View>
+
+        {/* Online play */}
+        <SectionTitle style={{ marginBottom: 10 }}>{t("mode.sectionOnline")}</SectionTitle>
         <View style={{ gap: 13, marginBottom: 20 }}>
           {options.map((opt, index) => (
             <ChoiceRow
@@ -112,11 +128,24 @@ export default function CasualModeScreen() {
               title={opt.title}
               desc={opt.desc}
               color={opt.color}
-              delay={120 + index * 70}
+              delay={170 + index * 70}
               disabled={!isOnline}
               onPress={() => handleOptionPress(opt.key)}
             />
           ))}
+        </View>
+
+        {/* Solo training */}
+        <SectionTitle style={{ marginBottom: 10 }}>{t("mode.sectionSolo")}</SectionTitle>
+        <View style={{ marginBottom: 20 }}>
+          <ChoiceRow
+            icon="🧠"
+            title={t("home.modes.solo")}
+            desc={t("home.modes.soloDesc")}
+            color="blue"
+            delay={400}
+            onPress={() => router.push("/mode/solo")}
+          />
         </View>
 
         <ModeXpBoost value={xpBoost} onChange={setXpBoost} />

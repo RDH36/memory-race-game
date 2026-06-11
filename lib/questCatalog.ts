@@ -48,10 +48,13 @@ export interface QuestDef {
 const gold = (amount: number): QuestReward => ({ kind: "gold", amount });
 
 export const QUESTS: QuestDef[] = [
-  // --- Quotidien (reset chaque jour) ---
-  { id: "daily-play-3", type: "daily", emoji: "🎮", hue: "blue", reward: gold(40), target: 3, current: (c) => c.daily.games },
-  { id: "daily-win-1", type: "daily", emoji: "🥇", hue: "gold", reward: gold(30), target: 1, current: (c) => c.daily.wins },
-  { id: "daily-win-3", type: "daily", emoji: "🔥", hue: "coral", reward: gold(70), target: 3, current: (c) => c.daily.wins },
+  // --- Quotidien (pool — 3 tirés au hasard par jour, voir dailyQuestsForDay) ---
+  { id: "daily-play-1", type: "daily", emoji: "🎮", hue: "blue",   reward: gold(20), target: 1, current: (c) => c.daily.games },
+  { id: "daily-play-3", type: "daily", emoji: "🎲", hue: "blue",   reward: gold(40), target: 3, current: (c) => c.daily.games },
+  { id: "daily-play-5", type: "daily", emoji: "🏃", hue: "blue",   reward: gold(70), target: 5, current: (c) => c.daily.games },
+  { id: "daily-win-1",  type: "daily", emoji: "🥇", hue: "gold",   reward: gold(30), target: 1, current: (c) => c.daily.wins },
+  { id: "daily-win-2",  type: "daily", emoji: "✌️", hue: "gold",   reward: gold(50), target: 2, current: (c) => c.daily.wins },
+  { id: "daily-win-3",  type: "daily", emoji: "🔥", hue: "coral",  reward: gold(70), target: 3, current: (c) => c.daily.wins },
 
   // --- Hebdo (reset chaque semaine) ---
   { id: "weekly-play-15", type: "weekly", emoji: "🎯", hue: "blue", reward: gold(160), target: 15, current: (c) => c.weekly.games },
@@ -97,6 +100,23 @@ export function getQuestEmoji(id: string): string {
 
 export function questsByType(type: QuestType): QuestDef[] {
   return QUESTS.filter((q) => q.type === type);
+}
+
+const DAILY_POOL = QUESTS.filter((q) => q.type === "daily");
+
+/**
+ * The daily quests shown on a given day — a deterministic random subset of the
+ * pool (seeded by the day index, so it's stable all day and rotates each day).
+ */
+export function dailyQuestsForDay(dayIndex: number, count = 3): QuestDef[] {
+  const arr = [...DAILY_POOL];
+  let s = (dayIndex * 2654435761 + 12345) >>> 0; // hash the day into a seed
+  for (let i = arr.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    const j = s % (i + 1);
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, Math.min(count, arr.length));
 }
 
 export function isQuestMet(def: QuestDef, ctx: QuestContext): boolean {

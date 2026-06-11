@@ -14,6 +14,7 @@ import { weekIndex } from "@/lib/questPeriods";
 import {
   FEATURED_QUEST_ID,
   QUESTS,
+  dailyQuestsForDay,
   isQuestMet,
   type QuestContext,
   type QuestDef,
@@ -40,19 +41,24 @@ function parseIds(raw: string | undefined | null): string[] {
   }
 }
 
-/** The claimed-id list for `type`, scoped to the current period. */
-function claimedFor(type: QuestType, q: QuestProfile): {
-  raw: string | undefined;
-  field: string;
-  ids: string[];
-} {
+/**
+ * The claimed-id list for `type`, scoped to the LIVE period: a daily/weekly
+ * claimed list from a past period counts as empty (the quests have reset, so
+ * they must show as fresh/unclaimed even before the first match this period).
+ */
+function claimedFor(
+  type: QuestType,
+  q: QuestProfile,
+  dailyLive: boolean,
+  weeklyLive: boolean,
+): { field: string; ids: string[] } {
   if (type === "daily") {
-    return { raw: q.claimedDailyRaw, field: "claimedDaily", ids: parseIds(q.claimedDailyRaw) };
+    return { field: "claimedDaily", ids: dailyLive ? parseIds(q.claimedDailyRaw) : [] };
   }
   if (type === "weekly") {
-    return { raw: q.claimedWeeklyRaw, field: "claimedWeekly", ids: parseIds(q.claimedWeeklyRaw) };
+    return { field: "claimedWeekly", ids: weeklyLive ? parseIds(q.claimedWeeklyRaw) : [] };
   }
-  return { raw: q.claimedQuestsRaw, field: "claimedQuests", ids: parseIds(q.claimedQuestsRaw) };
+  return { field: "claimedQuests", ids: parseIds(q.claimedQuestsRaw) };
 }
 
 export function useQuests() {
@@ -60,12 +66,14 @@ export function useQuests() {
 
   const owned = useMemo(() => parseOwned(abilitiesRaw), [abilitiesRaw]);
 
-  const ctx: QuestContext = useMemo(() => {
-    const today = localDayIndex();
-    const week = weekIndex(today);
-    const dailyLive = questData.dailyPeriod === today;
-    const weeklyLive = questData.weeklyPeriod === week;
-    return {
+  // Which daily/weekly period is live right now (a past period = reset).
+  const today = localDayIndex();
+  const week = weekIndex(today);
+  const dailyLive = questData.dailyPeriod === today;
+  const weeklyLive = questData.weeklyPeriod === week;
+
+  const ctx: QuestContext = useMemo(
+    () => ({
       stats,
       level,
       dayStreak: questData.dayStreak,
@@ -77,19 +85,23 @@ export function useQuests() {
         games: weeklyLive ? questData.weeklyGames : 0,
         wins: weeklyLive ? questData.weeklyWins : 0,
       },
-    };
-  }, [stats, level, questData]);
+    }),
+    [stats, level, questData, dailyLive, weeklyLive],
+  );
+
+  // Today's daily quests are a random subset of the pool (rotates each day).
+  const dailyToday = useMemo(() => new Set(dailyQuestsForDay(today).map((q) => q.id)), [today]);
 
   const states: QuestState[] = useMemo(
     () =>
-      QUESTS.map((def) => {
+      QUESTS.filter((def) => def.type !== "daily" || dailyToday.has(def.id)).map((def) => {
         const value = def.current(ctx);
         const met = value >= def.target;
-        const { ids } = claimedFor(def.type, questData);
+        const { ids } = claimedFor(def.type, questData, dailyLive, weeklyLive);
         const claimed = ids.includes(def.id);
         return { ...def, value, met, claimed, claimable: met && !claimed };
       }),
-    [ctx, questData],
+    [ctx, questData, dailyLive, weeklyLive, dailyToday],
   );
 
   const applyReward = useCallback(
@@ -109,14 +121,14 @@ export function useQuests() {
       if (!profileId) return false;
       const def = QUESTS.find((q) => q.id === id);
       if (!def || !isQuestMet(def, ctx)) return false;
-      const { field, ids } = claimedFor(def.type, questData);
+      const { field, ids } = claimedFor(def.type, questData, dailyLive, weeklyLive);
       if (ids.includes(id)) return false;
       const update: Record<string, unknown> = { [field]: JSON.stringify([...ids, id]) };
       applyReward(def.reward, update);
       db.transact(tx.profiles[profileId].update(update));
       return true;
     },
-    [profileId, ctx, questData, applyReward],
+    [profileId, ctx, questData, applyReward, dailyLive, weeklyLive],
   );
 
   const claimableCount = (type: QuestType) =>

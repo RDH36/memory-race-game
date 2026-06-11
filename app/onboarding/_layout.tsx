@@ -1,9 +1,9 @@
 import { Pressable, Text } from "react-native";
 import { Stack, useRouter, usePathname } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Haptics from "expo-haptics";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../lib/ThemeContext";
+import { haptics } from "../../lib/haptics";
 
 function SkipButton() {
   const router = useRouter();
@@ -11,7 +11,7 @@ function SkipButton() {
   const { colors } = useTheme();
 
   const handleSkip = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptics.tap();
     await AsyncStorage.setItem("onboarding_complete", "true");
     router.replace("/auth");
   };
@@ -31,7 +31,7 @@ function SkipButton() {
   );
 }
 
-const HIDE_SKIP_SCREENS = ["/onboarding/battle", "/onboarding/result"];
+const HIDE_SKIP_SCREENS = ["/onboarding/battle", "/onboarding/epilogue"];
 
 export default function OnboardingLayout() {
   const { colors } = useTheme();
@@ -51,8 +51,15 @@ export default function OnboardingLayout() {
         animation: "slide_from_right",
       }}
     >
+      {/* The prelude is a cinematic — it renders its own skip in the letterbox.
+          Hard cut (no native animation): the iris transition owns the reveal,
+          and a native cross-fade would flash the light window background. */}
+      <Stack.Screen
+        name="prelude"
+        options={{ headerShown: false, animation: "none", contentStyle: { backgroundColor: "#05060F" } }}
+      />
       <Stack.Screen name="battle" options={{ headerShown: false }} />
-      <Stack.Screen name="result" options={{ headerShown: false }} />
+      <Stack.Screen name="epilogue" options={{ headerShown: false, animation: "fade" }} />
     </Stack>
   );
 }

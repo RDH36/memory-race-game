@@ -104,6 +104,9 @@ export const haptics = {
   /** GO! / match start. */
   go: () =>
     fire((p) => p.ascent(), impact(Expo.ImpactFeedbackStyle.Heavy)),
+  /** Menacing rumble — story villain entrances. */
+  rumble: () =>
+    fire((p) => p.buzz(), impact(Expo.ImpactFeedbackStyle.Heavy)),
 };
 
 export type Haptics = typeof haptics;

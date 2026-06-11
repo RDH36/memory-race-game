@@ -14,6 +14,7 @@ import { HomeHeader } from "@/components/home/arcade/HomeHeader";
 import { ArcadeHero } from "@/components/home/arcade/ArcadeHero";
 import { QuickModes } from "@/components/home/arcade/QuickModes";
 import { HomeStats } from "@/components/home/arcade/HomeStats";
+import { StoryButton } from "@/components/home/arcade/StoryButton";
 import { FeaturedQuest } from "@/components/achievements/FeaturedQuest";
 import { CoachBubble, useCoachMark } from "@/components/onboarding/CoachBubble";
 
@@ -120,7 +121,7 @@ export default function HomeScreen() {
 
         {featured && !featured.claimed && (
           <Rise delay={100}>
-            <View style={{ marginBottom: 16 }}>
+            <View style={{ marginBottom: 10 }}>
               <FeaturedQuest
                 state={featured}
                 onClaim={() => {
@@ -131,6 +132,13 @@ export default function HomeScreen() {
             </View>
           </Rise>
         )}
+
+        {/* Story banner — twin of the featured quest card */}
+        <Rise delay={120}>
+          <View style={{ marginBottom: 16 }}>
+            <StoryButton />
+          </View>
+        </Rise>
 
         <Rise delay={120}>
           <View>

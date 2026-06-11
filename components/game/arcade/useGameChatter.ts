@@ -31,6 +31,7 @@ const TONE_BY_EMOJI: Record<string, Tone> = {
   "👑": "crown",
   "👼": "angel",
   "😈": "demon",
+  "👹": "demon",
 };
 
 // Emoji → i18n animal name key (under `avatars.*`), for clash banter ({opp}).
@@ -38,7 +39,7 @@ const NAME_KEY_BY_EMOJI: Record<string, string> = {
   "🧠": "brain", "🦊": "fox", "🐙": "octopus", "🦉": "owl", "🐼": "panda",
   "🦁": "lion", "🐯": "tiger", "🦄": "unicorn", "🐺": "wolf", "🦅": "eagle",
   "🐸": "frog", "🦋": "butterfly", "🐝": "bee", "🦈": "shark", "🐳": "whale",
-  "🦩": "flamingo", "👑": "crown", "👼": "angel", "😈": "demon",
+  "🦩": "flamingo", "👑": "crown", "👼": "angel", "😈": "demon", "👹": "demon",
   "🐶": "dog", "🐱": "cat", "🐰": "rabbit", "🐨": "koala", "🐵": "monkey",
   "🐻": "bear", "🐧": "penguin", "🐹": "hamster", "🦜": "parrot", "🐲": "dragon",
   "🦎": "lizard", "🦝": "raccoon", "🐞": "ladybug", "🦧": "ape", "🐊": "croc",

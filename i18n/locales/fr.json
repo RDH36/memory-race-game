@@ -125,6 +125,9 @@
     "xpBoost": "Boost pub : XP ×1.5 + or",
     "xpBoostDesc": "Regarde une pub : +50% XP et +5% pièces",
     "dailyReward": "Récompense quotidienne",
+    "storyEyebrow": "Histoire",
+    "storyTitle": "Prélude",
+    "storySubtitle": "Revis l'histoire et le combat contre Gromak",
     "dailyRewardSubtitle": "Réclame tes +{{xp}} XP et +{{gold}} 🪙 gratuits",
     "dailyRewardClaim": "Réclamer",
     "dailyRewardClaimed": "Reviens demain !",
@@ -296,6 +299,12 @@
     "premiumBoost": "+10% Premium"
   },
   "mode": {
+    "sectionStory": "Histoire",
+    "sectionOnline": "En ligne",
+    "sectionSolo": "Solo",
+    "campaignTitle": "Campagne Histoire",
+    "campaignDesc": "Affronte les brigades du Roi Démon et libère FLIPIA",
+    "campaignBadge": "Bientôt",
     "xpBoostPremium": {
       "title": "+10% XP · Premium actif",
       "desc": "Bonus permanent appliqué automatiquement",
@@ -384,18 +393,27 @@
     "successMessage": "Tes données sont liées à {{email}}. Tu pourras les retrouver sur un autre appareil.",
     "close": "Fermer",
     "linked": "Compte lié à",
-    "tagline": "Mémorise\nAffronte\nDomine !",
-    "continueGuest": "Continuer en tant qu'invité",
-    "guestWarning": "En tant qu'invité, <u>ton ELO ne sera pas sauvegardé</u>. Tu pourras créer un compte plus tard.",
+    "guildRibbon": "Guilde de Mémoire",
+    "guildTitle": "Inscris-toi au registre des héros",
+    "guildSubtitle": "Rejoins des héros du monde entier pour rendre sa mémoire à FLIPIA.",
+    "guildWelcome": "Bienvenue à la Guilde, héros !",
+    "joinGuild": "Rejoindre la Guilde avec Google",
+    "vagabond": "Continuer en vagabond",
+    "guestWarning": "Un vagabond ne figure pas au registre : <u>ton ELO ne sera pas sauvegardé</u>. Tu pourras rejoindre la Guilde plus tard.",
     "legal": "En continuant, tu acceptes nos <conditions>Conditions</conditions> et notre <privacy>Politique de confidentialité</privacy>.",
     "or": "ou",
     "back": "Retour"
   },
   "setup": {
-    "title": "Avatar",
-    "subtitle": "Choisis ton avatar et ton pseudo",
-    "nicknameLabel": "Pseudo",
-    "continue": "C'est parti !",
+    "ribbonGuild": "Registre de la Guilde",
+    "ribbonVagabond": "Fiche de vagabond",
+    "title": "Réincarne-toi !",
+    "subtitleGuild": "Complète ta fiche de héros : l'emoji de ta réincarnation et ton nom de légende.",
+    "subtitleVagabond": "Remplis ta fiche de vagabond : l'emoji de ta réincarnation et ton nom de voyageur.",
+    "avatarLabel": "Ta réincarnation",
+    "nicknameLabel": "Nom de héros",
+    "continueGuild": "Signer le registre",
+    "continueVagabond": "Prendre la route",
     "nicknameTaken": "Ce pseudo est déjà pris",
     "saveError": "Erreur lors de la sauvegarde"
   },
@@ -503,12 +521,60 @@
     "message": "Cette fonctionnalité nécessite une connexion Internet. Connecte-toi au Wi-Fi ou aux données mobiles et réessaye.",
     "ok": "OK"
   },
+  "story": {
+    "prelude": {
+      "s1": "Il était une fois FLIPIA, le monde des emojis, un royaume heureux où tout le monde avait une mémoire parfaite.",
+      "s2": "Mais un jour, le Roi Démon déclencha son arme et effaça la mémoire de tout FLIPIA...",
+      "s3": "Grâce au pouvoir des Anges, certains emojis acquirent des pouvoirs pour résister au Roi Démon et à son armée.",
+      "s4": "Pour mener la bataille, les Emojis royaux invoquèrent un héros d'un autre monde... Toi !",
+      "s5": "Réincarné en emoji, acquiers tous les pouvoirs, bats le Roi Démon et rends la mémoire à FLIPIA !",
+      "s6": "Mais pendant l'invocation, quelque chose tourna mal... le portail t'éjecta loin du château !",
+      "s7": "Tu atterris près d'un village attaqué par Gromak, un chef de brigade du Roi Démon.",
+      "s8": "Sauve le village ! Défie Gromak dans une bataille de mémoire et rends leurs souvenirs aux habitants.",
+      "b1": "Quelle belle journée !",
+      "b2": "Vos souvenirs sont à MOI !",
+      "b3": "Recevez nos pouvoirs...",
+      "b4": "Ô héros, entends notre appel !",
+      "b5": "Le héros... c'est TOI !",
+      "b6": "Wouaaah !!",
+      "b7": "Effacez tous leurs souvenirs !",
+      "b8": "Tu oses me défier, héros ?!",
+      "chapterTitle": "Prélude — La mémoire perdue",
+      "scroll": "Fais défiler pour suivre l'histoire",
+      "tap": "Touche pour continuer",
+      "cta": "Premier pas"
+    },
+    "epilogue": {
+      "title": "Épilogue — La Guilde de Mémoire",
+      "belicWinText": "Gromak est vaincu ! Mais Belic, un cadre du Roi Démon, surgit et l'emporte dans les ombres...",
+      "belicLoseText": "Belic, un cadre du Roi Démon, surgit à son tour pour emporter Gromak... puis ils disparaissent.",
+      "belicBubble": "Tu as peut-être sauvé ce village, héros... mais tu ne nous battras JAMAIS !",
+      "winText": "Le village est sauvé ! Les habitants retrouvent leurs souvenirs et t'invitent à rejoindre la Guilde de Mémoire du village.",
+      "winBubble": "Merci, héros ! Rejoins notre Guilde !",
+      "loseText": "Un garde impérial surgit et met Gromak en fuite. Tu es sauvé de justesse !",
+      "loseBubble": "Pas si vite, démon !",
+      "encourageText": "Les villageois te relèvent et t'encouragent : la Guilde de Mémoire du village t'aidera à prendre ta revanche !",
+      "encourageBubble": "Rejoins notre Guilde, héros !",
+      "cta": "Rejoindre la Guilde",
+      "ctaReplay": "Retour au village"
+    },
+    "brigadeChief": {
+      "role": "Chef de brigade du Roi Démon",
+      "intro": "C'est TOI le « héros » ? Ma brigade a déjà effacé la mémoire de ce village. Tu es le prochain !"
+    },
+    "belic": {
+      "role": "Cadre du Roi Démon"
+    },
+    "demonKing": {
+      "role": "Roi Démon de FLIPIA"
+    }
+  },
   "onboarding": {
     "skip": "Passer",
     "welcome": {
-      "question": "Tu penses avoir\nune bonne mémoire ?",
-      "subtitle": "Découvre Flipia, le jeu de mémoire où chaque carte compte.",
-      "cta": "Découvrir le jeu"
+      "question": "Un monde a perdu\nla mémoire...",
+      "subtitle": "Chaque carte retournée réveille un souvenir. FLIPIA attend son héros : toi.",
+      "cta": "Entrer dans l'histoire"
     },
     "coach": {
       "tap": "Touche pour continuer",
@@ -517,62 +583,14 @@
       "shop": "Passe en Premium pour tout débloquer.",
       "profile": "Suis ta progression et tes stats ici."
     },
-    "flip": {
-      "title": "Tape une carte",
-      "subtitle": "pour la retourner",
-      "hint": "Retourne l'autre aussi !",
-      "match": "C'est une paire !"
-    },
-    "match": {
-      "title": "Trouve les paires",
-      "subtitle": "Retourne 2 cartes identiques pour trouver une paire",
-      "bravo": "Bravo !",
-      "allFound": "Tu as trouvé toutes les paires !",
-      "cta": "Continuer"
-    },
-    "tornado": {
-      "title": "Ton arme secrète",
-      "subtitle": "Ton adversaire mémorise les cartes au fil des tours.\nLa Tornade mélange tout et efface sa mémoire !",
-      "hint": "Appuie sur Lancer pour déclencher la Tornade ↓",
-      "wow": "Boom ! Toutes les cartes sont mélangées !",
-      "detail": "Ton adversaire a tout oublié ! Tu as une seule Tornade par partie — utilise-la quand il est en avance pour reprendre le dessus.",
-      "cta": "J'ai compris, allons-y !"
-    },
-    "ready": {
-      "title": "Tu es prêt !",
-      "subtitle": "Tu vas affronter BabyBot pour montrer ta valeur.",
-      "opponents": "Tes adversaires",
-      "babyBot": "BabyBot",
-      "babyBotDesc": "Distrait, parfait pour commencer",
-      "nekoFlash": "NekoFlash",
-      "nekoFlashDesc": "Malin, un vrai défi",
-      "alphaMemory": "AlphaMemory",
-      "alphaMemoryDesc": "Imbattable... ou presque",
-      "cta": "Combattre BabyBot"
-    },
     "battle": {
       "you": "Toi",
       "yourTurn": "Ton tour ! Retourne 2 cartes",
       "matchFound": "Bien joué ! C'est encore ton tour !",
-      "mismatch": "Raté ! C'est au tour de BabyBot",
-      "cpuTurn": "BabyBot réfléchit...",
-      "cpuMatch": "BabyBot a trouvé une paire !",
-      "cpuMiss": "BabyBot a raté !"
-    },
-    "result": {
-      "won": "Victoire !",
-      "wonSub": "Tu as dominé BabyBot !",
-      "wonHook": "Des vrais joueurs t'attendent.\nEs-tu prêt à les affronter ?",
-      "lost": "Défaite...",
-      "lostSub": "BabyBot t'a eu cette fois !",
-      "lostHook": "BabyBot n'est que le début.\nMontre de quoi tu es capable !",
-      "draw": "Égalité !",
-      "drawSub": "Match serré !",
-      "drawHook": "Tu peux faire mieux.\nLes vrais défis commencent maintenant !",
-      "you": "Toi",
-      "ctaWon": "Écraser les autres joueurs",
-      "ctaLost": "Prendre ma revanche",
-      "ctaDraw": "Prouver que je suis meilleur"
+      "mismatch": "Raté ! C'est au tour de Gromak",
+      "cpuTurn": "Gromak réfléchit...",
+      "cpuMatch": "Gromak a trouvé une paire !",
+      "cpuMiss": "Gromak a raté !"
     }
   },
   "shop": {
@@ -774,8 +792,11 @@
       "achievement": "Hauts faits"
     },
     "items": {
+      "daily-play-1":   { "title": "Premier pas",     "description": "Joue 1 partie aujourd'hui" },
       "daily-play-3":   { "title": "Échauffement",    "description": "Joue 3 parties aujourd'hui" },
+      "daily-play-5":   { "title": "Marathon",        "description": "Joue 5 parties aujourd'hui" },
       "daily-win-1":    { "title": "Victoire du jour", "description": "Gagne 1 partie aujourd'hui" },
+      "daily-win-2":    { "title": "Doublé",          "description": "Gagne 2 parties aujourd'hui" },
       "daily-win-3":    { "title": "Triplé",           "description": "Gagne 3 parties aujourd'hui" },
       "weekly-play-15": { "title": "Marathon",         "description": "Joue 15 parties cette semaine" },
       "weekly-win-7":   { "title": "Série hebdo",      "description": "Gagne 7 parties cette semaine" },
