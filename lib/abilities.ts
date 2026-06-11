@@ -108,6 +108,24 @@ export function abilityEffect(id: string, level: number): AbilityEffect {
   }
 }
 
+/** Count shown on cast banners ("Bouclier ×2"): shield charges, frozen
+ *  turns, stolen pairs or revealed cards. Null when nothing to count. */
+export function effectMagnitude(effect: AbilityEffect): number | null {
+  switch (effect.kind) {
+    case "shield": return effect.shieldCharges;
+    case "freeze": return effect.freezeTurns;
+    case "steal": return effect.stealCount;
+    case "reveal": return effect.revealCount;
+    default: return null;
+  }
+}
+
+/** " ×2" banner suffix for an ability at a given level — empty below 2. */
+export function magnitudeSuffix(id: string, level: number): string {
+  const n = effectMagnitude(abilityEffect(id, level));
+  return n && n >= 2 ? ` ×${n}` : "";
+}
+
 // --- Owned map helpers (JSON map of id -> level, stored on the profile) ---
 type OwnedMap = Record<string, number>;
 

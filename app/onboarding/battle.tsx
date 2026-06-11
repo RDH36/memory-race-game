@@ -1,12 +1,10 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
-import Animated, { FadeInDown } from "react-native-reanimated";
-import { useTheme } from "../../lib/ThemeContext";
 import { haptics } from "../../lib/haptics";
 import { playFlip, playMatch } from "../../lib/sound";
 import { CardItem } from "../../components/game/CardItem";
@@ -15,46 +13,16 @@ import { useGameChatter } from "../../components/game/arcade/useGameChatter";
 import { usePlayerStats } from "../../lib/playerStats";
 import { BRIGADE_CHIEF } from "../../lib/story";
 import { VILLAGE_BG, VILLAGE_DECOR } from "../../lib/storyEpilogue";
-import { HandPointer } from "../../components/onboarding/HandPointer";
+import { BattleTooltip, EMOJIS, GuideHand, TOTAL_PAIRS, pickScriptedCpuCards, useBattleTutorial } from "../../components/onboarding/BattleTutorial";
 import type { MatchResult } from "../../hooks/useLocalGame";
-
-// Pre-shuffled 2x4 grid — 4 pairs
-const EMOJIS = ["🐶", "🦊", "🐸", "🐱", "🐱", "🐶", "🐸", "🦊"];
-const TOTAL_PAIRS = 4;
 
 // Memoized card: only the cards whose props actually change re-render on
 // each flip, instead of the whole grid.
 const MemoCard = memo(CardItem);
 
-type TooltipData = { text: string; type: "info" | "success" | "error"; key: number };
-
-function Tooltip({ text, type }: { text: string; type: TooltipData["type"] }) {
-  const { colors } = useTheme();
-  const hue =
-    type === "success" ? colors.hues.green : type === "error" ? colors.hues.coral : colors.hues.violet;
-  const [c, cd] = hue;
-  return (
-    <Animated.View
-      entering={FadeInDown.duration(250)}
-      style={{
-        backgroundColor: c,
-        borderRadius: 18,
-        paddingHorizontal: 24,
-        paddingVertical: 14,
-        alignSelf: "stretch",
-        marginHorizontal: 4,
-        boxShadow: `0 4px 0 ${cd}`,
-      }}
-    >
-      <Text style={{ color: "#FFF", fontFamily: "Fredoka_700Bold", fontSize: 18, textAlign: "center" }}>{text}</Text>
-    </Animated.View>
-  );
-}
-
 export default function BattleScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { colors } = useTheme();
   const { avatar, nickname } = usePlayerStats();
   const { replay } = useLocalSearchParams<{ replay?: string }>();
 
@@ -64,10 +32,8 @@ export default function BattleScreen() {
   const [scoreP1, setScoreP1] = useState(0);
   const [scoreP2, setScoreP2] = useState(0);
   const [lastMatch, setLastMatch] = useState<{ cards: number[]; type: "match" | "mismatch"; player: 1 | 2 } | null>(null);
-  const [tooltip, setTooltip] = useState<TooltipData>({ text: "", type: "info", key: 0 });
   const [gridDims, setGridDims] = useState<{ w: number; h: number } | null>(null);
   const lockedRef = useRef(false);
-  const keyRef = useRef(0);
 
   // Refs to avoid stale closures in resolve/cpuTurn chains
   const matchedByRef = useRef(matchedBy);
@@ -81,24 +47,10 @@ export default function BattleScreen() {
   const turnRef = useRef(turn);
   turnRef.current = turn;
 
-  const showTooltip = useCallback((text: string, type: TooltipData["type"]) => {
-    keyRef.current += 1;
-    setTooltip({ text, type, key: keyRef.current });
-  }, []);
-
-  // Story beat: the Brigade Chief taunts the hero before the fight begins.
-  // Then the tutorial happens inside the fight: tooltip + hand pointer.
-  const [showHand, setShowHand] = useState(false);
-  useEffect(() => {
-    lockedRef.current = true;
-    showTooltip(t("story.brigadeChief.intro"), "error");
-    const timer = setTimeout(() => {
-      lockedRef.current = false;
-      showTooltip(t("onboarding.battle.yourTurn"), "info");
-      setShowHand(true);
-    }, 3200);
-    return () => clearTimeout(timer);
-  }, []);
+  // Tutorial: Gromak's taunt, then a guided walkthrough of the first two
+  // pairs (hand on the exact card, other taps swallowed) — skipped in replay.
+  const { tooltip, showTooltip, blocksCard, onCardFlipped, onPlayerMatch, guideTarget } =
+    useBattleTutorial(replay === "1", lockedRef);
 
   // The story flows straight on: no score screen, the epilogue tells the
   // outcome narratively (villagers' thanks or the Lion's rescue).
@@ -132,6 +84,7 @@ export default function BattleScreen() {
       if (newP1 + newP2 >= TOTAL_PAIRS) { goToResult(newP1, newP2); return; }
 
       showTooltip(player === 1 ? t("onboarding.battle.matchFound") : t("onboarding.battle.cpuMatch"), player === 1 ? "success" : "error");
+      if (player === 1) onPlayerMatch();
       setSelected([]);
       lockedRef.current = false;
       if (player === 2) setTimeout(() => cpuTurn(next), 1200);
@@ -157,7 +110,9 @@ export default function BattleScreen() {
   // every selection change.
   const handleCardPress = useCallback((cardId: number) => {
     if (lockedRef.current || turnRef.current !== 1 || matchedByRef.current[cardId] !== -1 || selectedRef.current.includes(cardId)) return;
-    setShowHand(false);
+    // Guided steps: only the card under the finger responds.
+    if (blocksCard(cardId)) return;
+    onCardFlipped();
     haptics.flip();
     playFlip();
     const nextSelected = [...selectedRef.current, cardId];
@@ -171,22 +126,9 @@ export default function BattleScreen() {
   const cpuTurn = useCallback((currentMatchedBy: number[]) => {
     showTooltip(t("onboarding.battle.cpuTurn"), "info");
     lockedRef.current = true;
-    const available = EMOJIS.map((_, i) => i).filter((i) => currentMatchedBy[i] === -1);
-    if (available.length < 2) return;
-
-    // Scripted guaranteed win: the tutorial bot deliberately MISSES — it picks
-    // two non-matching cards whenever possible, so the player always wins.
-    const shuffled = [...available].sort(() => Math.random() - 0.5);
-    let first = shuffled[0];
-    let second = shuffled[1];
-    const mismatch = shuffled.find((j) => j !== first && EMOJIS[j] !== EMOJIS[first]);
-    if (mismatch !== undefined) {
-      second = mismatch;
-    } else {
-      // Only matching pairs remain (very end) — bob a card, then resolve.
-      const alt = available.find((j) => j !== first);
-      if (alt !== undefined) second = alt;
-    }
+    const pick = pickScriptedCpuCards(currentMatchedBy);
+    if (!pick) return;
+    const [first, second] = pick;
 
     setTimeout(() => {
       setSelected([first]);
@@ -245,9 +187,9 @@ export default function BattleScreen() {
 
         <View style={{ height: 12 }} />
 
-        {/* Tooltip (tutorial guidance — unchanged) */}
+        {/* Tooltip (tutorial guidance) */}
         <View style={{ minHeight: 44, marginBottom: 4 }}>
-          <Tooltip key={tooltip.key} text={tooltip.text} type={tooltip.type} />
+          <BattleTooltip key={tooltip.key} text={tooltip.text} type={tooltip.type} />
         </View>
 
         {/* Village skyline under attack */}
@@ -282,12 +224,9 @@ export default function BattleScreen() {
               width: cardSize > 0 ? gCols * cardSize + (gCols - 1) * 8 : "100%",
             }}
           >
-            {/* Tutorial hand: taps over the first card until the player flips one */}
-            {showHand && cardSize > 0 && (
-              <HandPointer
-                pointing="down"
-                style={{ top: -34, left: cardSize / 2 - 10, zIndex: 10 }}
-              />
+            {/* Guided hand: taps on the exact card to flip */}
+            {guideTarget !== null && cardSize > 0 && (
+              <GuideHand target={guideTarget} cardSize={cardSize} />
             )}
             {EMOJIS.map((emoji, idx) => (
               <View key={idx} style={{ width: cardSize > 0 ? cardSize : "22%", height: cardSize > 0 ? cardSize : undefined, aspectRatio: cardSize > 0 ? undefined : 1 }}>

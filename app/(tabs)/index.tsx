@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -16,7 +16,8 @@ import { QuickModes } from "@/components/home/arcade/QuickModes";
 import { HomeStats } from "@/components/home/arcade/HomeStats";
 import { StoryButton } from "@/components/home/arcade/StoryButton";
 import { FeaturedQuest } from "@/components/achievements/FeaturedQuest";
-import { CoachBubble, useCoachMark } from "@/components/onboarding/CoachBubble";
+import { useCoachMark } from "@/components/onboarding/CoachBubble";
+import { SpotlightCoach } from "@/components/onboarding/SpotlightCoach";
 
 const DAILY_REWARD_KEY = "daily_reward_last_claimed";
 const DAILY_REWARD_XP = 15;
@@ -48,8 +49,9 @@ export default function HomeScreen() {
     });
   }, []);
 
-  // First-visit coach-mark anchored to the play-modes panel.
+  // First-visit spotlight on the big PLAY hero.
   const coach = useCoachMark("coach_home");
+  const heroRef = useRef<View>(null);
 
   const claimDailyReward = useCallback(() => {
     if (dailyClaimed) return;
@@ -82,7 +84,9 @@ export default function HomeScreen() {
           </Panel>
         </Rise>
 
-        <ArcadeHero />
+        <View ref={heroRef} collapsable={false}>
+          <ArcadeHero />
+        </View>
 
         {/* Daily reward */}
         {!dailyClaimed && (
@@ -141,12 +145,7 @@ export default function HomeScreen() {
         </Rise>
 
         <Rise delay={120}>
-          <View>
-            <QuickModes />
-            {coach.show && (
-              <CoachBubble text={t("onboarding.coach.home")} onDismiss={coach.dismiss} side="above" hue="violet" />
-            )}
-          </View>
+          <QuickModes />
         </Rise>
 
         <Rise delay={160}>
@@ -158,6 +157,18 @@ export default function HomeScreen() {
           <MitsitsyCard />
         </View>
       </ScrollView>
+
+      {coach.show && (
+        <SpotlightCoach
+          targetRef={heroRef}
+          text={t("onboarding.coach.home")}
+          onDismiss={coach.dismiss}
+          onPressTarget={() => {
+            coach.dismiss();
+            router.push("/mode/casual");
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 }

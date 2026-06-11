@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -11,7 +11,8 @@ import { BuildsHeader } from "@/components/builds/BuildsHeader";
 import { AbilityCard } from "@/components/builds/AbilityCard";
 import { AbilityInfoModal } from "@/components/builds/AbilityInfoModal";
 import { UpgradeModal } from "@/components/builds/UpgradeModal";
-import { CoachBubble, useCoachMark } from "@/components/onboarding/CoachBubble";
+import { useCoachMark } from "@/components/onboarding/CoachBubble";
+import { SpotlightCoach } from "@/components/onboarding/SpotlightCoach";
 
 const H_PADDING = 20;
 const GAP = 12;
@@ -26,6 +27,7 @@ export default function BuildsScreen() {
   const [infoAbility, setInfoAbility] = useState<AbilityState | null>(null);
   const [upgradeAbility, setUpgradeAbility] = useState<AbilityState | null>(null);
   const coach = useCoachMark("coach_builds");
+  const firstCardRef = useRef<View>(null);
 
   const cardWidth = (width - H_PADDING * 2 - GAP * (COLUMNS - 1)) / COLUMNS;
 
@@ -62,23 +64,30 @@ export default function BuildsScreen() {
         >
           {states.map((a, i) => (
             <Rise key={a.id} delay={i * 50}>
-              <AbilityCard
-                ability={a}
-                gold={gold}
-                width={cardWidth}
-                onEquip={handleEquip}
-                onUnlock={handleUnlock}
-                onUpgrade={setUpgradeAbility}
-                onInfo={setInfoAbility}
-                onQuestNav={() => router.navigate("/achievements")}
-              />
+              <View ref={i === 0 ? firstCardRef : undefined} collapsable={false}>
+                <AbilityCard
+                  ability={a}
+                  gold={gold}
+                  width={cardWidth}
+                  onEquip={handleEquip}
+                  onUnlock={handleUnlock}
+                  onUpgrade={setUpgradeAbility}
+                  onInfo={setInfoAbility}
+                  onQuestNav={() => router.navigate("/achievements")}
+                />
+              </View>
             </Rise>
           ))}
-          {coach.show && !infoAbility && !upgradeAbility && (
-            <CoachBubble text={t("onboarding.coach.builds")} onDismiss={coach.dismiss} side="above" hue="violet" />
-          )}
         </View>
       </ScrollView>
+
+      {coach.show && !infoAbility && !upgradeAbility && (
+        <SpotlightCoach
+          targetRef={firstCardRef}
+          text={t("onboarding.coach.builds")}
+          onDismiss={coach.dismiss}
+        />
+      )}
 
       <AbilityInfoModal ability={infoAbility} onClose={() => setInfoAbility(null)} />
       <UpgradeModal

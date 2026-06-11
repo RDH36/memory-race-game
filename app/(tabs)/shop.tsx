@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -15,7 +15,8 @@ import { useRevenueCat, restorePurchases, PRODUCT_ID } from "../../lib/revenueca
 import { PACKS } from "../../lib/packs";
 import { PremiumHero } from "../../components/shop/PremiumHero";
 import { PackCard } from "../../components/shop/PackCard";
-import { CoachBubble, useCoachMark } from "@/components/onboarding/CoachBubble";
+import { useCoachMark } from "@/components/onboarding/CoachBubble";
+import { SpotlightCoach } from "@/components/onboarding/SpotlightCoach";
 
 export default function ShopScreen() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function ShopScreen() {
   const [restoring, setRestoring] = useState(false);
   const [info, setInfo] = useState<{ icon: string; title: string; message: string } | null>(null);
   const coach = useCoachMark("coach_shop");
+  const premiumRef = useRef<View>(null);
 
   const priceFor = (productId: string, fallback: string) => {
     const pkg = offering?.availablePackages.find((p) => p.product.identifier === productId);
@@ -85,19 +87,18 @@ export default function ShopScreen() {
       >
         {/* Premium hero — tap navigates to paywall */}
         <Animated.View entering={FadeInDown.delay(50).duration(400)} style={{ marginBottom: 20 }}>
-          <PremiumHero
-            eyebrow={t("shop.premium.eyebrow", "Le meilleur de Flipia")}
-            title={t("shop.premium.title", "Passe en Premium")}
-            subtitle={t("shop.premium.subtitle", "Tous les thèmes, XP ×2, modes exclusifs. Un seul paiement, débloqué à vie.")}
-            cta={t("shop.premium.cta", "Débloquer")}
-            price={priceFor(PRODUCT_ID.PREMIUM_LIFETIME, PACKS.premium.fallbackPrice)}
-            owned={ents.premium}
-            ownedLabel={t("shop.ownedPremium", "✓ Premium acquis")}
-            onPress={() => goToPaywall("premium")}
-          />
-          {coach.show && !info && (
-            <CoachBubble text={t("onboarding.coach.shop")} onDismiss={coach.dismiss} side="below" hue="gold" />
-          )}
+          <View ref={premiumRef} collapsable={false}>
+            <PremiumHero
+              eyebrow={t("shop.premium.eyebrow", "Le meilleur de Flipia")}
+              title={t("shop.premium.title", "Passe en Premium")}
+              subtitle={t("shop.premium.subtitle", "Tous les thèmes, XP ×2, modes exclusifs. Un seul paiement, débloqué à vie.")}
+              cta={t("shop.premium.cta", "Débloquer")}
+              price={priceFor(PRODUCT_ID.PREMIUM_LIFETIME, PACKS.premium.fallbackPrice)}
+              owned={ents.premium}
+              ownedLabel={t("shop.ownedPremium", "✓ Premium acquis")}
+              onPress={() => goToPaywall("premium")}
+            />
+          </View>
         </Animated.View>
 
         {/* Section label row */}
@@ -190,6 +191,19 @@ export default function ShopScreen() {
         onCancel={() => setInfo(null)}
         onConfirm={() => setInfo(null)}
       />
+
+      {coach.show && !info && (
+        <SpotlightCoach
+          targetRef={premiumRef}
+          text={t("onboarding.coach.shop")}
+          hue="gold"
+          onDismiss={coach.dismiss}
+          onPressTarget={() => {
+            coach.dismiss();
+            goToPaywall("premium");
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 }

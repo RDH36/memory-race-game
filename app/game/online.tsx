@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useOnlineGame } from "../../hooks/useOnlineGame";
-import { usePlayerAbilities, abilityEffect } from "../../lib/abilities";
+import { usePlayerAbilities, abilityEffect, magnitudeSuffix } from "../../lib/abilities";
 import { PowerCastBanner } from "../../components/game/PowerCastBanner";
 import type { HueName } from "@/components/ui/theme";
 import { useBotPlayer } from "../../hooks/useBotPlayer";
@@ -70,7 +70,8 @@ export default function OnlineGameScreen() {
           castNonceRef.current += 1;
           setBanner({
             emoji: ab.emoji,
-            label: t(`abilities.${ab.nameKey}.name`),
+            // Level-aware magnitude, e.g. "Bouclier ×2" at shield level 2.
+            label: t(`abilities.${ab.nameKey}.name`) + magnitudeSuffix(ab.id, ab.level),
             color: k === myKey ? "violet" : "coral",
             nonce: castNonceRef.current,
           });
@@ -87,8 +88,9 @@ export default function OnlineGameScreen() {
     if (!game) return;
     const fz = game.freezeTurns[myKey];
     if (prevFreezeRef.current !== null && fz > prevFreezeRef.current) {
+      const turns = fz - prevFreezeRef.current;
       castNonceRef.current += 1;
-      setBanner({ emoji: "❄️", label: t("power.frozenYou"), color: "blue", nonce: castNonceRef.current });
+      setBanner({ emoji: "❄️", label: t("power.frozenYou") + (turns >= 2 ? ` ×${turns}` : ""), color: "blue", nonce: castNonceRef.current });
     }
     prevFreezeRef.current = fz;
   }, [game?.freezeTurns?.[myKey]]);
@@ -96,8 +98,9 @@ export default function OnlineGameScreen() {
     if (!game) return;
     const sc = game.scores[myKey];
     if (prevScoreRef.current !== null && sc < prevScoreRef.current) {
+      const stolen = prevScoreRef.current - sc;
       castNonceRef.current += 1;
-      setBanner({ emoji: "🪝", label: t("power.robbed"), color: "pink", nonce: castNonceRef.current });
+      setBanner({ emoji: "🪝", label: t("power.robbed") + (stolen >= 2 ? ` ×${stolen}` : ""), color: "pink", nonce: castNonceRef.current });
     }
     prevScoreRef.current = sc;
   }, [game?.scores?.[myKey]]);

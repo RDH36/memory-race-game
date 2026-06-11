@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -11,7 +11,8 @@ import { ProfileStats, type StatsTab } from "../../components/profile/ProfileSta
 import { RecentMatches } from "../../components/profile/RecentMatches";
 import { APP_VERSION } from "../../lib/constants";
 import { useDeferredAnimation } from "../../lib/perf";
-import { CoachBubble, useCoachMark } from "@/components/onboarding/CoachBubble";
+import { useCoachMark } from "@/components/onboarding/CoachBubble";
+import { SpotlightCoach } from "@/components/onboarding/SpotlightCoach";
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -20,6 +21,7 @@ export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState<StatsTab>("global");
   const matchesReady = useDeferredAnimation();
   const coach = useCoachMark("coach_profile");
+  const statsRef = useRef<View>(null);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }} edges={["top"]}>
@@ -91,15 +93,12 @@ export default function ProfileScreen() {
           />
         </Panel>
 
-        <View>
+        <View ref={statsRef} collapsable={false}>
           <ProfileStats
             showProgress={false}
             activeTab={activeTab}
             onChangeTab={setActiveTab}
           />
-          {coach.show && (
-            <CoachBubble text={t("onboarding.coach.profile")} onDismiss={coach.dismiss} side="above" hue="coral" />
-          )}
         </View>
 
         {matchesReady && <RecentMatches tab={activeTab} />}
@@ -110,6 +109,15 @@ export default function ProfileScreen() {
           Flipia v{APP_VERSION}
         </Text>
       </ScrollView>
+
+      {coach.show && (
+        <SpotlightCoach
+          targetRef={statsRef}
+          text={t("onboarding.coach.profile")}
+          hue="coral"
+          onDismiss={coach.dismiss}
+        />
+      )}
     </SafeAreaView>
   );
 }
