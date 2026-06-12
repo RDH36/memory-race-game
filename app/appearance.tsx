@@ -21,6 +21,7 @@ import { AvatarTile } from "../components/appearance/AvatarTile";
 import { AvatarHalo } from "../components/appearance/AvatarHalo";
 import { PremiumHalo } from "../components/appearance/PremiumHalo";
 import { TableMiniPreview } from "../components/appearance/TableMiniPreview";
+import { useCampaign } from "../lib/campaign";
 
 const DOT_COUNT = 10;
 
@@ -29,7 +30,18 @@ export default function AppearanceScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { avatar, selectedTable, userId, profileId } = usePlayerStats();
-  const avatars = useUnlockedAvatars();
+  const entitlementAvatars = useUnlockedAvatars();
+  const { isAvatarUnlocked } = useCampaign();
+  // Story-locked avatars stay locked until their chapter is completed
+  // (grandfathered when already equipped).
+  const avatars = useMemo(
+    () =>
+      entitlementAvatars.map((a) => ({
+        ...a,
+        unlocked: a.unlocked && isAvatarUnlocked(a.id, a.storyChapter),
+      })),
+    [entitlementAvatars, isAvatarUnlocked],
+  );
   const tables = useUnlockedTables();
 
   const currentAvatar = useMemo(
@@ -51,6 +63,8 @@ export default function AppearanceScreen() {
   const handleAvatar = (skin: AvatarSkin & { unlocked: boolean }) => {
     if (!skin.unlocked) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      // Story-locked avatars send the player to the campaign, not the shop.
+      if (!skin.requires && skin.storyChapter) return router.push("/story");
       return goPaywall(skin.requires);
     }
     if (skin.id === avatar || !userId) return;

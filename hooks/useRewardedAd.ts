@@ -12,9 +12,14 @@ const AD_UNIT_ID = __DEV__
   ? TEST_AD_UNIT_ID
   : process.env.EXPO_PUBLIC_ADMOB_REWARDED_ID ?? TEST_AD_UNIT_ID;
 
+/** Dedicated unit for the "+3 hearts" daily rewarded ad (shop). */
+export const HEARTS_AD_UNIT_ID = __DEV__
+  ? TEST_AD_UNIT_ID
+  : process.env.EXPO_PUBLIC_ADMOB_REWARDED_HEARTS_ID ?? TEST_AD_UNIT_ID;
+
 const NOOP = () => {};
 
-export function useRewardedAd(onRewardEarned: () => void) {
+export function useRewardedAd(onRewardEarned: () => void, adUnitId: string = AD_UNIT_ID) {
   const premium = usePremium();
   const [isLoaded, setIsLoaded] = useState(false);
   const [isShowing, setIsShowing] = useState(false);
@@ -23,7 +28,7 @@ export function useRewardedAd(onRewardEarned: () => void) {
   onRewardRef.current = onRewardEarned;
 
   const loadAd = useCallback(() => {
-    const rewarded = RewardedAd.createForAdRequest(AD_UNIT_ID);
+    const rewarded = RewardedAd.createForAdRequest(adUnitId);
 
     const unsubLoaded = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
       setIsLoaded(true);
@@ -52,7 +57,7 @@ export function useRewardedAd(onRewardEarned: () => void) {
 
     rewardedRef.current = rewarded;
     rewarded.load();
-  }, []);
+  }, [adUnitId]);
 
   useEffect(() => {
     if (premium) return;

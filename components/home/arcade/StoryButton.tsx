@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@/lib/ThemeContext";
 import { Panel } from "@/components/ui/arcade";
 
-/** Story card — replays the prelude webtoon. Same card + inner structure
+/** Story card — opens the campaign map. Same card + inner structure
  *  as the featured quest (badged emoji, eyebrow, title, description). */
 export function StoryButton() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export function StoryButton() {
   const [base, lip, tint] = colors.hues.gold;
 
   const handlePress = () => {
-    router.push({ pathname: "/onboarding/prelude", params: { replay: "1" } });
+    router.push("/story");
   };
 
   return (

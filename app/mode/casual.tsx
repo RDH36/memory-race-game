@@ -104,7 +104,7 @@ export default function CasualModeScreen() {
 
         <ModeStatsArcade stats={stats} />
 
-        {/* Story campaign teaser — chapters against the Demon King, coming soon */}
+        {/* Story campaign — chapters against the Demon King */}
         <SectionTitle style={{ marginBottom: 10 }}>{t("mode.sectionStory")}</SectionTitle>
         <View style={{ marginBottom: 20 }}>
           <ChoiceRow
@@ -112,9 +112,8 @@ export default function CasualModeScreen() {
             title={t("mode.campaignTitle")}
             desc={t("mode.campaignDesc")}
             color="violet"
-            badge={t("mode.campaignBadge")}
-            locked
             delay={100}
+            onPress={() => router.push("/story")}
           />
         </View>
 

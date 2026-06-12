@@ -126,9 +126,9 @@
     "xpBoostDesc": "Watch an ad: +50% XP and +5% coins",
     "dailyReward": "Daily reward",
     "storyEyebrow": "Story",
-    "storyTitle": "Prelude",
-    "storySubtitle": "Replay the story and the fight against Gromak",
-    "dailyRewardSubtitle": "Claim your +{{xp}} XP and +{{gold}} 🪙 for free",
+    "storyTitle": "Campaign",
+    "storySubtitle": "Chapter 1 available — The Road of Ashes",
+    "dailyRewardSubtitle": "Claim your free +{{xp}} XP, +{{gold}} 🪙 and +{{lives}} ❤️",
     "dailyRewardClaim": "Claim",
     "dailyRewardClaimed": "Come back tomorrow!",
     "heroBubble": "Ready for a duel?",
@@ -567,6 +567,132 @@
     },
     "demonKing": {
       "role": "Demon King of FLIPIA"
+    },
+    "campaign": {
+      "title": "Campaign",
+      "chapterLabel": "Chapter 1",
+      "chapter2Title": "Chapter 2 — The Frozen Bay",
+      "soon": "Soon",
+      "unlockCost": "Unlock: {{cost}} 🪙",
+      "replayPrelude": "Replay the prelude",
+      "start": "Start",
+      "continue": "Continue",
+      "completed": "Completed",
+      "stepProgress": "Step {{current}}/{{total}}",
+      "currentStep": "Current step",
+      "replayScene": "Replay",
+      "encounterHint": "Match the pairs to restore the memory",
+      "steps": {
+        "depart": "Leaving the Guild",
+        "tomir": "The forgotten elder",
+        "ambush": "The brigand ambush",
+        "village": "Hollow Bourg-Soleil",
+        "gromak": "Gromak's revenge",
+        "outro": "Memory restored"
+      }
+    },
+    "chapter1": {
+      "title": "The Road of Ashes",
+      "depart": {
+        "s1": "At the Memory Guild, your first mission awaits: reach Bourg-Soleil, the neighboring village that has been silent for days.",
+        "s2": "The Fox, a champion blessed by the Angels, volunteers as your guide. Her Tornado gift has saved many travelers.",
+        "s3": "The road winds through the hills. The sun rises over FLIPIA... but no one remembers its name anymore.",
+        "s4": "In the distance, no smoke rises from Bourg-Soleil. Not a sound, not a song. A silence that bodes nothing good.",
+        "s5": "Suddenly, a figure staggers along the path. An old emoji wanders in the mist, lost in his own world...",
+        "b1": "Safe travels, hero!",
+        "b2": "I know the way, follow me!",
+        "b4": "No smoke... that's a bad sign.",
+        "b5": "Who... who's there?"
+      },
+      "village": {
+        "s1": "Guided by Tomir, you finally pass through the gates of Bourg-Soleil. The village stands intact... or so it seems.",
+        "s2": "Its people wander with empty eyes. No more laughter, no more memories. The brigade has already erased everything.",
+        "s3": "Tomir stops in the middle of his own street. His house is right there... but he walks past without seeing it.",
+        "s4": "Shadows leap from the alleys: the brigands! They surround the travelers, delighted by such easy loot.",
+        "s5": "And a laugh you already know tears through the silence. Gromak springs out, angrier than ever!",
+        "b3": "My street... I don't recognize it anymore...",
+        "b5": "YOU?! This time I won't be alone!"
+      },
+      "outro": {
+        "s1": "Memory returns to Bourg-Soleil like light after the storm. The stolen memories find their way home one by one.",
+        "s2": "The whole village celebrates. Laughter returns — and with it the names, the faces, the forgotten songs.",
+        "s3": "Tomir finds his house... and his daughter, who waited at the door every evening without knowing why.",
+        "s4": "That evening, the Fox rests a paw on your shoulder: from now on, she walks at your side.",
+        "s5": "But the road is only beginning. Up north, the sea froze all at once... The Frozen Bay awaits, hero.",
+        "b3": "Dad! You came back!",
+        "b4": "Shall we, partner?",
+        "b5": "North... the Frozen Bay."
+      },
+      "tomir": {
+        "s1": "You approach slowly. The old emoji trembles, eyes lost in the void. He doesn't run... he no longer even knows why he should.",
+        "s2": "He searches his memory like an empty house. His name, his street, his face in the mirror: everything is gone.",
+        "s3": "The Fox sniffs the air and growls: the brigade's scent. It wasn't the years that stole his memory... it was the demons.",
+        "s4": "So you kneel before him. The Angels' gift warms your hands: you can piece his memories back together.",
+        "s5": "Memory fragments float around him — a house, a child's face, the smell of warm bread. It's up to you to reunite them, hero.",
+        "b1": "Hey there... are you alright?",
+        "b2": "I... who am I?",
+        "b3": "This is the brigade's doing!",
+        "b4": "Look at me. I can help you.",
+        "b5": "Focus...",
+        "cta": "Heal his memory",
+        "intro": "I... I no longer know my name. Nor where my home is... Please, help me!",
+        "success": "Tomir! My name is Tomir! And my home... it's in Bourg-Soleil! Follow me, I know the way!"
+      },
+      "ambush": {
+        "name": "Brigand",
+        "intro": "Heh heh... amnesiac travelers don't even remember being robbed!",
+        "s1": "Tomir leads you toward Bourg-Soleil when the Fox stops dead, ears up. Something is moving in the bushes...",
+        "s2": "By the roadside, empty-eyed travelers are being robbed without reacting. They don't even remember being stolen from.",
+        "s3": "Brigands leap from the bushes and surround you! Profiteers of the chaos, they strip FLIPIA's forgotten ones bare.",
+        "s4": "The Fox growls and takes her place at your side. These cowards don't yet know the power of an intact memory.",
+        "s5": "The brigand chief sneers and pulls out a stolen deck of cards. In FLIPIA, even thieves settle scores in a memory duel!",
+        "b1": "Do you hear that...?",
+        "b3": "Your purse or your memory!",
+        "b4": "Stay behind me, Tomir!",
+        "b5": "Let's see if you bluff, \"hero\"!"
+      },
+      "gromak": {
+        "intro": "The Guild's little \"hero\"... My brigade already erased this village. You, I'll erase for good!",
+        "s1": "On Bourg-Soleil's square, the brigands part in silence. A heavy step shakes the ground: Gromak steps forward.",
+        "s2": "He has forgotten nothing of his defeat at the village. His rage has grown every night since you humiliated him before Belic.",
+        "s3": "Around you, the empty-eyed villagers don't even grasp the danger. Tomir trembles behind you.",
+        "s4": "The Fox whispers a warning: Gromak's tornado has grown stronger. This time, the fight is real.",
+        "s5": "Gromak snaps his cards. The fate of Bourg-Soleil is decided now — may the best memory win!",
+        "b2": "You HUMILIATED me, hero!",
+        "b3": "Don't be afraid, Tomir...",
+        "b4": "His tornado is stronger, careful!",
+        "b5": "FLIPIA will remember YOUR defeat!"
+      },
+      "trainHint": "Sharpen your memory, hero — the road to the Frozen Bay will be harsh. Train to fund the expedition!"
+    },
+    "rewards": {
+      "title": "Rewards",
+      "avatar": "Avatar unlocked!"
+    },
+    "lives": {
+      "budget": "3 mistakes max",
+      "failTitle": "The memory shattered...",
+      "noHeartsTitle": "Out of hearts!",
+      "startCost": "⚠️ Starting costs 1 ❤️ — you have {{lives}} left",
+      "retryText": "Retrying costs 1 ❤️ — you have {{lives}} left.",
+      "noLivesText": "You're out of hearts... Complete chapters, claim your daily reward or visit the shop.",
+      "retry": "Retry (1 ❤️)",
+      "getLives": "Get ❤️",
+      "shopLink": "🛒 Get more ❤️ in the shop"
+    },
+    "train": {
+      "title": "The Guild's advice",
+      "goldProgress": "{{gold}} / {{cost}} 🪙",
+      "goldMissing": "You need {{missing}} more 🪙 for chapter 2.",
+      "online": "Play online",
+      "vsAi": "Face the AI"
+    },
+    "battle": {
+      "cta": "To battle!",
+      "defeatTitle": "Defeat...",
+      "defeatText": "{{name}} kept the upper hand. Every hero falls first — try again!",
+      "retry": "Retry",
+      "leave": "Leave"
     }
   },
   "onboarding": {
@@ -578,7 +704,13 @@
     },
     "coach": {
       "tap": "Tap to continue",
+      "ok": "OK",
       "home": "Tap PLAY to start your first game!",
+      "menuBuilds": "Builds: unlock and upgrade your powers",
+      "menuQuests": "Quests: daily missions and rewards",
+      "menuPlay": "The center button: start a game!",
+      "menuShop": "Shop: packs, skins and Premium",
+      "menuProfile": "Profile: your stats and progress",
       "builds": "Unlock and equip your abilities here.",
       "shop": "Go Premium to unlock everything.",
       "profile": "Track your progress and stats here."
@@ -600,12 +732,23 @@
   "shop": {
     "title": "Shop",
     "premium": {
-      "eyebrow": "The best of Flipia",
+      "eyebrow": "-30% · The best of Flipia",
       "title": "Go Premium",
       "subtitle": "No ads, +10% XP and 2 exclusive skins. One payment, lifetime.",
       "cta": "Preview"
     },
     "sectionPacks": "Starter Packs",
+    "hearts": {
+      "section": "Hearts",
+      "discount": "-10% FOREVER",
+      "hint": "Hearts let you retry the FLIPIA campaign challenges.",
+      "successTitle": "Hearts added!",
+      "successText": "+{{hearts}} ❤️ joined your stash. Good luck, hero!",
+      "adTitle": "+{{hearts}} free ❤️",
+      "adLimit": "Watch an ad — once per day",
+      "adDone": "Already claimed today, come back tomorrow!",
+      "adCta": "Watch"
+    },
     "sectionPacksBadge": "Popular",
     "packAngel": {
       "title": "Angel Pack",

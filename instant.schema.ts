@@ -67,6 +67,11 @@ const _schema = i.schema({
       weeklyGames: i.number().optional(),
       weeklyWins: i.number().optional(),
       claimedWeekly: i.string().optional(),
+      // Story campaign — JSON {unlocked:[], completed:[], step:{chapterId:n}}.
+      storyProgress: i.string().optional(),
+      // Hearts spent to retry story encounters — earned per chapter or
+      // bought with real money (RevenueCat product, wired later).
+      lives: i.number().optional(),
     }),
     rooms: i.entity({
       appVersion: i.string().optional(),

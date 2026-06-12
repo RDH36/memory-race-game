@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { db } from "@/lib/instant";
 import { id, tx } from "@instantdb/react-native";
 import { useProfile } from "@/lib/identity";
@@ -8,28 +9,12 @@ import { nextQuestCounters } from "@/lib/questPeriods";
 import { computeLevel } from "@/lib/leveling";
 import { XP_REWARDS, GOLD_REWARDS, PREMIUM_GOLD_BONUS } from "@/lib/economy";
 import type { QuestProfile } from "@/lib/questCatalog";
+import { DEFAULT_STATS, type GameData, type PlayerStats, type RecordGameOptions } from "@/lib/playerStatsTypes";
 
-export interface PlayerStats {
-  gamesPlayed: number;
-  gamesWon: number;
-  currentStreak: number;
-  bestStreak: number;
-  points: number;
-}
+export type { PlayerStats } from "@/lib/playerStatsTypes";
 
 // AVATARS lives in lib/skins.ts (re-exported here for back-compat)
 export { AVATARS } from "@/lib/skins";
-
-interface GameData {
-  scoreP1: number;
-  scoreP2: number;
-  duration: number;
-  player2Type?: "cpu" | "human";
-}
-
-interface RecordGameOptions {
-  xpBoost?: number;
-}
 
 interface StatsContext {
   stats: PlayerStats;
@@ -44,6 +29,10 @@ interface StatsContext {
   equippedAbility: string;
   /** Raw JSON map of owned abilities -> level (undefined when none). */
   abilitiesRaw: string | undefined;
+  /** Raw JSON of story campaign progress (see lib/campaign). */
+  storyProgressRaw: string | undefined;
+  /** Hearts for story-campaign retries. */
+  lives: number;
   /** All quest-related raw profile fields (daily/weekly/achievements). */
   questData: QuestProfile;
   level: number;
@@ -56,11 +45,9 @@ interface StatsContext {
   recordGame: (won: boolean, difficulty?: string, gameData?: GameData, options?: RecordGameOptions) => void;
   addBonusXp: (amount: number) => void;
   addGold: (amount: number) => void;
+  addLives: (amount: number) => void;
+  spendLife: () => boolean;
 }
-
-const DEFAULT_STATS: PlayerStats = {
-  gamesPlayed: 0, gamesWon: 0, currentStreak: 0, bestStreak: 0, points: 0,
-};
 
 const Ctx = createContext<StatsContext | null>(null);
 
@@ -81,6 +68,16 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
   const gold = profile?.gold ?? 0;
   const equippedAbility = profile?.equippedAbility ?? "tornado";
   const abilitiesRaw = profile?.abilities ?? undefined;
+  const storyProgressRaw = profile?.storyProgress ?? undefined;
+  const lives = profile?.lives ?? 0;
+
+  // Starter hearts: +3 granted once post-onboarding (field stays undefined until then).
+  useEffect(() => {
+    if (!profileId || profile?.lives !== undefined) return;
+    AsyncStorage.getItem("onboarding_complete").then((v) => {
+      if (v === "true") db.transact([tx.profiles[profileId].update({ lives: 3 })]);
+    });
+  }, [profileId, profile?.lives]);
   const dayStreak = profile?.dayStreak ?? 0;
   const lastPlayedDay = profile?.lastPlayedDay ?? undefined;
   const questData: QuestProfile = useMemo(
@@ -213,9 +210,18 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
   }, [userId, stats, leaderboardId, profileId, premium, gold, dayStreak, lastPlayedDay, questData]);
 
   const addGold = useCallback((amount: number) => {
-    if (!profileId) return;
-    db.transact([tx.profiles[profileId].update({ gold: gold + amount })]);
+    if (profileId) db.transact([tx.profiles[profileId].update({ gold: gold + amount })]);
   }, [profileId, gold]);
+
+  const addLives = useCallback((amount: number) => {
+    if (profileId) db.transact([tx.profiles[profileId].update({ lives: lives + amount })]);
+  }, [profileId, lives]);
+
+  const spendLife = useCallback((): boolean => {
+    if (!profileId || lives <= 0) return false;
+    db.transact([tx.profiles[profileId].update({ lives: lives - 1 })]);
+    return true;
+  }, [profileId, lives]);
 
   const levelInfo = useMemo(() => computeLevel(stats.points), [stats.points]);
 
@@ -226,14 +232,14 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
   const value = useMemo(
     () => ({
       stats, avatar, nickname, selectedTable, profileId, userId, winRate,
-      gold, equippedAbility, abilitiesRaw, questData,
-      lastXpGain, lastGoldGain, recordGame, addBonusXp, addGold,
+      gold, equippedAbility, abilitiesRaw, storyProgressRaw, lives, questData,
+      lastXpGain, lastGoldGain, recordGame, addBonusXp, addGold, addLives, spendLife,
       level: levelInfo.level,
       levelProgress: levelInfo.progress,
       xpForNextLevel: levelInfo.xpForNext,
       xpInLevel: levelInfo.xpInLevel,
     }),
-    [stats, avatar, nickname, selectedTable, profileId, userId, winRate, gold, equippedAbility, abilitiesRaw, questData, lastXpGain, lastGoldGain, recordGame, addBonusXp, addGold, levelInfo],
+    [stats, avatar, nickname, selectedTable, profileId, userId, winRate, gold, equippedAbility, abilitiesRaw, storyProgressRaw, lives, questData, lastXpGain, lastGoldGain, recordGame, addBonusXp, addGold, addLives, spendLife, levelInfo],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

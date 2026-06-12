@@ -19,9 +19,13 @@ import { FeaturedQuest } from "@/components/achievements/FeaturedQuest";
 import { useCoachMark } from "@/components/onboarding/CoachBubble";
 import { SpotlightCoach } from "@/components/onboarding/SpotlightCoach";
 
+// Tab slots left to right, matching the tab bar order.
+const MENU_TOUR = ["menuBuilds", "menuQuests", "menuPlay", "menuShop", "menuProfile"];
+
 const DAILY_REWARD_KEY = "daily_reward_last_claimed";
 const DAILY_REWARD_XP = 15;
 const DAILY_REWARD_GOLD = 30;
+const DAILY_REWARD_LIVES = 3;
 
 function isSameDay(ts1: number, ts2: number) {
   const d1 = new Date(ts1);
@@ -37,7 +41,7 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const router = useRouter();
-  const { level, levelProgress, xpInLevel, xpForNextLevel, addBonusXp, addGold } = usePlayerStats();
+  const { level, levelProgress, xpInLevel, xpForNextLevel, addBonusXp, addGold, addLives } = usePlayerStats();
   const { featured, claim } = useQuests();
   const [dailyClaimed, setDailyClaimed] = useState(true);
 
@@ -49,18 +53,21 @@ export default function HomeScreen() {
     });
   }, []);
 
-  // First-visit spotlight on the big PLAY hero.
+  // First-visit guided tour: spotlight the PLAY hero, then walk the tab
+  // menu one slot at a time (-1 = hero, 0-4 = tabs).
   const coach = useCoachMark("coach_home");
   const heroRef = useRef<View>(null);
+  const [tourStep, setTourStep] = useState(-1);
 
   const claimDailyReward = useCallback(() => {
     if (dailyClaimed) return;
     addBonusXp(DAILY_REWARD_XP);
     addGold(DAILY_REWARD_GOLD);
+    addLives(DAILY_REWARD_LIVES);
     setDailyClaimed(true);
     AsyncStorage.setItem(DAILY_REWARD_KEY, Date.now().toString());
     haptics.coin();
-  }, [dailyClaimed, addBonusXp, addGold]);
+  }, [dailyClaimed, addBonusXp, addGold, addLives]);
 
   const [gold, goldD, goldBg] = colors.hues.gold;
 
@@ -115,7 +122,7 @@ export default function HomeScreen() {
                   {t("home.dailyReward")}
                 </Text>
                 <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 11.5, color: gold }}>
-                  {t("home.dailyRewardSubtitle", { xp: DAILY_REWARD_XP, gold: DAILY_REWARD_GOLD })}
+                  {t("home.dailyRewardSubtitle", { xp: DAILY_REWARD_XP, gold: DAILY_REWARD_GOLD, lives: DAILY_REWARD_LIVES })}
                 </Text>
               </View>
               <Ribbon color="gold">{t("home.dailyRewardClaim")}</Ribbon>
@@ -158,15 +165,23 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
-      {coach.show && (
+      {coach.show && tourStep === -1 && (
         <SpotlightCoach
           targetRef={heroRef}
           text={t("onboarding.coach.home")}
-          onDismiss={coach.dismiss}
+          onDismiss={() => setTourStep(0)}
           onPressTarget={() => {
             coach.dismiss();
             router.push("/mode/casual");
           }}
+        />
+      )}
+      {coach.show && tourStep >= 0 && tourStep < MENU_TOUR.length && (
+        <SpotlightCoach
+          menu
+          menuIndex={tourStep}
+          text={t(`onboarding.coach.${MENU_TOUR[tourStep]}`)}
+          onDismiss={() => (tourStep === MENU_TOUR.length - 1 ? coach.dismiss() : setTourStep(tourStep + 1))}
         />
       )}
     </SafeAreaView>

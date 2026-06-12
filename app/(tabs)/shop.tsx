@@ -11,10 +11,11 @@ import { IconBtn } from "@/components/ui/arcade";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import { Label } from "../../components/ui/Label";
 import { useEntitlements } from "../../hooks/useEntitlements";
-import { useRevenueCat, restorePurchases, PRODUCT_ID } from "../../lib/revenuecat";
+import { useRevenueCat, restorePurchases, originalPriceFor, DISCOUNT, PRODUCT_ID } from "../../lib/revenuecat";
 import { PACKS } from "../../lib/packs";
 import { PremiumHero } from "../../components/shop/PremiumHero";
 import { PackCard } from "../../components/shop/PackCard";
+import { HeartsSection } from "../../components/shop/HeartsSection";
 import { useCoachMark } from "@/components/onboarding/CoachBubble";
 import { SpotlightCoach } from "@/components/onboarding/SpotlightCoach";
 
@@ -94,11 +95,17 @@ export default function ShopScreen() {
               subtitle={t("shop.premium.subtitle", "Tous les thèmes, XP ×2, modes exclusifs. Un seul paiement, débloqué à vie.")}
               cta={t("shop.premium.cta", "Débloquer")}
               price={priceFor(PRODUCT_ID.PREMIUM_LIFETIME, PACKS.premium.fallbackPrice)}
+              originalPrice={originalPriceFor(offering, PRODUCT_ID.PREMIUM_LIFETIME, DISCOUNT.PREMIUM)}
               owned={ents.premium}
               ownedLabel={t("shop.ownedPremium", "✓ Premium acquis")}
               onPress={() => goToPaywall("premium")}
             />
           </View>
+        </Animated.View>
+
+        {/* Hearts — story campaign retries */}
+        <Animated.View entering={FadeInDown.delay(100).duration(400)}>
+          <HeartsSection onInfo={setInfo} />
         </Animated.View>
 
         {/* Section label row */}

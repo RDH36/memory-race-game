@@ -126,9 +126,9 @@
     "xpBoostDesc": "Regarde une pub : +50% XP et +5% pièces",
     "dailyReward": "Récompense quotidienne",
     "storyEyebrow": "Histoire",
-    "storyTitle": "Prélude",
-    "storySubtitle": "Revis l'histoire et le combat contre Gromak",
-    "dailyRewardSubtitle": "Réclame tes +{{xp}} XP et +{{gold}} 🪙 gratuits",
+    "storyTitle": "Campagne",
+    "storySubtitle": "Chapitre 1 disponible — La Route des Cendres",
+    "dailyRewardSubtitle": "Réclame tes +{{xp}} XP, +{{gold}} 🪙 et +{{lives}} ❤️ gratuits",
     "dailyRewardClaim": "Réclamer",
     "dailyRewardClaimed": "Reviens demain !",
     "heroBubble": "Prêt pour un duel ?",
@@ -567,6 +567,132 @@
     },
     "demonKing": {
       "role": "Roi Démon de FLIPIA"
+    },
+    "campaign": {
+      "title": "Campagne",
+      "chapterLabel": "Chapitre 1",
+      "chapter2Title": "Chapitre 2 — La Baie Gelée",
+      "soon": "Bientôt",
+      "unlockCost": "Déblocage : {{cost}} 🪙",
+      "replayPrelude": "Revoir le prélude",
+      "start": "Commencer",
+      "continue": "Continuer",
+      "completed": "Terminé",
+      "stepProgress": "Étape {{current}}/{{total}}",
+      "currentStep": "Étape en cours",
+      "replayScene": "Rejouer",
+      "encounterHint": "Retrouve les paires pour restaurer le souvenir",
+      "steps": {
+        "depart": "Le départ de la Guilde",
+        "tomir": "Le vieil oublié",
+        "ambush": "L'embuscade des brigands",
+        "village": "Bourg-Soleil éteint",
+        "gromak": "La revanche de Gromak",
+        "outro": "La mémoire retrouvée"
+      }
+    },
+    "chapter1": {
+      "title": "La Route des Cendres",
+      "depart": {
+        "s1": "À la Guilde de Mémoire, ta première mission t'attend : rejoindre Bourg-Soleil, le village voisin, dont on est sans nouvelles depuis des jours.",
+        "s2": "La Renarde, championne bénie des Anges, se porte volontaire pour te guider. Son don de Tornade a sauvé bien des voyageurs.",
+        "s3": "La route serpente entre les collines. Le soleil se lève sur FLIPIA... mais plus personne ne se souvient de son nom.",
+        "s4": "Au loin, aucune fumée ne monte de Bourg-Soleil. Pas un bruit, pas un chant. Un silence qui n'annonce rien de bon.",
+        "s5": "Soudain, une silhouette titube sur le chemin. Un vieil emoji erre dans la brume, comme perdu dans son propre monde...",
+        "b1": "Bonne route, héros !",
+        "b2": "Je connais la route, suis-moi !",
+        "b4": "Aucune fumée... c'est mauvais signe.",
+        "b5": "Qui... qui est là ?"
+      },
+      "village": {
+        "s1": "Guidés par Tomir, vous franchissez enfin les portes de Bourg-Soleil. Le village est intact... en apparence.",
+        "s2": "Ses habitants errent, le regard vide. Plus de rires, plus de souvenirs. La brigade a déjà tout effacé.",
+        "s3": "Tomir s'arrête au milieu de sa propre rue. Sa maison est là, à deux pas... mais il passe devant sans la voir.",
+        "s4": "Des ombres jaillissent des ruelles : les brigands ! Ils encerclent les voyageurs, ravis de leur butin facile.",
+        "s5": "Et un rire que tu connais déjà déchire le silence. Gromak surgit, plus furieux que jamais !",
+        "b3": "Ma rue... je ne la reconnais plus...",
+        "b5": "Toi ?! Cette fois, je ne serai pas seul !"
+      },
+      "outro": {
+        "s1": "La mémoire revient à Bourg-Soleil comme la lumière après l'orage. Les souvenirs volés regagnent leurs maisons un à un.",
+        "s2": "Le village entier fête sa victoire. Les rires reviennent — et avec eux, les noms, les visages, les chansons oubliées.",
+        "s3": "Tomir retrouve sa maison... et sa fille qui l'attendait chaque soir devant la porte, sans savoir pourquoi.",
+        "s4": "Ce soir-là, la Renarde pose sa patte sur ton épaule : désormais, elle marche à tes côtés.",
+        "s5": "Mais la route ne fait que commencer. Au nord, la mer s'est figée d'un coup... La Baie Gelée t'attend, héros.",
+        "b3": "Papa ! Tu es revenu !",
+        "b4": "On y va, partenaire ?",
+        "b5": "Au nord... la Baie Gelée."
+      },
+      "tomir": {
+        "s1": "Vous approchez doucement. Le vieil emoji tremble, les yeux perdus dans le vide. Il ne fuit pas... il ne sait même plus pourquoi il devrait fuir.",
+        "s2": "Il fouille sa mémoire comme on fouille une maison vide. Son nom, sa rue, son visage dans le miroir : tout a disparu.",
+        "s3": "La Renarde flaire l'air et grogne : l'odeur de la brigade. Ce ne sont pas les années qui ont volé sa mémoire... ce sont les démons.",
+        "s4": "Alors tu t'agenouilles face à lui. Le don des Anges réchauffe tes mains : tu peux recoller les morceaux de ses souvenirs.",
+        "s5": "Des fragments de mémoire flottent autour de lui — une maison, un visage d'enfant, une odeur de pain chaud. À toi de les réunir, héros.",
+        "b1": "Hé ho... ça va ?",
+        "b2": "Je... qui suis-je ?",
+        "b3": "C'est l'œuvre de la brigade !",
+        "b4": "Regarde-moi. Je peux t'aider.",
+        "b5": "Concentre-toi...",
+        "cta": "Soigner sa mémoire",
+        "intro": "Je... je ne sais plus mon nom. Ni où est ma maison... Aide-moi, je t'en prie !",
+        "success": "Tomir ! Je m'appelle Tomir ! Et ma maison... elle est à Bourg-Soleil ! Suis-moi, je connais le chemin !"
+      },
+      "ambush": {
+        "name": "Brigand",
+        "intro": "Hé hé... les voyageurs amnésiques ne se souviennent même pas qu'on les a volés !",
+        "s1": "Tomir vous guide vers Bourg-Soleil quand la Renarde s'arrête net, les oreilles dressées. Quelque chose bouge dans les fourrés...",
+        "s2": "Au bord du chemin, des voyageurs au regard vide se font détrousser sans réagir. Ils ne se souviennent même pas qu'on les vole.",
+        "s3": "Des brigands jaillissent des buissons et vous encerclent ! Profiteurs du chaos, ils dépouillent les oubliés de FLIPIA.",
+        "s4": "La Renarde gronde et se place à tes côtés. Ces lâches ne connaissent pas encore le pouvoir d'une mémoire intacte.",
+        "s5": "Le chef des brigands ricane et sort un paquet de cartes volé. À FLIPIA, même les voleurs règlent leurs comptes en duel de mémoire !",
+        "b1": "Tu entends... ?",
+        "b3": "La bourse ou la mémoire !",
+        "b4": "Reste derrière moi, Tomir !",
+        "b5": "Voyons si tu bluffes, « héros » !"
+      },
+      "gromak": {
+        "intro": "Le « héros » de la Guilde... Ma brigade a déjà effacé ce village. Toi, je vais t'effacer pour de bon !",
+        "s1": "Sur la place de Bourg-Soleil, les brigands s'écartent en silence. Un pas lourd fait trembler le sol : Gromak s'avance.",
+        "s2": "Il n'a rien oublié de sa défaite au village. Sa rage a grandi chaque nuit depuis que tu l'as humilié devant Belic.",
+        "s3": "Autour de vous, les habitants au regard vide ne comprennent même pas le danger. Tomir tremble derrière toi.",
+        "s4": "La Renarde te souffle un avertissement : la tornade de Gromak a gagné en puissance. Cette fois, le combat sera réel.",
+        "s5": "Gromak fait claquer ses cartes. Le destin de Bourg-Soleil se joue maintenant — que le meilleur souvenir gagne !",
+        "b2": "Tu m'as HUMILIÉ, héros !",
+        "b3": "N'aie pas peur, Tomir...",
+        "b4": "Sa tornade est plus forte, prudence !",
+        "b5": "FLIPIA se souviendra de TA défaite !"
+      },
+      "trainHint": "Aiguise ta mémoire, héros — la route vers la Baie Gelée sera rude. Entraîne-toi pour financer l'expédition !"
+    },
+    "rewards": {
+      "title": "Récompenses",
+      "avatar": "Avatar débloqué !"
+    },
+    "lives": {
+      "budget": "3 erreurs max",
+      "failTitle": "Le souvenir s'est brisé...",
+      "noHeartsTitle": "Plus de cœurs !",
+      "startCost": "⚠️ Commencer consomme 1 ❤️ — il t'en reste {{lives}}",
+      "retryText": "Retenter consomme 1 ❤️ — il t'en reste {{lives}}.",
+      "noLivesText": "Tu n'as plus de cœurs... Termine des chapitres, réclame ta récompense quotidienne ou passe par la boutique.",
+      "retry": "Réessayer (1 ❤️)",
+      "getLives": "Obtenir des ❤️",
+      "shopLink": "🛒 Recharge tes ❤️ dans la boutique"
+    },
+    "train": {
+      "title": "La Guilde te conseille",
+      "goldProgress": "{{gold}} / {{cost}} 🪙",
+      "goldMissing": "Il te manque {{missing}} 🪙 pour le chapitre 2.",
+      "online": "Jouer en ligne",
+      "vsAi": "Affronter l'IA"
+    },
+    "battle": {
+      "cta": "À l'attaque !",
+      "defeatTitle": "Défaite...",
+      "defeatText": "{{name}} a gardé le dessus. Chaque héros tombe d'abord — réessaie !",
+      "retry": "Réessayer",
+      "leave": "Quitter"
     }
   },
   "onboarding": {
@@ -578,7 +704,13 @@
     },
     "coach": {
       "tap": "Touche pour continuer",
+      "ok": "OK",
       "home": "Touche JOUER pour lancer ta première partie !",
+      "menuBuilds": "Builds : débloque et améliore tes pouvoirs",
+      "menuQuests": "Quêtes : missions quotidiennes et récompenses",
+      "menuPlay": "Le bouton central : lance une partie !",
+      "menuShop": "Boutique : packs, skins et Premium",
+      "menuProfile": "Profil : tes stats et ta progression",
       "builds": "Débloque et équipe tes abilités ici.",
       "shop": "Passe en Premium pour tout débloquer.",
       "profile": "Suis ta progression et tes stats ici."
@@ -600,12 +732,23 @@
   "shop": {
     "title": "Boutique",
     "premium": {
-      "eyebrow": "Le meilleur de Flipia",
+      "eyebrow": "-30% · Le meilleur de Flipia",
       "title": "Passe en Premium",
       "subtitle": "Plus de pub, +10% XP et 2 skins exclusifs. Un seul paiement, à vie.",
       "cta": "Aperçu"
     },
     "sectionPacks": "Starter Packs",
+    "hearts": {
+      "section": "Cœurs",
+      "discount": "-10% À VIE",
+      "hint": "Les cœurs servent à retenter les défis de la campagne FLIPIA.",
+      "successTitle": "Cœurs ajoutés !",
+      "successText": "+{{hearts}} ❤️ ont rejoint ta réserve. Bonne chance, héros !",
+      "adTitle": "+{{hearts}} ❤️ gratuits",
+      "adLimit": "Regarde une pub — 1 fois par jour",
+      "adDone": "Déjà réclamé aujourd'hui, reviens demain !",
+      "adCta": "Regarder"
+    },
     "sectionPacksBadge": "Populaires",
     "packAngel": {
       "title": "Pack Ange",

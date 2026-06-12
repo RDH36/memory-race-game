@@ -30,6 +30,45 @@ export const PRODUCT_ID = {
   })!,
 } as const;
 
+// Consumable hearts packs (story campaign retries) — same SKU on both stores.
+export const HEARTS_PACKS = [
+  { productId: "hearts_5", hearts: 5, fallbackPrice: "0,99 €" },
+  { productId: "hearts_15", hearts: 15, fallbackPrice: "1,99 €" },
+  { productId: "hearts_40", hearts: 40, fallbackPrice: "3,99 €" },
+] as const;
+
+// Permanent discounts baked into the Play Store prices — used to display
+// the crossed-out "original" price next to the real RevenueCat price.
+export const DISCOUNT = {
+  HEARTS: 0.1,
+  PREMIUM: 0.3,
+} as const;
+
+/**
+ * Crossed-out pre-discount price, derived from the live store price
+ * (price / (1 - discount)) and formatted in the product's currency.
+ * Returns null while the offering (or the product) isn't loaded.
+ */
+export function originalPriceFor(
+  offering: PurchasesOffering | null,
+  productId: string,
+  discount: number,
+): string | null {
+  const product = offering?.availablePackages.find(
+    (p) => p.product.identifier === productId,
+  )?.product;
+  if (!product?.price || !product.currencyCode) return null;
+  const original = product.price / (1 - discount);
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: product.currencyCode,
+    }).format(original);
+  } catch {
+    return `${original.toFixed(2)} ${product.currencyCode}`;
+  }
+}
+
 const ANDROID_API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY;
 const IOS_API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY;
 

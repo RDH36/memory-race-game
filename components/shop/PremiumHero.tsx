@@ -10,13 +10,15 @@ interface Props {
   subtitle: string;
   cta: string;
   price: string;
+  /** Crossed-out pre-discount price (hidden when null). */
+  originalPrice?: string | null;
   owned?: boolean;
   ownedLabel: string;
   onPress: () => void;
 }
 
 export function PremiumHero({
-  eyebrow, title, subtitle, cta, price, owned, ownedLabel, onPress,
+  eyebrow, title, subtitle, cta, price, originalPrice, owned, ownedLabel, onPress,
 }: Props) {
   return (
     <Pressable
@@ -156,20 +158,35 @@ export function PremiumHero({
                 </Text>
               </View>
               {!owned && (
-                <View
-                  style={{
-                    backgroundColor: "#F0EDFB",
-                    paddingHorizontal: 10,
-                    paddingVertical: 6,
-                    borderRadius: 10,
-                  }}
-                >
-                  <Text
-                    numberOfLines={1}
-                    style={{ fontFamily: "Fredoka_700Bold", fontSize: 13, color: "#3B309E" }}
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  {originalPrice && (
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        fontFamily: "Fredoka_700Bold",
+                        fontSize: 12,
+                        color: "#9A93C4",
+                        textDecorationLine: "line-through",
+                      }}
+                    >
+                      {originalPrice}
+                    </Text>
+                  )}
+                  <View
+                    style={{
+                      backgroundColor: "#F0EDFB",
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      borderRadius: 10,
+                    }}
                   >
-                    {price}
-                  </Text>
+                    <Text
+                      numberOfLines={1}
+                      style={{ fontFamily: "Fredoka_700Bold", fontSize: 13, color: "#3B309E" }}
+                    >
+                      {price}
+                    </Text>
+                  </View>
                 </View>
               )}
             </View>

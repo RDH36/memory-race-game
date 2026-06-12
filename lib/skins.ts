@@ -17,6 +17,8 @@ export interface AvatarSkin {
   /** If true, use a neutral warm grey bg instead of hue-based pastel */
   neutral?: boolean;
   requires: EntitlementKey | null;
+  /** Locked until this story chapter is completed (see lib/campaign). */
+  storyChapter?: string;
 }
 
 export interface TableSkin {
@@ -30,7 +32,7 @@ export interface TableSkin {
 // --- Avatar registry ---
 export const AVATAR_SKINS: AvatarSkin[] = [
   { id: "🧠", emoji: "🧠", nameKey: "brain",     hue: 290, requires: null },
-  { id: "🦊", emoji: "🦊", nameKey: "fox",       hue: 28,  requires: null },
+  { id: "🦊", emoji: "🦊", nameKey: "fox",       hue: 28,  requires: null, storyChapter: "chapter-1" },
   { id: "🐙", emoji: "🐙", nameKey: "octopus",   hue: 320, requires: null },
   { id: "🦉", emoji: "🦉", nameKey: "owl",       hue: 42,  requires: null },
   { id: "🐼", emoji: "🐼", nameKey: "panda",     hue: 0,   neutral: true, requires: null },
