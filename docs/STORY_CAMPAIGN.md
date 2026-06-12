@@ -98,7 +98,7 @@ Un chapitre n'est **pas** un simple combat de boss : c'est la **route du héros*
 | ⚔️ **Escarmouche** | Brigands / sbires de la brigade sur la route | Combat court (grille réduite, CPU facile, sans pouvoir ennemi) |
 | 👹 **Boss** | Le chef de brigade du chapitre | Combat complet avec capacité corrompue |
 
-⚠️ **RÈGLE IMMERSION (tous les chapitres)** : on n'envoie JAMAIS le joueur directement dans un jeu. **Chaque étape de gameplay (rencontre, escarmouche, boss) commence par sa propre histoire webtoon de 5 panels minimum** qui met en scène la situation, puis un CTA lance le jeu (« Soigner sa mémoire », « À l'attaque ! »…). Les scènes pures font aussi 5 panels minimum. Champ `panels` obligatoire sur `EncounterStep` et `BattleStep`.
+⚠️ **RÈGLE IMMERSION (tous les chapitres)** : on n'envoie JAMAIS le joueur directement dans un jeu, **ni directement vers l'étape suivante après une victoire**. Chaque étape de gameplay (rencontre, escarmouche, boss) : **intro webtoon ≥ 5 panels** → CTA payant (1 ❤️) → jeu → **carte(s) histoire de victoire (`outroPanels`, ≥ 2 panels)** → continuer vers l'étape suivante. Les scènes pures font aussi 5 panels minimum. Champs `panels` ET `outroPanels` obligatoires sur `EncounterStep` et `BattleStep`.
 
 Les rencontres 💔 sont le cœur émotionnel : elles montrent concrètement ce que le Roi Démon a volé (un père qui ne reconnaît plus son enfant, un boulanger qui a oublié ses recettes, des amoureux qui ne se souviennent plus l'un de l'autre…). Chaque souvenir rendu = un petit moment de victoire qui donne du sens au combat final.
 

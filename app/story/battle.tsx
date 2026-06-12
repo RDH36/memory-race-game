@@ -56,8 +56,8 @@ export default function StoryBattleScreen() {
   const { game, lastMatchResult, handleCardPress, handlePower, handleTornadoComplete, resetGame } =
     useLocalGame(difficulty, myAbility, cpuAbility);
 
-  // The fight is told first: webtoon intro phase, then the actual battle.
-  const [phase, setPhase] = useState<"story" | "battle">("story");
+  // Webtoon intro → battle → victory story card, then the next step.
+  const [phase, setPhase] = useState<"story" | "battle" | "outro">("story");
   const [turnTimer, setTurnTimer] = useState(0);
   const [introLock, setIntroLock] = useState(true);
   const [revealed, setRevealed] = useState(false);
@@ -101,15 +101,16 @@ export default function StoryBattleScreen() {
       finishedRef.current = true;
       if (timerRef.current) clearInterval(timerRef.current);
       advanceStep(CHAPTER_1, stepIdx);
-      // Chain straight into the next step after savoring the win.
-      setTimeout(() => setExitTo(stepHref(CHAPTER_1, stepIdx + 1) ?? "back"), 1000);
+      // Victory story card first — never straight into the next step.
+      setTimeout(() => setPhase("outro"), 1000);
     } else {
       registerDefeat(800);
     }
   }, [game.status]);
 
-  // In-battle mistake budget: more than 3 missed pairs = instant defeat.
-  const { mistakes, failed, reset: resetMistakes } = useMistakeBudget(lastMatchResult, () => registerDefeat(700));
+  // Mistake budget: >3 missed pairs = defeat (shield-absorbed misses are free).
+  const { mistakes, failed, reset: resetMistakes } =
+    useMistakeBudget(lastMatchResult, game.shieldCharges.p1, () => registerDefeat(700));
 
   const handleRetry = () => {
     if (!startBattle()) return; // a retry is a fresh attempt — paid again
@@ -144,19 +145,26 @@ export default function StoryBattleScreen() {
   const gridConfig = GRID_CONFIG[difficulty];
   const totalPairs = gridConfig.totalCards / 2;
 
-  if (phase === "story") {
+  if (phase !== "battle") {
+    const isOutro = phase === "outro";
     return (
       <View style={{ flex: 1, backgroundColor: "#05060F" }}>
         <WebtoonScroll
-          panels={battle?.panels ?? []}
+          panels={(isOutro ? battle?.outroPanels : battle?.panels) ?? []}
           title={t("story.chapter1.title")}
-          ctaLabel={`${t("story.battle.cta")} (1 ❤️)`}
-          ctaEmoji="⚔️"
-          ctaNote={t("story.lives.startCost", { lives })}
-          // Starting the fight charges the heart upfront.
-          onDone={() => { if (startBattle()) setPhase("battle"); }}
+          ctaLabel={isOutro ? t("story.campaign.continue") : `${t("story.battle.cta")} (1 ❤️)`}
+          ctaEmoji={isOutro ? "▶️" : "⚔️"}
+          ctaNote={isOutro ? undefined : t("story.lives.startCost", { lives })}
+          // Intro: pay 1 ❤️ to start. Outro: continue towards the next step.
+          onDone={() => {
+            if (isOutro) setExitTo(stepHref(CHAPTER_1, stepIdx + 1) ?? "back");
+            else if (startBattle()) setPhase("battle");
+          }}
         />
         {!revealed && <IrisTransition mode="in" duration={1000} onDone={() => setRevealed(true)} />}
+        {exitTo && (
+          <IrisTransition duration={600} onDone={() => (exitTo === "back" ? router.back() : router.replace(exitTo))} />
+        )}
         <LivesFailModal
           visible={showNoHearts}
           icon="💔"
@@ -174,20 +182,11 @@ export default function StoryBattleScreen() {
         <BattleTopBar onQuit={() => (game.status === "playing" ? setShowQuitModal(true) : router.back())} />
 
         <StoryBattleHud
-          game={game}
-          lastMatchResult={lastMatchResult}
-          totalPairs={totalPairs}
-          turnTimer={turnTimer}
-          avatar={avatar}
-          nickname={nickname}
-          enemyAvatar={enemy?.avatar ?? "👺"}
-          enemyName={enemyName}
+          game={game} lastMatchResult={lastMatchResult} totalPairs={totalPairs} turnTimer={turnTimer}
+          avatar={avatar} nickname={nickname} enemyAvatar={enemy?.avatar ?? "👺"} enemyName={enemyName}
         />
 
-        {/* Enemy taunt while the intro lock holds */}
-        {introLock && battle && (
-          <BattleTauntBanner avatar={enemy?.avatar ?? "👺"} text={t(battle.enemy.introKey)} />
-        )}
+        {introLock && battle && <BattleTauntBanner avatar={enemy?.avatar ?? "👺"} text={t(battle.enemy.introKey)} />}
 
         <MistakeHearts mistakes={mistakes} />
 

@@ -28,6 +28,8 @@ export type EncounterStep = {
   npcEmoji: string;
   /** Webtoon intro told before the healing mini game. */
   panels: PreludePanel[];
+  /** Victory story card(s) shown after the healing, before the next step. */
+  outroPanels: PreludePanel[];
   /** One emoji per pair (3 pairs → 6 cards). */
   cardEmojis: string[];
   /** i18n keys under `story.{chapter}.{id}.*`: intro, success. */
@@ -40,6 +42,8 @@ export type BattleStep = {
   id: string;
   /** Webtoon intro told before the fight (min 5 panels). */
   panels: PreludePanel[];
+  /** Victory story card(s) shown after the win, before the next step. */
+  outroPanels: PreludePanel[];
   enemy: StepEnemy;
   /** Drives grid size AND cpu memory (lib/gameLogic GRID_CONFIG). */
   difficulty: CpuDifficulty;

@@ -636,7 +636,11 @@
         "b5": "Concentre-toi...",
         "cta": "Soigner sa mémoire",
         "intro": "Je... je ne sais plus mon nom. Ni où est ma maison... Aide-moi, je t'en prie !",
-        "success": "Tomir ! Je m'appelle Tomir ! Et ma maison... elle est à Bourg-Soleil ! Suis-moi, je connais le chemin !"
+        "success": "Tomir ! Je m'appelle Tomir ! Et ma maison... elle est à Bourg-Soleil ! Suis-moi, je connais le chemin !",
+        "o1": "Les souvenirs reprennent leur place un à un : son nom, sa maison, le rire de sa fille, l'odeur du pain chaud. Tomir pleure de joie.",
+        "o2": "« Ma maison est à Bourg-Soleil, je connais chaque raccourci ! » Tomir prend la tête du groupe, le pas soudain léger. En route !",
+        "ob1": "Je me souviens... de TOUT !",
+        "ob2": "Par ici, mes amis !"
       },
       "ambush": {
         "name": "Brigand",
@@ -649,7 +653,11 @@
         "b1": "Tu entends... ?",
         "b3": "La bourse ou la mémoire !",
         "b4": "Reste derrière moi, Tomir !",
-        "b5": "Voyons si tu bluffes, « héros » !"
+        "b5": "Voyons si tu bluffes, « héros » !",
+        "o1": "Les brigands détalent en abandonnant leur butin ! Les voyageurs récupèrent leurs affaires... même s'ils ne se souviennent pas les avoir perdues.",
+        "o2": "Dans sa fuite, le chef des brigands a lâché plus précieux qu'une bourse : Gromak rassemble sa brigade à Bourg-Soleil. La Renarde fronce le museau — il faut faire vite.",
+        "ob1": "On reviendra, héros !!",
+        "ob2": "Gromak... ici ? Pressons le pas !"
       },
       "gromak": {
         "intro": "Le « héros » de la Guilde... Ma brigade a déjà effacé ce village. Toi, je vais t'effacer pour de bon !",
@@ -661,7 +669,11 @@
         "b2": "Tu m'as HUMILIÉ, héros !",
         "b3": "N'aie pas peur, Tomir...",
         "b4": "Sa tornade est plus forte, prudence !",
-        "b5": "FLIPIA se souviendra de TA défaite !"
+        "b5": "FLIPIA se souviendra de TA défaite !",
+        "o1": "Gromak s'effondre à genoux, ses cartes éparpillées au vent. Sa brigade détale dans les ruelles sans demander son reste.",
+        "o2": "Et au-dessus de Bourg-Soleil, les premiers souvenirs scintillent comme des lucioles. Les habitants clignent des yeux... quelque chose leur revient.",
+        "ob1": "Im... impossible... encore toi...",
+        "ob2": "Regarde, héros... la mémoire revient !"
       },
       "trainHint": "Aiguise ta mémoire, héros — la route vers la Baie Gelée sera rude. Entraîne-toi pour financer l'expédition !"
     },

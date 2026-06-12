@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Crown } from "../ui/icons/Crown";
 import { Sparkle } from "../ui/icons/Sparkle";
 import { MiniCardFace, MiniCardBack } from "./MiniCard";
+import { StrikePrice } from "./StrikePrice";
 
 interface Props {
   eyebrow: string;
@@ -159,19 +160,7 @@ export function PremiumHero({
               </View>
               {!owned && (
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                  {originalPrice && (
-                    <Text
-                      numberOfLines={1}
-                      style={{
-                        fontFamily: "Fredoka_700Bold",
-                        fontSize: 12,
-                        color: "#9A93C4",
-                        textDecorationLine: "line-through",
-                      }}
-                    >
-                      {originalPrice}
-                    </Text>
-                  )}
+                  {originalPrice && <StrikePrice value={originalPrice} size={13} color="#9A93C4" />}
                   <View
                     style={{
                       backgroundColor: "#F0EDFB",

@@ -9,6 +9,7 @@ import { useTheme } from "@/lib/ThemeContext";
 import { haptics } from "@/lib/haptics";
 import { Btn3D, Panel, Ribbon } from "@/components/ui/arcade";
 import { Label } from "@/components/ui/Label";
+import { StrikePrice } from "@/components/shop/StrikePrice";
 import { usePlayerStats } from "@/lib/playerStats";
 import { usePremium } from "@/hooks/useEntitlements";
 import { HEARTS_AD_UNIT_ID, useRewardedAd } from "@/hooks/useRewardedAd";
@@ -103,18 +104,7 @@ export function HeartsSection({ onInfo }: { onInfo: (info: Info) => void }) {
               <Text style={{ fontFamily: "Fredoka_700Bold", fontSize: 16, color: colors.onSurface }}>
                 ×{pack.hearts}
               </Text>
-              <Text
-                numberOfLines={1}
-                style={{
-                  fontFamily: "Fredoka_700Bold",
-                  fontSize: 11,
-                  color: colors.onSurfaceMuted,
-                  textDecorationLine: "line-through",
-                  opacity: original ? 1 : 0,
-                }}
-              >
-                {original ?? " "}
-              </Text>
+              <StrikePrice value={original} color={colors.onSurfaceMuted} />
               <Btn3D
                 color="coral"
                 size="sm"

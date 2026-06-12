@@ -11,15 +11,26 @@ import type { MatchResult } from "@/hooks/useLocalGame";
 
 export const MAX_MISTAKES = 3;
 
-/** Counts the player's mismatches; fires onFail once past the budget. */
-export function useMistakeBudget(lastMatchResult: MatchResult, onFail: () => void) {
+/**
+ * Counts the player's mismatches; fires onFail once past the budget.
+ * A miss absorbed by the shield ability (charge consumed in the same
+ * render) is free — it never burns a budget heart.
+ */
+export function useMistakeBudget(
+  lastMatchResult: MatchResult,
+  shieldCharges: number,
+  onFail: () => void,
+) {
   const [mistakes, setMistakes] = useState(0);
   const failedRef = useRef(false);
+  const prevChargesRef = useRef(shieldCharges);
   const onFailRef = useRef(onFail);
   onFailRef.current = onFail;
 
   useEffect(() => {
     if (lastMatchResult?.type !== "mismatch" || lastMatchResult.player !== 1) return;
+    const shielded = shieldCharges < prevChargesRef.current;
+    if (shielded) return;
     setMistakes((m) => {
       const next = m + 1;
       if (next > MAX_MISTAKES && !failedRef.current) {
@@ -28,7 +39,12 @@ export function useMistakeBudget(lastMatchResult: MatchResult, onFail: () => voi
       }
       return next;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastMatchResult]);
+
+  useEffect(() => {
+    prevChargesRef.current = shieldCharges;
+  }, [shieldCharges]);
 
   const reset = () => {
     failedRef.current = false;

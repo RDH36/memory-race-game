@@ -2,8 +2,8 @@
 // Bourg-Soleil. Free to start; rewards gold + the 🦊 avatar.
 import { BRIGADE_CHIEF } from "@/lib/story";
 import { CH1_DEPART, CH1_VILLAGE, CH1_OUTRO } from "./panels";
-import { CH1_TOMIR } from "./tomir";
-import { CH1_AMBUSH, CH1_GROMAK } from "./battles";
+import { CH1_TOMIR, CH1_TOMIR_OUTRO } from "./tomir";
+import { CH1_AMBUSH, CH1_AMBUSH_OUTRO, CH1_GROMAK, CH1_GROMAK_OUTRO } from "./battles";
 import type { StoryChapterDef } from "../types";
 
 export const CHAPTER_1: StoryChapterDef = {
@@ -20,6 +20,7 @@ export const CHAPTER_1: StoryChapterDef = {
       id: "tomir",
       npcEmoji: "👴",
       panels: CH1_TOMIR,
+      outroPanels: CH1_TOMIR_OUTRO,
       cardEmojis: ["🏡", "👧", "🍞"],
       introKey: "story.chapter1.tomir.intro",
       successKey: "story.chapter1.tomir.success",
@@ -28,6 +29,7 @@ export const CHAPTER_1: StoryChapterDef = {
       type: "skirmish",
       id: "ambush",
       panels: CH1_AMBUSH,
+      outroPanels: CH1_AMBUSH_OUTRO,
       enemy: {
         avatar: "👺",
         nameKey: "story.chapter1.ambush.name",
@@ -41,6 +43,7 @@ export const CHAPTER_1: StoryChapterDef = {
       type: "boss",
       id: "gromak",
       panels: CH1_GROMAK,
+      outroPanels: CH1_GROMAK_OUTRO,
       enemy: {
         avatar: BRIGADE_CHIEF.avatar,
         name: BRIGADE_CHIEF.name,

@@ -636,7 +636,11 @@
         "b5": "Focus...",
         "cta": "Heal his memory",
         "intro": "I... I no longer know my name. Nor where my home is... Please, help me!",
-        "success": "Tomir! My name is Tomir! And my home... it's in Bourg-Soleil! Follow me, I know the way!"
+        "success": "Tomir! My name is Tomir! And my home... it's in Bourg-Soleil! Follow me, I know the way!",
+        "o1": "The memories settle back one by one: his name, his house, his daughter's laugh, the smell of warm bread. Tomir weeps with joy.",
+        "o2": "\"My home is in Bourg-Soleil, I know every shortcut!\" Tomir takes the lead, his step suddenly light. Onward!",
+        "ob1": "I remember... EVERYTHING!",
+        "ob2": "This way, my friends!"
       },
       "ambush": {
         "name": "Brigand",
@@ -649,7 +653,11 @@
         "b1": "Do you hear that...?",
         "b3": "Your purse or your memory!",
         "b4": "Stay behind me, Tomir!",
-        "b5": "Let's see if you bluff, \"hero\"!"
+        "b5": "Let's see if you bluff, \"hero\"!",
+        "o1": "The brigands bolt, abandoning their loot! The travelers get their belongings back... even if they don't remember losing them.",
+        "o2": "Fleeing, the brigand chief dropped something more precious than a purse: Gromak is gathering his brigade at Bourg-Soleil. The Fox wrinkles her muzzle — time is short.",
+        "ob1": "We'll be back, hero!!",
+        "ob2": "Gromak... here? Let's hurry!"
       },
       "gromak": {
         "intro": "The Guild's little \"hero\"... My brigade already erased this village. You, I'll erase for good!",
@@ -661,7 +669,11 @@
         "b2": "You HUMILIATED me, hero!",
         "b3": "Don't be afraid, Tomir...",
         "b4": "His tornado is stronger, careful!",
-        "b5": "FLIPIA will remember YOUR defeat!"
+        "b5": "FLIPIA will remember YOUR defeat!",
+        "o1": "Gromak falls to his knees, his cards scattered to the wind. His brigade scrambles into the alleys without looking back.",
+        "o2": "And above Bourg-Soleil, the first memories shimmer like fireflies. The villagers blink... something is coming back to them.",
+        "ob1": "Im... impossible... you again...",
+        "ob2": "Look, hero... memory is returning!"
       },
       "trainHint": "Sharpen your memory, hero — the road to the Frozen Bay will be harsh. Train to fund the expedition!"
     },

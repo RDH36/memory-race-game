@@ -80,6 +80,41 @@ export const CH1_AMBUSH: PreludePanel[] = [
   },
 ];
 
+/** Skirmish victory — the brigands flee, dropping a precious piece of intel. */
+export const CH1_AMBUSH_OUTRO: PreludePanel[] = [
+  {
+    id: "ch1-ambush-flee",
+    textKey: "story.chapter1.ambush.o1",
+    bg: ["#04121F", "#0E4D3A"],
+    glow: "#4ADE80",
+    effect: "blessing",
+    actors: [
+      { emoji: "👺", x: -90, y: -120, size: 48, anim: "shake" },
+      { emoji: "💨", x: -40, y: -90, size: 38, anim: "fade", delay: 200 },
+      { emoji: "👺", x: 70, y: -150, size: 42, anim: "shake", delay: 300 },
+      { emoji: "💰", x: 40, y: 0, size: 40, anim: "bob", delay: 450 },
+      { emoji: "🦸", x: -40, y: 90, size: 60, anim: "pulse" },
+      { emoji: "🦊", x: 60, y: 110, size: 44, anim: "bob", delay: 250 },
+    ],
+    bubble: { textKey: "story.chapter1.ambush.ob1", x: -30, y: -50 },
+  },
+  {
+    id: "ch1-ambush-intel",
+    textKey: "story.chapter1.ambush.o2",
+    bg: ["#14142B", "#2E2A55"],
+    glow: "#FFD166",
+    effect: "calm",
+    actors: [
+      { emoji: "🦊", x: -45, y: -60, size: 70, anim: "shake" },
+      { emoji: "🏘️", x: 60, y: -140, size: 50, anim: "fade", delay: 300 },
+      { emoji: "👹", x: 60, y: -50, size: 44, anim: "fade", delay: 500 },
+      { emoji: "🦸", x: -60, y: 90, size: 56, anim: "bob" },
+      { emoji: "👴", x: 50, y: 110, size: 44, anim: "shake", delay: 200 },
+    ],
+    bubble: { textKey: "story.chapter1.ambush.ob2", x: -25, y: 20 },
+  },
+];
+
 /** Boss intro — Gromak's revenge on the square of hollow Bourg-Soleil. */
 export const CH1_GROMAK: PreludePanel[] = [
   {
@@ -155,5 +190,40 @@ export const CH1_GROMAK: PreludePanel[] = [
       { emoji: "🎴", x: 42, y: 95, size: 44, anim: "bob", delay: 350 },
     ],
     bubble: { textKey: "story.chapter1.gromak.b5", x: -50, y: 25 },
+  },
+];
+
+/** Boss victory — Gromak falls, the first memories shimmer over the village. */
+export const CH1_GROMAK_OUTRO: PreludePanel[] = [
+  {
+    id: "ch1-gromak-falls",
+    textKey: "story.chapter1.gromak.o1",
+    bg: ["#16030C", "#54101F"],
+    glow: "#FFD166",
+    effect: "blessing",
+    actors: [
+      { emoji: "👹", x: 0, y: 60, size: 96, anim: "shake" },
+      { emoji: "💫", x: -70, y: -40, size: 40, anim: "spin", delay: 150 },
+      { emoji: "🦸", x: 70, y: -90, size: 66, anim: "pulse" },
+      { emoji: "👺", x: -95, y: -150, size: 40, anim: "fade", delay: 350 },
+      { emoji: "💨", x: -60, y: -120, size: 34, anim: "fade", delay: 500 },
+    ],
+    bubble: { textKey: "story.chapter1.gromak.ob1", x: 25, y: -40 },
+  },
+  {
+    id: "ch1-gromak-shimmer",
+    textKey: "story.chapter1.gromak.o2",
+    bg: ["#101A3E", "#2C4A9E"],
+    glow: "#7EC8FF",
+    effect: "blessing",
+    actors: [
+      { emoji: "🧠", x: -80, y: -140, size: 36, anim: "pulse" },
+      { emoji: "🧠", x: 75, y: -160, size: 32, anim: "pulse", delay: 250 },
+      { emoji: "✨", x: 0, y: -100, size: 40, anim: "pulse", delay: 400 },
+      { emoji: "🏘️", x: 0, y: 10, size: 76, anim: "bob" },
+      { emoji: "😮", x: -80, y: 120, size: 42, anim: "bob", delay: 300 },
+      { emoji: "😮", x: 80, y: 120, size: 42, anim: "bob", delay: 500 },
+    ],
+    bubble: { textKey: "story.chapter1.gromak.ob2", x: 0, y: 80 },
   },
 ];

@@ -80,3 +80,37 @@ export const CH1_TOMIR: PreludePanel[] = [
     bubble: { textKey: "story.chapter1.tomir.b5", x: 20, y: 40 },
   },
 ];
+
+/** Encounter victory — Tomir remembers everything and leads the way. */
+export const CH1_TOMIR_OUTRO: PreludePanel[] = [
+  {
+    id: "ch1-tomir-remembers",
+    textKey: "story.chapter1.tomir.o1",
+    bg: ["#1B1206", "#54400E"],
+    glow: "#FFD166",
+    effect: "blessing",
+    actors: [
+      { emoji: "👴", x: -35, y: -50, size: 78, anim: "pulse" },
+      { emoji: "✨", x: -95, y: -140, size: 34, anim: "pulse", delay: 150 },
+      { emoji: "🏡", x: 60, y: -130, size: 42, anim: "bob", delay: 300 },
+      { emoji: "👧", x: 90, y: -60, size: 38, anim: "bob", delay: 450 },
+      { emoji: "🥹", x: 55, y: 90, size: 44, anim: "bob", delay: 250 },
+    ],
+    bubble: { textKey: "story.chapter1.tomir.ob1", x: -20, y: 40 },
+  },
+  {
+    id: "ch1-tomir-leads",
+    textKey: "story.chapter1.tomir.o2",
+    bg: ["#04121F", "#0E4D3A"],
+    glow: "#4ADE80",
+    effect: "calm",
+    actors: [
+      { emoji: "👴", x: -60, y: -60, size: 60, anim: "bob" },
+      { emoji: "🛤️", x: 0, y: 40, size: 50, anim: "fade", delay: 200 },
+      { emoji: "🏘️", x: 70, y: -140, size: 48, anim: "fade", delay: 400 },
+      { emoji: "🦸", x: 20, y: 110, size: 56, anim: "bob", delay: 150 },
+      { emoji: "🦊", x: 90, y: 120, size: 42, anim: "bob", delay: 350 },
+    ],
+    bubble: { textKey: "story.chapter1.tomir.ob2", x: -35, y: 10 },
+  },
+];

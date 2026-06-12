@@ -31,8 +31,8 @@ export default function EncounterScreen() {
   const stepDef = CHAPTER_1.steps[stepIdx];
   const encounter = stepDef?.type === "encounter" ? stepDef : null;
 
-  // story → game → won; fail opens the retry modal.
-  const [phase, setPhase] = useState<"story" | "game">("story");
+  // story → game → outro (victory card); fail opens the retry modal.
+  const [phase, setPhase] = useState<"story" | "game" | "outro">("story");
   const [won, setWon] = useState(false);
   const [showFailModal, setShowFailModal] = useState(false);
   const [showNoHearts, setShowNoHearts] = useState(false);
@@ -40,9 +40,10 @@ export default function EncounterScreen() {
   const [revealed, setRevealed] = useState(false);
   const [exitTo, setExitTo] = useState<StepHref | "back" | null>(null);
 
+  // Victory story card first — never straight into the next step.
   const handleContinue = () => {
     advanceStep(CHAPTER_1, stepIdx);
-    setExitTo(stepHref(CHAPTER_1, stepIdx + 1) ?? "back");
+    setPhase("outro");
   };
 
   // Every attempt is PAID upfront (1 ❤️) — quitting never refunds it.
@@ -65,15 +66,23 @@ export default function EncounterScreen() {
     <View style={{ flex: 1, backgroundColor: LETTERBOX }}>
       <StatusBar style="light" />
 
-      {phase === "story" ? (
+      {phase !== "game" ? (
         <WebtoonScroll
-          panels={encounter?.panels ?? []}
+          panels={(phase === "outro" ? encounter?.outroPanels : encounter?.panels) ?? []}
           title={t("story.chapter1.title")}
-          ctaLabel={`${t("story.chapter1.tomir.cta")} (1 ❤️)`}
-          ctaEmoji="💖"
-          ctaNote={t("story.lives.startCost", { lives })}
-          // Starting the healing charges the heart upfront.
-          onDone={() => { if (startGame()) setPhase("game"); }}
+          ctaLabel={
+            phase === "outro"
+              ? t("story.campaign.continue")
+              : `${t("story.chapter1.tomir.cta")} (1 ❤️)`
+          }
+          ctaEmoji={phase === "outro" ? "▶️" : "💖"}
+          ctaNote={phase === "outro" ? undefined : t("story.lives.startCost", { lives })}
+          // Intro: starting the healing charges the heart upfront.
+          // Outro (memory restored): continue towards the next step.
+          onDone={() => {
+            if (phase === "outro") setExitTo(stepHref(CHAPTER_1, stepIdx + 1) ?? "back");
+            else if (startGame()) setPhase("game");
+          }}
         />
       ) : (
         <View style={{ flex: 1, paddingTop: insets.top + 20 }}>
