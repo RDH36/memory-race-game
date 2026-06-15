@@ -8,6 +8,7 @@ import { db } from "@/lib/instant";
 import { tx } from "@instantdb/react-native";
 import { usePlayerStats } from "@/lib/playerStats";
 import type { HueName } from "@/components/ui/theme";
+import { track } from "@/lib/analytics";
 
 export const DEFAULT_ABILITY_ID = "tornado";
 
@@ -201,6 +202,7 @@ export function usePlayerAbilities() {
       if (!profileId || isOwned(owned, ability.id) || gold < ability.baseCost) return false;
       const next = serializeOwned({ ...owned, [ability.id]: 1 });
       db.transact(tx.profiles[profileId].update({ gold: gold - ability.baseCost, abilities: next }));
+      track("ability_unlocked", { ability: ability.id, cost: ability.baseCost });
       return true;
     },
     [profileId, gold, owned],
@@ -214,6 +216,7 @@ export function usePlayerAbilities() {
       if (gold < cost) return false;
       const next = serializeOwned({ ...owned, [ability.id]: level + 1 });
       db.transact(tx.profiles[profileId].update({ gold: gold - cost, abilities: next }));
+      track("ability_upgraded", { ability: ability.id, level: level + 1, cost });
       return true;
     },
     [profileId, gold, owned],

@@ -8,6 +8,7 @@ import { useTheme } from "@/lib/ThemeContext";
 import { Btn3D, CoinBar, Panel, Ribbon, Rise, ScreenHeader } from "@/components/ui/arcade";
 import { ChoiceRow } from "@/components/mode/arcade/ChoiceRow";
 import { IrisTransition } from "@/components/onboarding/IrisTransition";
+import { track } from "@/lib/analytics";
 import { CHAPTER_1, NEXT_CHAPTER_TEASER, isChapterCompleted, useCampaign } from "@/lib/campaign";
 
 export default function CampaignMapScreen() {
@@ -78,7 +79,10 @@ export default function CampaignMapScreen() {
               size="md"
               full
               label={ctaLabel}
-              onPress={() => setOpening(true)}
+              onPress={() => {
+                track("campaign_chapter_opened", { chapter: CHAPTER_1.id, step: stepIdx, done });
+                setOpening(true);
+              }}
             >
               <Text style={{ fontSize: 16 }}>{done ? "🏅" : "⚔️"}</Text>
             </Btn3D>

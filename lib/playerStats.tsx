@@ -8,6 +8,7 @@ import { localDayIndex, nextDayStreak } from "@/lib/dailyStreak";
 import { nextQuestCounters } from "@/lib/questPeriods";
 import { computeLevel } from "@/lib/leveling";
 import { XP_REWARDS, GOLD_REWARDS, PREMIUM_GOLD_BONUS } from "@/lib/economy";
+import { track } from "@/lib/analytics";
 import type { QuestProfile } from "@/lib/questCatalog";
 import { DEFAULT_STATS, type GameData, type PlayerStats, type RecordGameOptions } from "@/lib/playerStatsTypes";
 
@@ -71,7 +72,7 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
   const storyProgressRaw = profile?.storyProgress ?? undefined;
   const lives = profile?.lives ?? 0;
 
-  // Starter hearts: +3 granted once post-onboarding (field stays undefined until then).
+  // Starter hearts: +3 once post-onboarding (field undefined until then).
   useEffect(() => {
     if (!profileId || profile?.lives !== undefined) return;
     AsyncStorage.getItem("onboarding_complete").then((v) => {
@@ -96,8 +97,7 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
     [profile?.claimedQuests, profile?.dayStreak, profile?.dailyPeriod, profile?.dailyGames, profile?.dailyWins, profile?.claimedDaily, profile?.weeklyPeriod, profile?.weeklyGames, profile?.weeklyWins, profile?.claimedWeekly],
   );
 
-  // Leaderboard from InstantDB (stats)
-  const { data } = db.useQuery(
+  const { data } = db.useQuery( // leaderboard stats
     userId ? { leaderboard: { $: { where: { userId } } } } : null,
   );
   const entry = data?.leaderboard?.[0];
@@ -143,6 +143,7 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
 
   const recordGame = useCallback((won: boolean, difficulty = "medium", gameData?: GameData, options?: RecordGameOptions) => {
     if (!userId) return;
+    track("game_played", { difficulty, won, mode: gameData?.player2Type === "human" ? "online" : "solo" });
 
     const rewards = XP_REWARDS[difficulty] ?? XP_REWARDS.medium;
     const baseXp = won ? rewards.win : rewards.loss;
@@ -151,9 +152,7 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
     setLastXpGain(xp);
 
     const goldRewards = GOLD_REWARDS[difficulty] ?? GOLD_REWARDS.medium;
-    // Rewarded-ad boost (+5%) for the in-mode ad. Premium players don't watch
-    // ads, so they get the same flat +50 coins the free rewarded ad grants.
-    const goldAdBoost = (options?.xpBoost ?? 1) > 1 ? 1.05 : 1;
+    const goldAdBoost = (options?.xpBoost ?? 1) > 1 ? 1.05 : 1; // +5% in-mode rewarded ad
     let goldEarned = Math.round((won ? goldRewards.win : goldRewards.loss) * goldAdBoost);
     if (premium) goldEarned += PREMIUM_GOLD_BONUS;
     setLastGoldGain(goldEarned);
@@ -225,9 +224,7 @@ export function PlayerStatsProvider({ children }: { children: React.ReactNode })
 
   const levelInfo = useMemo(() => computeLevel(stats.points), [stats.points]);
 
-  const winRate = stats.gamesPlayed > 0
-    ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100)
-    : 0;
+  const winRate = stats.gamesPlayed > 0 ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100) : 0;
 
   const value = useMemo(
     () => ({

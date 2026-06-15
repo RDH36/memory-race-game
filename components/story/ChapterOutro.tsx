@@ -9,6 +9,7 @@ import { Btn3D, Panel, Pop, Ribbon, Rise } from "@/components/ui/arcade";
 import { NEXT_CHAPTER_TEASER, useCampaign } from "@/lib/campaign";
 import type { StoryChapterDef } from "@/lib/campaign";
 import { getAvatarSkin } from "@/lib/skins";
+import { track } from "@/lib/analytics";
 
 export function ChapterOutro({ chapter }: { chapter: StoryChapterDef }) {
   const router = useRouter();
@@ -21,7 +22,10 @@ export function ChapterOutro({ chapter }: { chapter: StoryChapterDef }) {
   // chapter is already completed, and retries while the profile loads.
   useEffect(() => {
     if (claimed.current) return;
-    if (completeChapter(chapter)) claimed.current = true;
+    if (completeChapter(chapter)) {
+      claimed.current = true;
+      track("campaign_chapter_completed", { chapter: chapter.id });
+    }
   }, [chapter, completeChapter]);
 
   const avatarSkin = getAvatarSkin(chapter.rewardAvatarId);

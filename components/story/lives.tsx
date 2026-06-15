@@ -20,6 +20,7 @@ export function useMistakeBudget(
   lastMatchResult: MatchResult,
   shieldCharges: number,
   onFail: () => void,
+  enabled = true,
 ) {
   const [mistakes, setMistakes] = useState(0);
   const failedRef = useRef(false);
@@ -28,6 +29,8 @@ export function useMistakeBudget(
   onFailRef.current = onFail;
 
   useEffect(() => {
+    // Disabled in replay mode: re-reading a cleared step has no stakes.
+    if (!enabled) return;
     if (lastMatchResult?.type !== "mismatch" || lastMatchResult.player !== 1) return;
     const shielded = shieldCharges < prevChargesRef.current;
     if (shielded) return;
@@ -50,7 +53,7 @@ export function useMistakeBudget(
     failedRef.current = false;
     setMistakes(0);
   };
-  return { mistakes, failed: mistakes > MAX_MISTAKES, reset };
+  return { mistakes, failed: enabled && mistakes > MAX_MISTAKES, reset };
 }
 
 /** Row of 3 hearts dimming with each mistake + "3 erreurs max" label. */
@@ -120,6 +123,7 @@ export function LivesFailModal({
   icon,
   title,
   baseMessage,
+  freeRetry = false,
   onLeave,
   onRetry,
 }: {
@@ -128,13 +132,32 @@ export function LivesFailModal({
   title: string;
   /** Optional context prepended to the retry message (e.g. boss taunt). */
   baseMessage?: string;
+  /** Replay mode: retrying is free — no heart cost, no shop link. */
+  freeRetry?: boolean;
   onLeave: () => void;
   onRetry: () => void;
 }) {
   const router = useRouter();
   const { t } = useTranslation();
   const { lives } = usePlayerStats();
-  const outOfLives = lives <= 0;
+  const outOfLives = !freeRetry && lives <= 0;
+
+  // Replay: low-stakes retry, no heart language at all.
+  if (freeRetry) {
+    return (
+      <ConfirmModal
+        visible={visible}
+        icon={icon}
+        title={title}
+        message={baseMessage ?? t("story.lives.replayRetryText")}
+        cancelText={t("story.battle.leave")}
+        confirmText={t("story.battle.retry")}
+        confirmIcon="🔄"
+        onCancel={onLeave}
+        onConfirm={onRetry}
+      />
+    );
+  }
 
   const retryText = t("story.lives.retryText", { lives });
   return (

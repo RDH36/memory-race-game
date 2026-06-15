@@ -16,6 +16,7 @@ import {
   type CardSkin,
 } from "../../lib/skins";
 import { purchaseProduct, restorePurchases, useRevenueCat } from "../../lib/revenuecat";
+import { track } from "../../lib/analytics";
 import { useEntitlements } from "../../hooks/useEntitlements";
 import { PlateauPreview } from "../../components/preview/PlateauPreview";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
@@ -87,6 +88,7 @@ export default function PackPreviewScreen() {
       setBusy("buy");
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       await purchaseProduct(pack.productId);
+      track("purchase_completed", { product: pack.productId, pack: pack.id });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace({ pathname: "/pack/unveil", params: { packId: pack.id } });
       return;

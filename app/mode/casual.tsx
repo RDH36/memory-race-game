@@ -14,6 +14,7 @@ import { useConnectivity } from "../../lib/ConnectivityContext";
 import { usePlayerStats } from "../../lib/playerStats";
 import { useGameModeStats } from "../../lib/gameModeStats";
 import { useRewardedAd } from "../../hooks/useRewardedAd";
+import { useFlag } from "../../lib/analytics";
 
 type OptionKey = "matchmaking" | "create" | "join";
 
@@ -34,6 +35,7 @@ export default function CasualModeScreen() {
 
   const onRewardEarned = useCallback(() => {}, []);
   const { isLoaded: rewardedLoaded, showAd: showRewardedAd } = useRewardedAd(onRewardEarned);
+  const campaignOn = useFlag("campaign_enabled");
 
   const friendsStats = modeStats?.friends;
   const gamesPlayed = friendsStats?.gamesPlayed ?? 0;
@@ -104,18 +106,22 @@ export default function CasualModeScreen() {
 
         <ModeStatsArcade stats={stats} />
 
-        {/* Story campaign — chapters against the Demon King */}
-        <SectionTitle style={{ marginBottom: 10 }}>{t("mode.sectionStory")}</SectionTitle>
-        <View style={{ marginBottom: 20 }}>
-          <ChoiceRow
-            icon="📖"
-            title={t("mode.campaignTitle")}
-            desc={t("mode.campaignDesc")}
-            color="violet"
-            delay={100}
-            onPress={() => router.push("/story")}
-          />
-        </View>
+        {/* Story campaign — chapters against the Demon King (kill-switchable) */}
+        {campaignOn && (
+          <>
+            <SectionTitle style={{ marginBottom: 10 }}>{t("mode.sectionStory")}</SectionTitle>
+            <View style={{ marginBottom: 20 }}>
+              <ChoiceRow
+                icon="📖"
+                title={t("mode.campaignTitle")}
+                desc={t("mode.campaignDesc")}
+                color="violet"
+                delay={100}
+                onPress={() => router.push("/story")}
+              />
+            </View>
+          </>
+        )}
 
         {/* Online play */}
         <SectionTitle style={{ marginBottom: 10 }}>{t("mode.sectionOnline")}</SectionTitle>

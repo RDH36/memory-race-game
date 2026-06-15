@@ -11,7 +11,7 @@ import { Btn3D, Panel, Ribbon } from "@/components/ui/arcade";
 import { Label } from "@/components/ui/Label";
 import { StrikePrice } from "@/components/shop/StrikePrice";
 import { usePlayerStats } from "@/lib/playerStats";
-import { usePremium } from "@/hooks/useEntitlements";
+import { track } from "@/lib/analytics";
 import { HEARTS_AD_UNIT_ID, useRewardedAd } from "@/hooks/useRewardedAd";
 import { DISCOUNT, HEARTS_PACKS, originalPriceFor, purchaseProduct, useRevenueCat } from "@/lib/revenuecat";
 
@@ -25,7 +25,6 @@ export function HeartsSection({ onInfo }: { onInfo: (info: Info) => void }) {
   const { colors } = useTheme();
   const { offering } = useRevenueCat();
   const { profileId, addLives } = usePlayerStats();
-  const premium = usePremium();
   const [busyId, setBusyId] = useState<string | null>(null);
 
   // Free hearts via rewarded ad — limited to one claim per local day.
@@ -40,6 +39,7 @@ export function HeartsSection({ onInfo }: { onInfo: (info: Info) => void }) {
     addLives(AD_HEARTS);
     setAdClaimedToday(true);
     AsyncStorage.setItem(AD_CLAIM_KEY, new Date().toDateString());
+    track("hearts_ad_watched", { hearts: AD_HEARTS });
     haptics.coin();
     onInfo({
       icon: "❤️",
@@ -48,7 +48,8 @@ export function HeartsSection({ onInfo }: { onInfo: (info: Info) => void }) {
     });
   }, [addLives, onInfo, t]);
 
-  const { isLoaded: adLoaded, showAd } = useRewardedAd(onAdReward, HEARTS_AD_UNIT_ID);
+  // allowPremium: even premium players can opt in to the free-hearts ad.
+  const { isLoaded: adLoaded, showAd } = useRewardedAd(onAdReward, HEARTS_AD_UNIT_ID, true);
 
   const priceFor = (productId: string, fallback: string) => {
     const pkg = offering?.availablePackages.find((p) => p.product.identifier === productId);
@@ -62,6 +63,7 @@ export function HeartsSection({ onInfo }: { onInfo: (info: Info) => void }) {
       haptics.select();
       await purchaseProduct(productId);
       addLives(hearts);
+      track("hearts_pack_purchased", { product: productId, hearts });
       haptics.coin();
       onInfo({
         icon: "❤️",
@@ -118,9 +120,9 @@ export function HeartsSection({ onInfo }: { onInfo: (info: Info) => void }) {
         })}
       </View>
 
-      {/* Free daily hearts via rewarded ad (hidden for premium: no ads) */}
-      {!premium && (
-        <Panel
+      {/* Free daily hearts via rewarded ad — available to everyone, premium
+          included (opt-in ad for a consumable, not regular advertising) */}
+      <Panel
           background={colors.surfaceContainer}
           style={{
             marginTop: 10,
@@ -146,8 +148,7 @@ export function HeartsSection({ onInfo }: { onInfo: (info: Info) => void }) {
             label={t("shop.hearts.adCta")}
             onPress={showAd}
           />
-        </Panel>
-      )}
+      </Panel>
 
       <Text
         style={{

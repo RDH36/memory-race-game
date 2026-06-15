@@ -21,6 +21,7 @@ import { haptics } from "../../lib/haptics";
 import { BELIC_LOSE, BELIC_WIN, EPILOGUE_ENCOURAGE, EPILOGUE_LOSE, EPILOGUE_WIN } from "../../lib/storyEpilogue";
 import { StoryPanel } from "../../components/onboarding/StoryPanel";
 import { ConfettiParticles } from "../../components/result/ConfettiParticles";
+import { track } from "../../lib/analytics";
 
 const LETTERBOX = "#05060F";
 const GAP = 18;
@@ -109,6 +110,7 @@ export default function EpilogueScreen() {
       return;
     }
     await AsyncStorage.setItem("onboarding_complete", "true");
+    track("onboarding_completed");
     router.replace("/auth");
   };
 

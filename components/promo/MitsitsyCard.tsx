@@ -2,6 +2,7 @@ import { Linking, Pressable, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../lib/ThemeContext";
+import { track } from "../../lib/analytics";
 
 const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.rdh36.moneytracking";
@@ -12,7 +13,10 @@ export function MitsitsyCard() {
 
   return (
     <Pressable
-      onPress={() => Linking.openURL(PLAY_STORE_URL)}
+      onPress={() => {
+        track("mitsitsy_promo_clicked");
+        Linking.openURL(PLAY_STORE_URL);
+      }}
       style={({ pressed }) => ({
         transform: [{ scale: pressed ? 0.98 : 1 }],
         opacity: pressed ? 0.9 : 1,

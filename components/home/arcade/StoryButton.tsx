@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/lib/ThemeContext";
 import { Panel } from "@/components/ui/arcade";
+import { useFlag } from "@/lib/analytics";
 
 /** Story card — opens the campaign map. Same card + inner structure
  *  as the featured quest (badged emoji, eyebrow, title, description). */
@@ -12,10 +13,13 @@ export function StoryButton() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const [base, lip, tint] = colors.hues.gold;
+  const campaignOn = useFlag("campaign_enabled");
 
   const handlePress = () => {
     router.push("/story");
   };
+
+  if (!campaignOn) return null; // remote kill-switch
 
   return (
     <Panel onPress={handlePress} background={tint} style={{ padding: 16 }}>

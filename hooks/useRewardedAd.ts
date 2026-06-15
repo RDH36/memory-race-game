@@ -19,8 +19,15 @@ export const HEARTS_AD_UNIT_ID = __DEV__
 
 const NOOP = () => {};
 
-export function useRewardedAd(onRewardEarned: () => void, adUnitId: string = AD_UNIT_ID) {
-  const premium = usePremium();
+export function useRewardedAd(
+  onRewardEarned: () => void,
+  adUnitId: string = AD_UNIT_ID,
+  // Premium removes ads everywhere EXCEPT opt-in rewarded ads (e.g. free
+  // hearts): the player explicitly chooses to watch for a consumable.
+  allowPremium = false,
+) {
+  const isPremium = usePremium();
+  const premium = isPremium && !allowPremium;
   const [isLoaded, setIsLoaded] = useState(false);
   const [isShowing, setIsShowing] = useState(false);
   const rewardedRef = useRef<RewardedAd | null>(null);

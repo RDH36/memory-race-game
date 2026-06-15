@@ -8,6 +8,7 @@ import { db } from "@/lib/instant";
 import { tx } from "@instantdb/react-native";
 import { usePlayerStats } from "@/lib/playerStats";
 import { refreshQuestReminders } from "@/lib/notifications";
+import { track } from "@/lib/analytics";
 import { parseOwned, serializeOwned } from "@/lib/abilities";
 import { localDayIndex } from "@/lib/dailyStreak";
 import { weekIndex } from "@/lib/questPeriods";
@@ -126,6 +127,7 @@ export function useQuests() {
       const update: Record<string, unknown> = { [field]: JSON.stringify([...ids, id]) };
       applyReward(def.reward, update);
       db.transact(tx.profiles[profileId].update(update));
+      track("quest_claimed", { quest: id, type: def.type });
       return true;
     },
     [profileId, ctx, questData, applyReward, dailyLive, weeklyLive],

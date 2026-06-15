@@ -6,6 +6,7 @@ import Purchases, {
   PurchasesOffering,
 } from "react-native-purchases";
 import { db } from "@/lib/instant";
+import { identify } from "@/lib/analytics";
 
 // --- Entitlement keys (must match RevenueCat dashboard lookup_keys) ---
 export const ENTITLEMENT = {
@@ -149,6 +150,7 @@ export function RevenueCatProvider({ children }: { children: React.ReactNode }) 
   // Identify user when InstantDB userId becomes available
   useEffect(() => {
     if (!isReady || !userId) return;
+    identify(userId); // tie PostHog analytics to the real user
     Purchases.logIn(userId)
       .then(({ customerInfo }) => setCustomerInfo(customerInfo))
       .catch(() => {});

@@ -20,8 +20,11 @@ import { useTheme } from "@/lib/ThemeContext";
 import { usePlayerStats } from "@/lib/playerStats";
 import { GRID_CONFIG } from "@/lib/gameLogic";
 import { getCardSkin } from "@/lib/skins";
+import { track } from "@/lib/analytics";
 import { CHAPTER_1, stepHref, useCampaign } from "@/lib/campaign";
 import type { StepHref } from "@/lib/campaign";
+
+const ev = (name: string, stepId?: string) => track(name, { chapter: CHAPTER_1.id, step: stepId });
 
 const INTRO_MS = 2800;
 
@@ -31,10 +34,12 @@ export default function StoryBattleScreen() {
   const { colors } = useTheme();
   const { step } = useLocalSearchParams<{ step?: string }>();
   const { avatar, nickname, selectedTable, lives, spendLife } = usePlayerStats();
-  const { advanceStep } = useCampaign();
+  const { advanceStep, stepIndex } = useCampaign();
   const skin = getCardSkin(selectedTable);
 
   const stepIdx = Number(step ?? 0);
+  // Replay of an already-cleared step: no heart cost, no mistake budget.
+  const isReplay = stepIdx < stepIndex(CHAPTER_1.id);
   const stepDef = CHAPTER_1.steps[stepIdx];
   const battle = stepDef?.type === "skirmish" || stepDef?.type === "boss" ? stepDef : null;
   const enemy = battle?.enemy;
@@ -70,6 +75,7 @@ export default function StoryBattleScreen() {
 
   useEffect(() => {
     if (phase !== "battle") return;
+    ev("campaign_step_started", battle?.id);
     const timeout = setTimeout(() => setIntroLock(false), INTRO_MS);
     return () => clearTimeout(timeout);
   }, [phase]);
@@ -81,9 +87,9 @@ export default function StoryBattleScreen() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [game.currentTurn, game.status]);
 
-  // Every attempt is PAID upfront (1 ❤️ at start) — quitting never refunds.
+  // Each attempt costs 1 ❤️ upfront (quitting never refunds). Replays are free.
   const startBattle = (): boolean => {
-    if (spendLife()) return true;
+    if (isReplay || spendLife()) return true;
     setShowNoHearts(true);
     return false;
   };
@@ -92,6 +98,7 @@ export default function StoryBattleScreen() {
     if (finishedRef.current) return;
     finishedRef.current = true;
     if (timerRef.current) clearInterval(timerRef.current);
+    ev("campaign_step_failed", battle?.id);
     setTimeout(() => setShowDefeatModal(true), delayMs);
   };
 
@@ -101,16 +108,16 @@ export default function StoryBattleScreen() {
       finishedRef.current = true;
       if (timerRef.current) clearInterval(timerRef.current);
       advanceStep(CHAPTER_1, stepIdx);
-      // Victory story card first — never straight into the next step.
-      setTimeout(() => setPhase("outro"), 1000);
+      ev("campaign_step_completed", battle?.id);
+      setTimeout(() => setPhase("outro"), 1000); // victory card before next step
     } else {
       registerDefeat(800);
     }
   }, [game.status]);
 
-  // Mistake budget: >3 missed pairs = defeat (shield-absorbed misses are free).
+  // >3 missed pairs = defeat (shield-absorbed misses free; off in replay).
   const { mistakes, failed, reset: resetMistakes } =
-    useMistakeBudget(lastMatchResult, game.shieldCharges.p1, () => registerDefeat(700));
+    useMistakeBudget(lastMatchResult, game.shieldCharges.p1, () => registerDefeat(700), !isReplay);
 
   const handleRetry = () => {
     if (!startBattle()) return; // a retry is a fresh attempt — paid again
@@ -152,10 +159,9 @@ export default function StoryBattleScreen() {
         <WebtoonScroll
           panels={(isOutro ? battle?.outroPanels : battle?.panels) ?? []}
           title={t("story.chapter1.title")}
-          ctaLabel={isOutro ? t("story.campaign.continue") : `${t("story.battle.cta")} (1 ❤️)`}
+          ctaLabel={isOutro ? t("story.campaign.continue") : `${t("story.battle.cta")}${isReplay ? "" : " (1 ❤️)"}`}
           ctaEmoji={isOutro ? "▶️" : "⚔️"}
-          ctaNote={isOutro ? undefined : t("story.lives.startCost", { lives })}
-          // Intro: pay 1 ❤️ to start. Outro: continue towards the next step.
+          ctaNote={isOutro || isReplay ? undefined : t("story.lives.startCost", { lives })}
           onDone={() => {
             if (isOutro) setExitTo(stepHref(CHAPTER_1, stepIdx + 1) ?? "back");
             else if (startBattle()) setPhase("battle");
@@ -188,7 +194,7 @@ export default function StoryBattleScreen() {
 
         {introLock && battle && <BattleTauntBanner avatar={enemy?.avatar ?? "👺"} text={t(battle.enemy.introKey)} />}
 
-        <MistakeHearts mistakes={mistakes} />
+        {!isReplay && <MistakeHearts mistakes={mistakes} />}
 
         <View style={{ flex: 1 }}>
           <GameGrid
@@ -220,16 +226,10 @@ export default function StoryBattleScreen() {
       </View>
 
       {game.tornadoActive && <TornadoOverlay onComplete={handleTornadoComplete} />}
-
-      {/* Iris-in on arrival, iris-out into the next step after a win */}
       {!revealed && <IrisTransition mode="in" duration={1000} onDone={() => setRevealed(true)} />}
       {exitTo && (
-        <IrisTransition
-          duration={600}
-          onDone={() => (exitTo === "back" ? router.back() : router.replace(exitTo))}
-        />
+        <IrisTransition duration={600} onDone={() => (exitTo === "back" ? router.back() : router.replace(exitTo))} />
       )}
-
       <BattleQuitModal
         visible={showQuitModal}
         onCancel={() => setShowQuitModal(false)}
@@ -240,7 +240,8 @@ export default function StoryBattleScreen() {
         visible={showDefeatModal}
         icon={enemy?.avatar ?? "👹"}
         title={t("story.battle.defeatTitle")}
-        baseMessage={t("story.battle.defeatText", { name: enemyName })}
+        baseMessage={isReplay ? undefined : t("story.battle.defeatText", { name: enemyName })}
+        freeRetry={isReplay}
         onLeave={() => { setShowDefeatModal(false); router.back(); }}
         onRetry={handleRetry}
       />

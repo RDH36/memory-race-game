@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@/lib/ThemeContext";
 import { usePlayerStats } from "@/lib/playerStats";
 import { useQuests } from "@/lib/quests";
+import { track } from "@/lib/analytics";
 import { haptics } from "@/lib/haptics";
 import { MitsitsyCard } from "@/components/promo/MitsitsyCard";
 import { Panel, Pop, Rise, Ribbon, XPBar } from "@/components/ui/arcade";
@@ -64,6 +65,7 @@ export default function HomeScreen() {
     addBonusXp(DAILY_REWARD_XP);
     addGold(DAILY_REWARD_GOLD);
     addLives(DAILY_REWARD_LIVES);
+    track("daily_reward_claimed");
     setDailyClaimed(true);
     AsyncStorage.setItem(DAILY_REWARD_KEY, Date.now().toString());
     haptics.coin();

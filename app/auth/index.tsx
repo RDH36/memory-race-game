@@ -14,6 +14,7 @@ import { radii } from "../../components/ui/theme";
 import { Btn3D, Ribbon } from "@/components/ui/arcade";
 import { GoogleIcon } from "@/components/ui/GoogleIcon";
 import { GuildHero } from "@/components/auth/GuildHero";
+import { track } from "@/lib/analytics";
 
 GoogleSignin.configure({
   webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
@@ -45,6 +46,7 @@ export default function AuthScreen() {
         clientName: "google-auth",
         idToken,
       });
+      track("signed_in", { method: "google" });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace("/");
     } catch (err: any) {
@@ -58,6 +60,7 @@ export default function AuthScreen() {
     setGuestLoading(true);
     try {
       await db.auth.signInAsGuest();
+      track("signed_in", { method: "guest" });
       router.replace("/auth/setup");
     } finally {
       setGuestLoading(false);

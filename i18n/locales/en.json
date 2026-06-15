@@ -690,7 +690,8 @@
       "noLivesText": "You're out of hearts... Complete chapters, claim your daily reward or visit the shop.",
       "retry": "Retry (1 ❤️)",
       "getLives": "Get ❤️",
-      "shopLink": "🛒 Get more ❤️ in the shop"
+      "shopLink": "🛒 Get more ❤️ in the shop",
+      "replayRetryText": "Free replay — no hearts at stake. Play again?"
     },
     "train": {
       "title": "The Guild's advice",

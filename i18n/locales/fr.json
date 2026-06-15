@@ -690,7 +690,8 @@
       "noLivesText": "Tu n'as plus de cœurs... Termine des chapitres, réclame ta récompense quotidienne ou passe par la boutique.",
       "retry": "Réessayer (1 ❤️)",
       "getLives": "Obtenir des ❤️",
-      "shopLink": "🛒 Recharge tes ❤️ dans la boutique"
+      "shopLink": "🛒 Recharge tes ❤️ dans la boutique",
+      "replayRetryText": "Relecture libre — aucun cœur en jeu. On recommence ?"
     },
     "train": {
       "title": "La Guilde te conseille",

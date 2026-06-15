@@ -14,8 +14,11 @@ import { HealingGrid } from "@/components/story/HealingGrid";
 import { LivesPill, LivesFailModal } from "@/components/story/lives";
 import { IrisTransition } from "@/components/onboarding/IrisTransition";
 import { usePlayerStats } from "@/lib/playerStats";
+import { track } from "@/lib/analytics";
 import { CHAPTER_1, stepHref, useCampaign } from "@/lib/campaign";
 import type { StepHref } from "@/lib/campaign";
+
+const ev = (name: string, stepId?: string) => track(name, { chapter: CHAPTER_1.id, step: stepId });
 
 const LETTERBOX = "#05060F";
 
@@ -24,12 +27,14 @@ export default function EncounterScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { step } = useLocalSearchParams<{ step?: string }>();
-  const { advanceStep } = useCampaign();
+  const { advanceStep, stepIndex } = useCampaign();
   const { lives, spendLife } = usePlayerStats();
 
   const stepIdx = Number(step ?? 0);
   const stepDef = CHAPTER_1.steps[stepIdx];
   const encounter = stepDef?.type === "encounter" ? stepDef : null;
+  // Replay of an already-cleared step: no heart cost, no mistake budget.
+  const isReplay = stepIdx < stepIndex(CHAPTER_1.id);
 
   // story → game → outro (victory card); fail opens the retry modal.
   const [phase, setPhase] = useState<"story" | "game" | "outro">("story");
@@ -43,16 +48,16 @@ export default function EncounterScreen() {
   // Victory story card first — never straight into the next step.
   const handleContinue = () => {
     advanceStep(CHAPTER_1, stepIdx);
+    ev("campaign_step_completed", encounter?.id);
     setPhase("outro");
   };
 
   // Every attempt is PAID upfront (1 ❤️) — quitting never refunds it.
+  // Replays are free: re-reading a cleared step never costs a heart.
   const startGame = (): boolean => {
-    if (!spendLife()) {
-      setShowNoHearts(true);
-      return false;
-    }
-    return true;
+    if (isReplay || spendLife()) return true;
+    setShowNoHearts(true);
+    return false;
   };
 
   // A retry is a fresh attempt — it costs a heart again.
@@ -73,15 +78,15 @@ export default function EncounterScreen() {
           ctaLabel={
             phase === "outro"
               ? t("story.campaign.continue")
-              : `${t("story.chapter1.tomir.cta")} (1 ❤️)`
+              : `${t("story.chapter1.tomir.cta")}${isReplay ? "" : " (1 ❤️)"}`
           }
           ctaEmoji={phase === "outro" ? "▶️" : "💖"}
-          ctaNote={phase === "outro" ? undefined : t("story.lives.startCost", { lives })}
+          ctaNote={phase === "outro" || isReplay ? undefined : t("story.lives.startCost", { lives })}
           // Intro: starting the healing charges the heart upfront.
           // Outro (memory restored): continue towards the next step.
           onDone={() => {
             if (phase === "outro") setExitTo(stepHref(CHAPTER_1, stepIdx + 1) ?? "back");
-            else if (startGame()) setPhase("game");
+            else if (startGame()) { ev("campaign_step_started", encounter?.id); setPhase("game"); }
           }}
         />
       ) : (
@@ -123,8 +128,9 @@ export default function EncounterScreen() {
             <HealingGrid
               cardEmojis={encounter?.cardEmojis ?? ["🏡", "👧", "🍞"]}
               resetNonce={resetNonce}
+              freeMode={isReplay}
               onWin={() => setWon(true)}
-              onFail={() => setShowFailModal(true)}
+              onFail={() => { ev("campaign_step_failed", encounter?.id); setShowFailModal(true); }}
             />
           </View>
 
@@ -153,6 +159,7 @@ export default function EncounterScreen() {
         visible={showFailModal}
         icon="💔"
         title={t("story.lives.failTitle")}
+        freeRetry={isReplay}
         onLeave={() => {
           setShowFailModal(false);
           router.back();

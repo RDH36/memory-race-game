@@ -23,6 +23,7 @@ function shuffledDeck(emojis: string[]): string[] {
 export function HealingGrid({
   cardEmojis,
   resetNonce,
+  freeMode = false,
   onWin,
   onFail,
 }: {
@@ -30,6 +31,8 @@ export function HealingGrid({
   cardEmojis: string[];
   /** Bump to reshuffle and restart the grid (retry). */
   resetNonce: number;
+  /** Replay mode: no mistake budget — re-reading a cleared step is free. */
+  freeMode?: boolean;
   onWin: () => void;
   onFail: () => void;
 }) {
@@ -79,7 +82,7 @@ export function HealingGrid({
       if (all.length === deck.length) setTimeout(onWin, 450);
     } else {
       setJustMismatched([a, b]);
-      const failed = mistakes + 1 > MAX_MISTAKES;
+      const failed = !freeMode && mistakes + 1 > MAX_MISTAKES;
       setTimeout(() => {
         setSelected([]);
         setJustMismatched([]);
@@ -94,7 +97,7 @@ export function HealingGrid({
 
   return (
     <View style={{ alignItems: "center", gap: 14 }}>
-      <MistakeHearts mistakes={mistakes} />
+      {!freeMode && <MistakeHearts mistakes={mistakes} />}
 
       <View
         style={{
