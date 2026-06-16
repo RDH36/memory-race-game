@@ -1,5 +1,6 @@
 // Hearts UI for story-campaign games: the balance pill, the in-run mistake
-// budget (more than 3 misses = failed) and the shared failure modal
+// budget (3 free misses, then each extra miss spends one global heart and the
+// game keeps going; out of hearts = defeat) and the shared failure modal
 // (a retry costs one heart; out of hearts → shop).
 import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
@@ -12,36 +13,49 @@ import type { MatchResult } from "@/hooks/useLocalGame";
 export const MAX_MISTAKES = 3;
 
 /**
- * Counts the player's mismatches; fires onFail once past the budget.
- * A miss absorbed by the shield ability (charge consumed in the same
- * render) is free — it never burns a budget heart.
+ * Counts the player's mismatches. The first MAX_MISTAKES misses are free (the
+ * in-run budget hearts). Every miss past the budget calls `onOverBudget` to
+ * spend one global ❤️ — if it returns true the game keeps going, if it returns
+ * false (no hearts left) `onFail` fires once and the run is lost. A miss
+ * absorbed by the shield ability is always free and never counts.
  */
 export function useMistakeBudget(
   lastMatchResult: MatchResult,
   shieldCharges: number,
+  onOverBudget: () => boolean,
   onFail: () => void,
   enabled = true,
 ) {
   const [mistakes, setMistakes] = useState(0);
+  const [failed, setFailed] = useState(false);
+  const mistakesRef = useRef(0);
   const failedRef = useRef(false);
   const prevChargesRef = useRef(shieldCharges);
+  const onOverBudgetRef = useRef(onOverBudget);
   const onFailRef = useRef(onFail);
+  onOverBudgetRef.current = onOverBudget;
   onFailRef.current = onFail;
 
   useEffect(() => {
     // Disabled in replay mode: re-reading a cleared step has no stakes.
     if (!enabled) return;
     if (lastMatchResult?.type !== "mismatch" || lastMatchResult.player !== 1) return;
+    if (failedRef.current) return;
     const shielded = shieldCharges < prevChargesRef.current;
     if (shielded) return;
-    setMistakes((m) => {
-      const next = m + 1;
-      if (next > MAX_MISTAKES && !failedRef.current) {
-        failedRef.current = true;
-        onFailRef.current();
-      }
-      return next;
-    });
+
+    // Side effects stay out of the setState updater so StrictMode's double
+    // invocation can't double-spend a heart.
+    const next = mistakesRef.current + 1;
+    mistakesRef.current = next;
+    setMistakes(next);
+
+    // Past the free budget, each miss burns one global heart; none left = defeat.
+    if (next > MAX_MISTAKES && !onOverBudgetRef.current()) {
+      failedRef.current = true;
+      setFailed(true);
+      onFailRef.current();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastMatchResult]);
 
@@ -51,12 +65,14 @@ export function useMistakeBudget(
 
   const reset = () => {
     failedRef.current = false;
+    mistakesRef.current = 0;
     setMistakes(0);
+    setFailed(false);
   };
-  return { mistakes, failed: enabled && mistakes > MAX_MISTAKES, reset };
+  return { mistakes, failed, reset };
 }
 
-/** Row of 3 hearts dimming with each mistake + "3 erreurs max" label. */
+/** Row of 3 free-budget hearts dimming with each mistake + rule label. */
 export function MistakeHearts({ mistakes }: { mistakes: number }) {
   const { t } = useTranslation();
   const left = Math.max(0, MAX_MISTAKES - mistakes);

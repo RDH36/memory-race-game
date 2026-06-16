@@ -115,9 +115,16 @@ export default function StoryBattleScreen() {
     }
   }, [game.status]);
 
-  // >3 missed pairs = defeat (shield-absorbed misses free; off in replay).
-  const { mistakes, failed, reset: resetMistakes } =
-    useMistakeBudget(lastMatchResult, game.shieldCharges.p1, () => registerDefeat(700), !isReplay);
+  // First 3 missed pairs are free; each extra miss burns one global ❤️ and the
+  // game continues — only running out of hearts ends it. Shield-absorbed misses
+  // are free; the whole budget is off in replay mode.
+  const { mistakes, failed, reset: resetMistakes } = useMistakeBudget(
+    lastMatchResult,
+    game.shieldCharges.p1,
+    spendLife,
+    () => registerDefeat(700),
+    !isReplay,
+  );
 
   const handleRetry = () => {
     if (!startBattle()) return; // a retry is a fresh attempt — paid again

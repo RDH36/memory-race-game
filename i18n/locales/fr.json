@@ -682,7 +682,7 @@
       "avatar": "Avatar débloqué !"
     },
     "lives": {
-      "budget": "3 erreurs max",
+      "budget": "3 erreurs offertes, puis -1 ❤️",
       "failTitle": "Le souvenir s'est brisé...",
       "noHeartsTitle": "Plus de cœurs !",
       "startCost": "⚠️ Commencer consomme 1 ❤️ — il t'en reste {{lives}}",

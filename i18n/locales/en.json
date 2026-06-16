@@ -682,7 +682,7 @@
       "avatar": "Avatar unlocked!"
     },
     "lives": {
-      "budget": "3 mistakes max",
+      "budget": "3 free mistakes, then -1 ❤️",
       "failTitle": "The memory shattered...",
       "noHeartsTitle": "Out of hearts!",
       "startCost": "⚠️ Starting costs 1 ❤️ — you have {{lives}} left",
